@@ -15,11 +15,11 @@ namespace Infrastructure.Middleware
     {
         private readonly RequestDelegate _next;
 
-        public  ExceptionHandlingMiddleware(RequestDelegate next)
+        public ExceptionHandlingMiddleware(RequestDelegate next)
         {
             _next = next;
         }
-        
+
         public async Task Invoke(HttpContext context)
         {
             try
