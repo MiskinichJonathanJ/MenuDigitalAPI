@@ -17,7 +17,7 @@ services:
         volumes:
             - ./:/app
         working_dir: /app
-        command: dotnet watch --project ./TuProyecto.csproj run --urls http://+:80
+        command: dotnet watch --project ./MenuDigitalRestaurante/MenuDigitalRestaurante.csproj run --urls http://+:80
         depends_on:
             - db
         environment:
