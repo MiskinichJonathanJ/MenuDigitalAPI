@@ -62,9 +62,7 @@ namespace Application.UseCase.DishUse
             await _validator.ValidateUpdate(id, request);
             var  dish = await _query.GetDishById(id);
 
-            var entityUpdated = _mapper.ToEntity(request);
-
-            await _command.UpdateDish(dish, entityUpdated);
+            await _command.UpdateDish(dish, request);
             
             return _mapper.ToResponse(dish);
         }

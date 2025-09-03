@@ -1,0 +1,29 @@
+version: "3.9"
+
+services:  
+    db:
+        image: postgres:latest
+        restart: always
+        environment:
+            POSTGRES_USER: postgres
+            POSTGRES_PASSWORD: Admin#1234
+            POSTGRES_DB: testDb
+        volumes:
+            - db_data:/var/lib/postgresql/data
+        ports:
+            - "5434:5432"
+    api:
+        image: api
+        depends_on:
+            - db
+        environment:
+            ConnectionStrings__MenuDigitalConnection: "Host=db;Port=5432;Database=testDb;Username=postgres;Password=Admin#1234"
+            ASPNETCORE_ENVIRONMENT: Development
+            ASPNETCORE_URLS: http://+:80
+        ports:
+            - 8080:80
+
+volumes:
+    db_data:
+        
+        

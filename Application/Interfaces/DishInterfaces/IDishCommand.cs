@@ -1,9 +1,5 @@
-﻿using Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Application.DataTransfers.Request;
+using Domain.Entities;
 
 namespace Application.Interfaces.DishInterfaces
 {
@@ -11,6 +7,6 @@ namespace Application.Interfaces.DishInterfaces
     {
         Task CreateDish(Dish dish);
         Task DeleteDish(int id);
-        Task UpdateDish(Dish dishEnDB, Dish dishActualizado);
+        Task UpdateDish(Dish dishEnDB, DishRequest dishActualizado);
     }
 }
