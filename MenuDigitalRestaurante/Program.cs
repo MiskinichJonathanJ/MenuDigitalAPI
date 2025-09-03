@@ -21,7 +21,7 @@ builder.Services.AddSwaggerGen();
 
 // Custom
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("MenuDigiltalConnection")));
+    options.UseNpgsql(builder.Configuration.GetConnectionString("MenuDigitalConnection")));
 
 builder.Services.AddScoped<IDishServices, DishServices>();
 builder.Services.AddScoped<IDishCommand, DishCommand>();
@@ -55,6 +55,11 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+}
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    db.Database.Migrate();
 }
 
 app.UseHttpsRedirection();
