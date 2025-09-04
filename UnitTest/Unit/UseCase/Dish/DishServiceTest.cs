@@ -1,15 +1,16 @@
 ﻿using Application.DataTransfers.Request;
+using Application.DataTransfers.Response;
+using Application.Exceptions;
 using Application.Interfaces.DishInterfaces;
 using Application.UseCase.DishUse;
+using Domain.Entities;
 using FluentAssertions;
 using Moq;
-using Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Application.DataTransfers.Response;
 
 namespace UnitTest.Unit.UseCase.Dish
 {
@@ -199,6 +200,40 @@ namespace UnitTest.Unit.UseCase.Dish
             result.category.id.Should().Be(expectedResponse.category.id);
             result.ID.Should().Be(expectedResponse.ID);
             result.IsActive.Should().BeTrue();
+        }
+
+        [Fact]
+        public async  Task CreateDish_ReturnInvalidDishPriceException()
+        {
+            // ARRANGE
+            var mockCommand = new Mock<IDishCommand>();
+            var mockQuery = new Mock<IDishQuery>();
+            var mockMapper = new Mock<IDishMapper>();
+            var mockValidator = new Mock<IDishValidator>();
+
+            var service = new DishServices(
+                mockCommand.Object,
+                mockQuery.Object,
+                mockMapper.Object,
+                mockValidator.Object
+            );
+
+            var dishRequest = new DishRequest
+            {
+                Name = "test name",
+                Description = "test description",
+                Price = -1244,
+                Category = 1,
+                Image = "test URL"
+            };
+
+            mockValidator.Setup(v => v.ValidateCreate(It.IsAny<DishRequest>())).Throws(new InvalidDishPriceException("Precio  invalido"));
+
+            // ACT
+            var result = service.CreateDish(dishRequest);
+
+            // ASSERT
+            await Assert.ThrowsAsync<InvalidDishPriceException>(() => result);
         }
     }
 }
