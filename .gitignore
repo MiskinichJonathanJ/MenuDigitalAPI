@@ -3,3 +3,14 @@ obj/
 *.user
 appsettings.Development.json
 .vs/
+
+# Coverage reports
+/corage-report/
+/coragereport/
+/coragereport/
+**/coverage*.xml
+**/coverage*.opencover.xml
+**/coverage*.cobertura.xml
+
+# Test result folders
+/TestResults/

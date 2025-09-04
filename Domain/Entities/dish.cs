@@ -10,7 +10,6 @@ namespace Domain.Entities
         public decimal Price { get; set; }
         public  bool IsAvailable { get; set; }
         public  string ImageURL { get; set; }
-
         public int CategoryId { get; set; }
         public Category CategoryNav { get; set; }
 
