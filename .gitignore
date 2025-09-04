@@ -11,6 +11,6 @@ appsettings.Development.json
 **/coverage*.xml
 **/coverage*.opencover.xml
 **/coverage*.cobertura.xml
-
+UnitTest\coverage.opencover.xml
 # Test result folders
 /TestResults/
