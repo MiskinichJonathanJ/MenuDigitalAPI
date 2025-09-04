@@ -1,13 +1,13 @@
-﻿using System;
+﻿using Application.DataTransfers.Request;
+using Application.DataTransfers.Response;
+using Application.Exceptions;
+using Application.Interfaces.DishInterfaces;
+using Domain.Entities;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
-using Domain.Entities;
-using Application.DataTransfers.Request;
-using Application.DataTransfers.Response;
-using Application.Interfaces.DishInterfaces;
 
 namespace Application.UseCase.DishUse
 {
@@ -36,9 +36,14 @@ namespace Application.UseCase.DishUse
             return _mapper.ToResponse(dish);
         }
         
-        public Task DeleteDish(int id)
+        public async Task DeleteDish(Guid id)
         {
-            throw new NotImplementedException();
+            var dishDelete = await _query.GetDishById(id);
+
+            if (dishDelete == null)
+                throw new DishNotFoundException($"El dish con el ID {id} no fue encontrado");
+
+            await _command.DeleteDish(dishDelete);
         }
 
         public async Task<ICollection<DishResponse>> GetAllDish(
@@ -52,9 +57,14 @@ namespace Application.UseCase.DishUse
             return result.Select(d => _mapper.ToResponse(d)).ToList();
         }
 
-        public Task<Dish> GetDishById(int id)
+        public async Task<DishResponse> GetDishById(Guid  id)
         {
-            throw new NotImplementedException();
+            var  dish = await  _query.GetDishById(id);
+
+            if (dish == null)
+                throw new DishNotFoundException($"El dish con el ID {id} no fue encontrado");
+
+            return _mapper.ToResponse(dish);
         }
 
         public async Task<DishResponse> UpdateDish(Guid id, DishRequest request)

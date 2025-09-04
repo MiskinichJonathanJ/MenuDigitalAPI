@@ -27,9 +27,11 @@ namespace Infrastructure.Command
             await _context.SaveChangesAsync();
         }
 
-        public Task DeleteDish(int id)
+        public Task DeleteDish(Dish dish)
         {
-            throw new NotImplementedException();
+            _context.Remove(dish);
+
+            return _context.SaveChangesAsync();
         }
 
         public async  Task UpdateDish(Dish dishEnDB, DishRequest dishActualizado)

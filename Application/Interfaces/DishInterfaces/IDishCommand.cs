@@ -6,7 +6,7 @@ namespace Application.Interfaces.DishInterfaces
     public interface IDishCommand
     {
         Task CreateDish(Dish dish);
-        Task DeleteDish(int id);
+        Task DeleteDish(Dish dish);
         Task UpdateDish(Dish dishEnDB, DishRequest dishActualizado);
     }
 }
