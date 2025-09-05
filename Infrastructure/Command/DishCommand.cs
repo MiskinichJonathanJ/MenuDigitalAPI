@@ -2,6 +2,7 @@
 using Application.Interfaces.DishInterfaces;
 using Domain.Entities;
 using Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,7 +14,7 @@ namespace Infrastructure.Command
 {
     public class DishCommand : IDishCommand
     {
-        public readonly AppDbContext _context;
+        private readonly AppDbContext _context;
 
         public DishCommand(AppDbContext context)
         {
@@ -27,15 +28,16 @@ namespace Infrastructure.Command
             await _context.SaveChangesAsync();
         }
 
-        public Task DeleteDish(Dish dish)
+        public async Task DeleteDish(Dish dish)
         {
             _context.Remove(dish);
 
-            return _context.SaveChangesAsync();
+            await _context.SaveChangesAsync();
         }
 
         public async  Task UpdateDish(Dish dishEnDB, DishRequest dishActualizado)
-        { 
+        {
+
             dishEnDB.Name = dishActualizado.Name;
             dishEnDB.Description = dishActualizado.Description;
             dishEnDB.Price = dishActualizado.Price;

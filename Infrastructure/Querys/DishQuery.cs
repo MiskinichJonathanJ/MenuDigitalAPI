@@ -51,7 +51,7 @@ namespace Infrastructure.Querys
 
         public async Task<Dish?> GetDishById(Guid dishId)
         {
-            return await _context.Dishes.FirstOrDefaultAsync(d=> d.ID == dishId);
+            return await _context.Dishes.Include(d => d.CategoryNav).FirstOrDefaultAsync(d=> d.ID == dishId);
         }
 
         public async Task<Category?> GetCategoryById(int id)
