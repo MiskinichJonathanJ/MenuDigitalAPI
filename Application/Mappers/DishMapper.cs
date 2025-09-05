@@ -1,5 +1,4 @@
 ﻿using Application.DataTransfers.Response;
-using Application.DataTransfers.Request;
 using Domain.Entities;
 using System;
 using System.Collections.Generic;
@@ -7,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Application.Interfaces.DishInterfaces;
+using Application.DataTransfers.Request.Dish;
 
 namespace Application.Mappers
 {

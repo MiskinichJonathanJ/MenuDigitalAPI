@@ -1,4 +1,4 @@
-﻿using Application.DataTransfers.Request;
+﻿using Application.DataTransfers.Request.Dish;
 using Application.DataTransfers.Response;
 using Application.Exceptions;
 using Application.Interfaces.DishInterfaces;
@@ -49,7 +49,7 @@ namespace Application.UseCase.DishUse
         public async Task<ICollection<DishResponse>> GetAllDish(
             string? name = null,
             int? categoryId = null,
-            bool onlyActive = true,
+            bool? onlyActive = null,
             string? sortByPrice = null
         )
         {
@@ -67,7 +67,7 @@ namespace Application.UseCase.DishUse
             return _mapper.ToResponse(dish);
         }
 
-        public async Task<DishResponse> UpdateDish(Guid id, DishRequest request)
+        public async Task<DishResponse> UpdateDish(Guid id, UpdateDishRequest request)
         {
             await _validator.ValidateUpdate(id, request);
             var  dish = await _query.GetDishById(id);
