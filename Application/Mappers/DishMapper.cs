@@ -46,7 +46,6 @@ namespace Application.Mappers
                     name = dish.CategoryNav.Name
                 }
             };
-            Console.WriteLine(dish);
             return dishResponse;
         }
     }

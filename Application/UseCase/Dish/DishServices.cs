@@ -72,6 +72,9 @@ namespace Application.UseCase.DishUse
             await _validator.ValidateUpdate(id, request);
             var  dish = await _query.GetDishById(id);
 
+            if  (dish == null)
+                throw new DishNotFoundException($"El dish con el ID {id} no fue encontrado");
+
             await _command.UpdateDish(dish, request);
             
             return _mapper.ToResponse(dish);

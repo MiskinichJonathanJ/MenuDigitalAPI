@@ -34,7 +34,7 @@ namespace Application.Validations
 
         public async Task ValidateUpdate(Guid idDish, DishRequest request)
         {
-            if(_query.GetDishById(idDish) == null)
+            if(await _query.GetDishById(idDish) == null)
                 throw new DishNotFoundException("El platillo no existe");
             await  ValidateCreate(request);
         }
