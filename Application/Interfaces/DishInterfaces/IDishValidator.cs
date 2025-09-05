@@ -1,4 +1,4 @@
-﻿using Application.DataTransfers.Request;
+﻿using Application.DataTransfers.Request.Dish;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +9,8 @@ namespace Application.Interfaces.DishInterfaces
 {
     public interface IDishValidator
     {
-        Task ValidateCreate(DishRequest request);
-        Task ValidateUpdate(Guid idDish,  DishRequest request);
+        Task ValidateCreate(DishBaseRequest request);
+        Task ValidateCommon(DishBaseRequest request);
+        Task ValidateUpdate(Guid idDish,  UpdateDishRequest request);
     }
 }

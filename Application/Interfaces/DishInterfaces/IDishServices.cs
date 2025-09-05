@@ -1,4 +1,4 @@
-﻿using Application.DataTransfers.Request;
+﻿using Application.DataTransfers.Request.Dish;
 using Application.DataTransfers.Response;
 using Domain.Entities;
 using System;
@@ -16,11 +16,11 @@ namespace Application.Interfaces.DishInterfaces
         Task<ICollection<DishResponse>> GetAllDish(
             string? name = null,
             int? categoryId = null,
-            bool onlyActive = true,
+            bool? onlyActive = null,
             string? sortByPrice = null
         );
         Task<DishResponse> GetDishById(Guid id);
-        Task<DishResponse> UpdateDish(Guid id, DishRequest request);
+        Task<DishResponse> UpdateDish(Guid id, UpdateDishRequest request);
 
     }
 }
