@@ -5,7 +5,7 @@ namespace Domain.Entities
     public class Dish
     {
         public Guid ID { get; set; }
-        public string Name { get; set; }
+        public string Name { get; set; } = null!;
         public string Description { get; set; }
         public decimal Price { get; set; }
         public  bool IsAvailable { get; set; }
