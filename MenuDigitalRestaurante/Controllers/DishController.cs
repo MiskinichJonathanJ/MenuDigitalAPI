@@ -19,23 +19,6 @@ namespace MenuDigitalRestaurante.Controllers
             _services = services;
         }
 
-        /// <summary>
-        /// Crear un nuevo plato.
-        /// </summary>
-        /// /// <remarks>
-        /// Validaciones:
-        /// - El nombre del plato debe ser único
-        /// - El precio debe ser mayor a 0
-        /// - La categoría debe existir en el sistema
-        ///
-        /// Casos de uso:
-        /// - Agregar nuevos platos al menú
-        /// - Platos estacionales o especiales del chef
-        /// </remarks> 
-        /// <param name="request">Datos del plato a crear</param>
-        /// <response code="201">Plato creado exitosamente</response>
-        /// <response code="400">Datos de entradas invalidos</response>
-        /// <response code="409">Ya existe un plato con el mismo nombre</response>
         [HttpPost]
         [ProducesResponseType(typeof(DishResponse), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ApiError), StatusCodes.Status400BadRequest)]
@@ -46,33 +29,6 @@ namespace MenuDigitalRestaurante.Controllers
             return new JsonResult(result);
         }
 
-
-        /// <summary>
-        /// Buscar platos.
-        /// </summary>
-        /// <remarks>
-        /// Obtiene una lista de platos del menú con opciones de filtrado y ordenamiento.
-        /// Filtros disponibles:
-        /// - Por nombre (búsqueda parcial)  
-        /// - Por categoría  
-        /// - Solo platos activos/todos  
-        ///
-        /// Ordenamiento:
-        /// - Por precio ascendente o descendente  
-        /// - Sin ordenamiento específico  
-        ///
-        /// Casos de uso:
-        /// - Mostrar menú completo a los clientes  
-        /// - Buscar platos específicos  
-        /// - Filtrar por categorías (entrantes, principales, postres)  
-        /// - Administración del menú (incluyendo platos inactivos)  
-        /// </remarks>
-        /// <param name="name">Buscar platos por nombre (Busqueda parcial)</param>
-        /// <param name="category"> Filtrar platos por categoría </param>
-        /// <param name="onlyActive"> true para solo platos activos, false para todos </param>
-        /// <param name="sortByPrice"> Ordenar por precio</param>
-        /// <response code="200">Lista de platos obtenida exitosamente</response>
-        /// <response code="400">Parametros de busqueda invalidos</response>
         [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<DishResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiError), StatusCodes.Status400BadRequest)]
