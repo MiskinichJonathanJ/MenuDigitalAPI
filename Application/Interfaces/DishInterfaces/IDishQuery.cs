@@ -12,7 +12,7 @@ namespace Application.Interfaces.DishInterfaces
         Task<ICollection<Dish>> GetAllDish(
             string? name = null,
             int? categoryId = null,
-            bool onlyActive = true,
+            bool? onlyActive = null,
             string? sortByPrice = null
         );
         Task<Dish?> GetDishById(Guid dishId);

@@ -1,4 +1,4 @@
-﻿using Application.DataTransfers.Request;
+﻿using Application.DataTransfers.Request.Dish;
 using Application.DataTransfers.Response;
 using Application.Interfaces.DishInterfaces;
 using Microsoft.AspNetCore.Http;
@@ -35,7 +35,7 @@ namespace MenuDigitalRestaurante.Controllers
         public  async Task<IActionResult>  GetAll(
             [FromQuery] string? name,
             [FromQuery] int? category,
-            [FromQuery] bool onlyActive = true,
+            [FromQuery] bool? onlyActive = null,
             [FromQuery] string? sortByPrice = null
         )
         {
@@ -48,7 +48,7 @@ namespace MenuDigitalRestaurante.Controllers
         [ProducesResponseType(typeof(ApiError), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ApiError), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ApiError), StatusCodes.Status409Conflict)]
-        public async Task<IActionResult> UpdateDish(Guid id,[FromBody] DishRequest request)
+        public async Task<IActionResult> UpdateDish(Guid id,[FromBody] UpdateDishRequest request)
         {
             var result = await _services.UpdateDish(id, request);
             return Ok(result);
