@@ -44,7 +44,7 @@ namespace Infrastructure.Middleware
                 case DishNotFoundException:
                     context.Response.StatusCode = StatusCodes.Status404NotFound;
                     break;
-                case InvalidDishPriceException:
+                case InvalidDishPriceException or ArgumentException:
                     context.Response.StatusCode = StatusCodes.Status400BadRequest;
                     break;
                 case CategoryNotFoundException:

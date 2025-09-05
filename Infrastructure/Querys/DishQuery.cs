@@ -21,7 +21,7 @@ namespace Infrastructure.Querys
         public async Task<ICollection<Dish>> GetAllDish(
             string? name = null,
             int? categoryId = null,
-            bool onlyActive = true,
+            bool? onlyActive = null,
             string? sortByPrice = null
         )
         {
@@ -33,8 +33,8 @@ namespace Infrastructure.Querys
             if(categoryId.HasValue)
                 query = query.Where(d => d.CategoryId == categoryId);
 
-            if(onlyActive)
-                query = query.Where(d => d.IsAvailable);
+            if(onlyActive != null)
+                query = query.Where(d => d.IsAvailable == onlyActive);
             
             if (!string.IsNullOrEmpty(sortByPrice))
             {

@@ -1,4 +1,4 @@
-﻿using Application.DataTransfers.Request;
+﻿using Application.DataTransfers.Request.Dish;
 using Application.Interfaces.DishInterfaces;
 using Domain.Entities;
 using Infrastructure.Persistence;
@@ -35,7 +35,7 @@ namespace Infrastructure.Command
             await _context.SaveChangesAsync();
         }
 
-        public async  Task UpdateDish(Dish dishEnDB, DishRequest dishActualizado)
+        public async  Task UpdateDish(Dish dishEnDB, UpdateDishRequest dishActualizado)
         {
 
             dishEnDB.Name = dishActualizado.Name;
@@ -44,6 +44,7 @@ namespace Infrastructure.Command
             dishEnDB.CategoryId = dishActualizado.Category;
             dishEnDB.ImageURL = dishActualizado.Image;
             dishEnDB.UpdatedDate = DateTime.UtcNow;
+            dishEnDB.IsAvailable = dishActualizado.IsActive;
 
             await _context.SaveChangesAsync();
         }

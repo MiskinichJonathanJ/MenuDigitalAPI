@@ -1,4 +1,4 @@
-﻿using Application.DataTransfers.Request;
+﻿using Application.DataTransfers.Request.Dish;
 using Application.DataTransfers.Response;
 using Application.Exceptions;
 using Application.Interfaces.DishInterfaces;
@@ -155,7 +155,7 @@ namespace UnitTest.Unit.UseCase.Dish
 
             var dishId = Guid.NewGuid();
 
-            var dishRequest = new DishRequest
+            var dishRequest = new UpdateDishRequest
             {
                 Name = "test name update",
                 Description = "test description update",
