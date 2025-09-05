@@ -43,7 +43,7 @@ namespace Application.Mappers
                 category = new GenericResponse
                 {
                     id = dish.CategoryId,
-                    name = dish.CategoryNav.Name
+                    name = dish.CategoryNav?.Name ?? "Sin categoría"
                 }
             };
             return dishResponse;

@@ -36,12 +36,7 @@ builder.Services.AddSwaggerGen(options =>
     {
         Version = "v1",
         Title = "Restaurante API",
-        Description = "API para la gestión de platos en un restaurante",
-        Contact = new OpenApiContact
-        {
-            Name = "Contact Restaurant  API Support",
-            Url = new Uri("https://example.com/contact")
-        }
+        Description = "API para la gestión de platos en un restaurante"
     });
     var xmlFile = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
     var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
