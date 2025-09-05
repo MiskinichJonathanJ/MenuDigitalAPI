@@ -9,6 +9,6 @@ namespace Application.DataTransfers.Response
     public class GenericResponse
     {
         public  int id { get; set; }
-        public  string name { get; set; }
+        public required string name { get; set; }
     }
 }

@@ -56,7 +56,11 @@ namespace UnitTest.Unit.UseCase.Dish
                 Description = dishRequest.Description,
                 Price = dishRequest.Price,
                 Image = dishRequest.Image,
-                category = new GenericResponse { id = dishRequest.Category }
+                category = new GenericResponse 
+                { 
+                    id = dishRequest.Category,
+                    name = "Category Name"
+                }
             };
 
             mockMapper.Setup(m => m.ToEntity(It.IsAny<DishRequest>())).Returns(dishEntity);
@@ -74,6 +78,7 @@ namespace UnitTest.Unit.UseCase.Dish
             result.Description.Should().Be(dishRequest.Description);
             result.Price.Should().Be(dishRequest.Price);
             result.Image.Should().Be(dishRequest.Image);
+            result.category.Should().NotBeNull();
             result.category.id.Should().Be(dishRequest.Category);
         }
 
@@ -121,7 +126,11 @@ namespace UnitTest.Unit.UseCase.Dish
                 Description = d.Description,
                 Price = d.Price,
                 Image = d.ImageURL,
-                category = new GenericResponse { id = d.CategoryId }
+                category = new GenericResponse
+                {
+                    id = d.CategoryId,
+                    name = d.CategoryNav?.Name ?? "Category Name"
+                }
             }).ToList();
 
             mockQuery.Setup(q => q.GetAllDish(It.IsAny<string?>(), It.IsAny<int?>(), It.IsAny<bool>(), It.IsAny<string?>()))
@@ -180,7 +189,11 @@ namespace UnitTest.Unit.UseCase.Dish
                 Description = dishRequest.Description,
                 Price = dishRequest.Price,
                 Image = dishRequest.Image,
-                category = new GenericResponse { id = dishRequest.Category },
+                category = new GenericResponse 
+                { 
+                    id = dishRequest.Category,
+                    name = "Category Name"
+                },
                 IsActive = true
             };
 
@@ -197,6 +210,7 @@ namespace UnitTest.Unit.UseCase.Dish
             result.Description.Should().Be(expectedResponse.Description);
             result.Price.Should().Be(expectedResponse.Price);
             result.Image.Should().Be(expectedResponse.Image);
+            result.category.Should().NotBeNull();
             result.category.id.Should().Be(expectedResponse.category.id);
             result.ID.Should().Be(expectedResponse.ID);
             result.IsActive.Should().BeTrue();

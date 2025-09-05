@@ -24,7 +24,7 @@ namespace Application.Validations
             await  ValidateCommon(request);
 
             var dishConNombre = await _query.GetAllDish(name: request.Name);
-            if (dishConNombre.Any())
+            if (dishConNombre.Count != 0)
                 throw new DishNameAlreadyExistsException("Ya existe un platillo con ese nombre");
         }
 
