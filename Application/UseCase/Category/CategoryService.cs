@@ -5,13 +5,11 @@ namespace Application.UseCase.Category
 {
     public class CategoryService : ICategoryService
     {
-        public readonly ICategoryCommand _command;
         public readonly ICategoryQuery _query;
         public readonly ICategoryMapper _mapper;
 
-        public  CategoryService(ICategoryCommand command, ICategoryQuery query, ICategoryMapper mapper)
+        public  CategoryService(ICategoryQuery query, ICategoryMapper mapper)
         {
-            _command = command;
             _query = query;
             _mapper = mapper;
         }
