@@ -1,5 +1,5 @@
 ﻿using Application.DataTransfers.Response;
-using Application.Interfaces.Status;
+using Application.Interfaces.IStatus;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MenuDigitalRestaurante.Controllers
