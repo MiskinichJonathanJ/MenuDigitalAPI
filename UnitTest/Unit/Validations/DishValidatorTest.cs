@@ -120,21 +120,5 @@ namespace UnitTest.Unit.Validations
             // ASSERT
             await act.Should().ThrowAsync<DishNameAlreadyExistsException>();
         }
-
-        [Fact]
-        public async Task ValidateUpdate_InvalidParams_ReturnsDishNotFoundException()
-        {
-            // ARRANGE
-            var validRequest = BuildValidUpdateRequest();
-
-            mockQuery.Setup(q => q.GetDishById(It.IsAny<Guid>())).ReturnsAsync((Domain.Entities.Dish?)null);
-
-            // ACT
-            Func<Task> act = async () => await validator.ValidateUpdate(Guid.NewGuid(), validRequest);
-
-            // ASSERT
-            await act.Should().ThrowAsync<DishNotFoundException>();
-        }
-
     }
 }

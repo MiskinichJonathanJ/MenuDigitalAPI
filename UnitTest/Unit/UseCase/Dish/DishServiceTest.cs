@@ -105,12 +105,10 @@ namespace UnitTest.Unit.UseCase.Dish
                 IsActive = true
             };
 
-            mockValidator.Setup(v => v.ValidateUpdate(It.IsAny<Guid>(), It.IsAny<UpdateDishRequest>())).Returns(Task.CompletedTask);
             mockQuery.Setup(q => q.GetDishById(It.IsAny<Guid>())).ReturnsAsync(dishEntity);
 
             //Assert
             await Assert.ThrowsAsync<DishNotFoundException>(() => service.UpdateDish(dishId, dishRequest));
-            mockValidator.Verify(v => v.ValidateUpdate(dishId, dishRequest), Times.Once);
             mockQuery.Verify(q => q.GetDishById(dishId), Times.Once);
             VerifyNoOtherCalls();
         }
@@ -198,6 +196,7 @@ namespace UnitTest.Unit.UseCase.Dish
 
             mockQuery.Setup(q => q.GetDishById(dishId)).ReturnsAsync(dishEntity);
             mockCommand.Setup(c => c.DeleteDish(dishEntity)).Returns(Task.CompletedTask);
+            mockMapper.Setup(m => m.ToResponse(It.IsAny<Domain.Entities.Dish>())).Returns(BuildResponse(dishEntity));
 
             // ACT
             await service.DeleteDish(dishId);
@@ -205,6 +204,7 @@ namespace UnitTest.Unit.UseCase.Dish
             // ASSERT
             mockQuery.Verify(q => q.GetDishById(dishId), Times.Once);
             mockCommand.Verify(c => c.DeleteDish(dishEntity), Times.Once);
+            mockMapper.Verify(m => m.ToResponse(dishEntity), Times.Once);
             VerifyNoOtherCalls();
         }
 
