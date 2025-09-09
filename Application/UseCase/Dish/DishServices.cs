@@ -73,6 +73,7 @@ namespace Application.UseCase.DishUse
         private async Task<Dish> GetDishOrThrow(Guid id)
         {
             var dish = await _query.GetDishById(id);
+
             return dish == null ? throw new DishNotFoundException($"El dish con el ID {id} no fue encontrado") : dish;
         }
     }
