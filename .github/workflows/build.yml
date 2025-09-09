@@ -60,6 +60,9 @@ jobs:
       - name: Build solution
         run: dotnet build --no-restore
 
+      - name: Ensure coverage folder exists
+        run: mkdir UnitTest/coverage
+
       - name: Run tests with coverage
         run: |
           dotnet test UnitTest/UnitTest.csproj `
