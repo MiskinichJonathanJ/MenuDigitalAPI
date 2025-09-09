@@ -1,10 +1,5 @@
-﻿using Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Application.DataTransfers.Response.Category;
+﻿using Application.DataTransfers.Response.Category;
+using Domain.Entities;
 
 namespace Application.Interfaces.ICategory
 {

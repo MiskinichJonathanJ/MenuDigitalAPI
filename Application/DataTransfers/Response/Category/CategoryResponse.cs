@@ -8,9 +8,9 @@ namespace Application.DataTransfers.Response.Category
 {
     public class CategoryResponse
     {
-        public int CategoryId { get; set; }
-        public required string CategoryName { get; set; }
-        public required string CategoryDescription { get; set; }
+        public int Id { get; set; }
+        public required string Name { get; set; }
+        public required string Description { get; set; }
         public int Order { get; set; }
     }
 }

@@ -15,9 +15,9 @@ namespace Application.Mappers
         {
             CategoryResponse categorySend = new CategoryResponse
             {
-                CategoryId = category.Id,
-                CategoryName = category.Name,
-                CategoryDescription = category.Description,
+                Id = category.Id,
+                Name = category.Name,
+                Description = category.Description,
                 Order = category.Order
             };
 
