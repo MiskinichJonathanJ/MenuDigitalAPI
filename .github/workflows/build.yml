@@ -69,11 +69,7 @@ jobs:
 
       - name: Generate HTML coverage report
         shell: powershell
-        run: |
-          reportgenerator `
-            -reports:UnitTest/coverage/coverage.opencover.xml `
-            -targetdir:UnitTest/coverage-report `
-            -reporttypes:Html
+        run: dotnet tool run reportgenerator -reports:UnitTest/coverage/coverage.opencover.xml -targetdir:UnitTest/coverage-report -reporttypes:Html
 
       - name: End SonarCloud Analysis
         shell: powershell
