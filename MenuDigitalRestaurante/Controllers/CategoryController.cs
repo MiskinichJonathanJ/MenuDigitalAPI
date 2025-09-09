@@ -9,7 +9,7 @@ namespace MenuDigitalRestaurante.Controllers
     [Route("api/v1/[controller]")]
     [ApiController]
     [Produces("application/json")]
-    public class CategoryController : Controller
+    public class CategoryController : ControllerBase
     {
         public readonly ICategoryService _service;
 

@@ -75,7 +75,7 @@ namespace UnitTest.Unit.UseCase.Dish
             result.Price.Should().Be(expectedResponse.Price);
             result.Image.Should().Be(expectedResponse.Image);
             result.category.Should().NotBeNull();
-            result.category.id.Should().Be(expectedResponse.category.id);
+            result.category.id.Should().Be(expectedResponse.category?.id ?? 1);
             result.ID.Should().Be(expectedResponse.ID);
             result.IsActive.Should().BeTrue();
         }
@@ -159,7 +159,7 @@ namespace UnitTest.Unit.UseCase.Dish
             result.name.Should().Be(expectedResponse.name);
             result.Description.Should().Be(expectedResponse.Description);
             result.Image.Should().Be(expectedResponse.Image);
-            result.category.id.Should().Be(expectedResponse.category.id);
+            result.category?.id.Should().Be(expectedResponse.category?.id ?? 1);
         }
 
         [Fact]

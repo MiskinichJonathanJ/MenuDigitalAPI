@@ -7,7 +7,7 @@ namespace MenuDigitalRestaurante.Controllers
     [Route("api/v1/[controller]")]
     [ApiController]
     [Produces("application/json")]
-    public class DeliveryTypeController : Controller
+    public class DeliveryTypeController : ControllerBase
     {
         public readonly IDeliveryTypeService _service;
         public DeliveryTypeController(IDeliveryTypeService services)

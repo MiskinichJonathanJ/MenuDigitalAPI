@@ -26,11 +26,12 @@ namespace Infrastructure.Querys
         )
         {
             IQueryable<Dish> query = _context.Dishes.Include(d =>  d.CategoryNav);
-            
+
             if (!string.IsNullOrEmpty(name))
-                query = query.Where(d => d.Name.ToLower().Contains(name.ToLower()));
-            
-            if(categoryId.HasValue)
+                query = query.Where(d => d.Name.Contains(name, StringComparison.OrdinalIgnoreCase));
+
+
+            if (categoryId.HasValue)
                 query = query.Where(d => d.CategoryId == categoryId);
 
             if (onlyActive == true)

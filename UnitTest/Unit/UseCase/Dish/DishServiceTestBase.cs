@@ -31,7 +31,7 @@ namespace UnitTest.Unit.UseCase.Dish
             );
         }
 
-        protected DishRequest BuildValidRequest() => new()
+        protected static DishRequest BuildValidRequest() => new()
         {
             Name = "test name",
             Description = "test description",

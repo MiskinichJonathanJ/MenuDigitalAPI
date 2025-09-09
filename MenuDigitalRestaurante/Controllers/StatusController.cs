@@ -7,7 +7,7 @@ namespace MenuDigitalRestaurante.Controllers
     [Route("api/v1/[controller]")]
     [ApiController]
     [Produces("application/json")]
-    public class StatusController : Controller
+    public class StatusController : ControllerBase
     {
         public readonly IStatusService _service;
         public StatusController(IStatusService services)

@@ -11,8 +11,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Interfaces\DeliveryType\" />
-    <Folder Include="Interfaces\Order\" />
+    <Folder Include="DataTransfers\Response\Status\" />
+    <Folder Include="Interfaces\IOrder\" />
+    <Folder Include="UseCase\Order\" />
   </ItemGroup>
 
 </Project>

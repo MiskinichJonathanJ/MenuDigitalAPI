@@ -15,7 +15,7 @@ namespace UnitTest.Unit.Validations
             validator = new DishValidator(mockQuery.Object);
         }
 
-        protected DishRequest BuildValidBaseRequest()
+        protected static DishRequest BuildValidBaseRequest()
         {
             return new DishRequest
             {
@@ -27,7 +27,7 @@ namespace UnitTest.Unit.Validations
             };
         }
 
-        protected UpdateDishRequest BuildValidUpdateRequest()
+        protected static UpdateDishRequest BuildValidUpdateRequest()
         {
             return new UpdateDishRequest
             {

@@ -41,7 +41,8 @@ namespace Application.Validations
 
         public async Task ValidateCategoryExists(int categoryId)
         {
-            var category = await _query.GetCategoryById(categoryId) ?? throw new CategoryNotFoundException("La categoria no existe");
+           if (await _query.GetCategoryById(categoryId) == null)
+            throw new CategoryNotFoundException("La categoria no existe");
         }
 
         public async Task ValidateDishNameUnique(string name, Guid? id = null)
