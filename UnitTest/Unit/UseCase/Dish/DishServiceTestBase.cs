@@ -1,13 +1,9 @@
 ﻿using Application.DataTransfers.Request.Dish;
 using Application.DataTransfers.Response;
-using Application.Interfaces.DishInterfaces;
+using Application.DataTransfers.Response.Dish;
+using Application.Interfaces.IDish;
 using Application.UseCase.DishUse;
 using Moq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace UnitTest.Unit.UseCase.Dish
 {

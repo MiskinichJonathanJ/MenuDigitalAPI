@@ -1,12 +1,7 @@
 ﻿using Application.DataTransfers.Request.Dish;
-using Application.Interfaces.DishInterfaces;
+using Application.Interfaces.IDish;
 using Application.Validations;
 using Moq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace UnitTest.Unit.Validations
 {
