@@ -1,12 +1,8 @@
 ﻿using Application.DataTransfers.Response;
 using Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Application.Interfaces.DishInterfaces;
+using Application.Interfaces.IDish;
 using Application.DataTransfers.Request.Dish;
+using Application.DataTransfers.Response.Dish;
 
 namespace Application.Mappers
 {

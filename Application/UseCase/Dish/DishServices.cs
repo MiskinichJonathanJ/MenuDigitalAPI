@@ -1,7 +1,7 @@
 ﻿using Application.DataTransfers.Request.Dish;
-using Application.DataTransfers.Response;
+using Application.DataTransfers.Response.Dish;
 using Application.Exceptions;
-using Application.Interfaces.DishInterfaces;
+using Application.Interfaces.IDish;
 using Domain.Entities;
 using System;
 using System.Collections.Generic;

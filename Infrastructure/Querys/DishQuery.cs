@@ -1,4 +1,4 @@
-﻿using Application.Interfaces.DishInterfaces;
+﻿using Application.Interfaces.IDish;
 using Domain.Entities;
 using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;

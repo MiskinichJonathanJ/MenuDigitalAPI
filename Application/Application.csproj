@@ -10,4 +10,9 @@
     <ProjectReference Include="..\Domain\Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Interfaces\DeliveryType\" />
+    <Folder Include="Interfaces\Order\" />
+  </ItemGroup>
+
 </Project>

@@ -1,5 +1,5 @@
-﻿using Application.DataTransfers.Response;
-using Application.Interfaces.CategoryInterfaces;
+﻿using Application.DataTransfers.Response.Category;
+using Application.Interfaces.ICategory;
 using Domain.Entities;
 using System;
 using System.Collections.Generic;
