@@ -43,6 +43,15 @@ namespace MenuDigitalRestaurante.Controllers
             return Ok(result);
         }
 
+        [HttpGet("{id}")]
+        [ProducesResponseType(typeof(DishResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiError), StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetById(Guid id)
+        {
+            var result = await _services.GetDishById(id);
+            return Ok(result);
+        }
+
         [HttpPut("{id}")]
         [ProducesResponseType(typeof(DishResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiError), StatusCodes.Status400BadRequest)]
@@ -51,6 +60,16 @@ namespace MenuDigitalRestaurante.Controllers
         public async Task<IActionResult> UpdateDish(Guid id,[FromBody] UpdateDishRequest request)
         {
             var result = await _services.UpdateDish(id, request);
+            return Ok(result);
+        }
+
+        [HttpDelete("{id}")]
+        [ProducesResponseType(typeof(DishResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiError), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ApiError), StatusCodes.Status409Conflict)]
+        public async Task<IActionResult> DeleteDish(Guid id)
+        {
+            var result  = await _services.DeleteDish(id);
             return Ok(result);
         }
     }
