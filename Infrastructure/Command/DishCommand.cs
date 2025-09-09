@@ -30,7 +30,7 @@ namespace Infrastructure.Command
 
         public async Task DeleteDish(Dish dish)
         {
-            _context.Remove(dish);
+            dish.IsAvailable = false;
 
             await _context.SaveChangesAsync();
         }

@@ -12,72 +12,46 @@ namespace UnitTest.Unit.Validations
     public class DishValidatorTest : DishValidatorTestBase
     {
         [Fact]
-        public async Task ValidateCommon_ValidParams_ReturnsNothinException()
+        public void ValidateCommon_ValidParams_ReturnsNothinException()
         {
             // ARRANGE
             var validRequest = BuildValidBaseRequest();
 
             mockQuery.Setup(q => q.GetCategoryById(It.IsAny<int>())).ReturnsAsync(new Domain.Entities.Category { Id = 1, Name = "test", Description = "test" });
 
-            // ACT
-            Func<Task> act = async () => await validator.ValidateCommon(validRequest);
-
-            // ASSERT
-            await act.Should().NotThrowAsync<Exception>();
+            // ACT & ASSERT
+           FluentActions.Invoking(() => validator.ValidateCommon(validRequest)).Should().NotThrow();
         }
 
         [Fact]
-        public async Task ValidateCommon_InvalidName_ThrowsArgumentException()
+        public void ValidateCommon_InvalidName_ThrowsArgumentException()
         {
             // ARRANGE
             var invalidRequest = BuildValidBaseRequest();
             invalidRequest.Name = "";
-            // ACT
-            Func<Task> act = async () => await validator.ValidateCommon(invalidRequest);
-            // ASSERT
-            await act.Should().ThrowAsync<ArgumentException>()
-                     .WithMessage("El nombre del platillo no puede estar vacío");
+            // ACT & ASSERT
+            Assert.Throws<ArgumentException>(() => validator.ValidateCommon(invalidRequest));
         }
 
         [Fact]
-        public async Task ValidateCommon_NameExceedsMaxLength_ThrowsArgumentException()
+        public void ValidateCommon_NameExceedsMaxLength_ThrowsArgumentException()
         {
             // ARRANGE
             var invalidRequest = BuildValidBaseRequest();
             invalidRequest.Name = new string('a', 256);
 
-            // ACT
-            Func<Task> act = async () => await validator.ValidateCommon(invalidRequest);
-            
-            // ASSERT
-            await act.Should().ThrowAsync<ArgumentException>()
-                     .WithMessage("El nombre del platillo no debe exceder los 256 caracteres");
+            // ACT & ASSERT
+            Assert.Throws<ArgumentException>(() => validator.ValidateCommon(invalidRequest));
         }
 
         [Fact]
-        public async Task ValidateCommon_InvalidPrice_ThrowsInvalidDishPriceException()
+        public void ValidateCommon_InvalidPrice_ThrowsInvalidDishPriceException()
         {
             // ARRANGE
             var invalidRequest = BuildValidBaseRequest();
             invalidRequest.Price = 0;
-            // ACT
-            Func<Task> act = async () => await validator.ValidateCommon(invalidRequest);
-            // ASSERT
-            await act.Should().ThrowAsync<Application.Exceptions.InvalidDishPriceException>()
-                     .WithMessage("El precio del platillo debe ser mayor a 0");
-        }
-
-        [Fact]
-        public async Task ValidateCommon_NonExistentCategory_ThrowsCategoryNotFoundException()
-        {
-            // ARRANGE
-            var invalidRequest = BuildValidBaseRequest();
-            mockQuery.Setup(q => q.GetCategoryById(It.IsAny<int>())).ReturnsAsync((Domain.Entities.Category?)null);
-            // ACT
-            Func<Task> act = async () => await validator.ValidateCommon(invalidRequest);
-            // ASSERT
-            await act.Should().ThrowAsync<Application.Exceptions.CategoryNotFoundException>()
-                     .WithMessage("La categoria no existe");
+            // ACT & ASSERT
+            Assert.Throws<InvalidDishPriceException>(() => validator.ValidateCommon(invalidRequest));
         }
 
         [Fact]

@@ -38,12 +38,8 @@ namespace Application.UseCase.DishUse
         
         public async Task DeleteDish(Guid id)
         {
-            var dishDelete = await _query.GetDishById(id);
-
-            if (dishDelete == null)
-                throw new DishNotFoundException($"El dish con el ID {id} no fue encontrado");
-
-            await _command.DeleteDish(dishDelete);
+            var dish = await GetDishOrThrow(id);
+            await _command.DeleteDish(dish);
         }
 
         public async Task<ICollection<DishResponse>> GetAllDish(
@@ -59,25 +55,24 @@ namespace Application.UseCase.DishUse
 
         public async Task<DishResponse> GetDishById(Guid  id)
         {
-            var  dish = await  _query.GetDishById(id);
-
-            if (dish == null)
-                throw new DishNotFoundException($"El dish con el ID {id} no fue encontrado");
-
+            var dish = await GetDishOrThrow(id);
             return _mapper.ToResponse(dish);
         }
 
         public async Task<DishResponse> UpdateDish(Guid id, UpdateDishRequest request)
         {
+            var dish = await GetDishOrThrow(id);
             await _validator.ValidateUpdate(id, request);
-            var  dish = await _query.GetDishById(id);
-
-            if  (dish == null)
-                throw new DishNotFoundException($"El dish con el ID {id} no fue encontrado");
 
             await _command.UpdateDish(dish, request);
             
             return _mapper.ToResponse(dish);
+        }
+
+        private async Task<Dish> GetDishOrThrow(Guid id)
+        {
+            var dish = await _query.GetDishById(id);
+            return dish == null ? throw new DishNotFoundException($"El dish con el ID {id} no fue encontrado") : dish;
         }
     }
 }

@@ -21,26 +21,19 @@ namespace Application.Validations
 
         public async Task ValidateCreate(DishBaseRequest request)
         {
-            await  ValidateCommon(request);
-
-            var dishConNombre = await _query.GetAllDish(name: request.Name);
-            if (dishConNombre.Count != 0)
-                throw new DishNameAlreadyExistsException("Ya existe un platillo con ese nombre");
+            ValidateCommon(request);
+            await ValidateCategoryExists(request.Category);
+            await ValidateDishNameUnique(request.Name);
         }
 
         public async Task ValidateUpdate(Guid idDish, UpdateDishRequest request)
         {
-            if(await _query.GetDishById(idDish) == null)
-                throw new DishNotFoundException("El platillo no existe");
-
-            await ValidateCommon(request);
-
-            var dishConNombre = await _query.GetAllDish(name: request.Name);
-            if (dishConNombre.Any(d => d.ID != idDish))
-                throw new DishNameAlreadyExistsException("Ya existe un platillo con ese nombre");
+            ValidateCommon(request);
+            await ValidateCategoryExists(request.Category);
+            await ValidateDishNameUnique(request.Name, idDish);
         }
 
-        public async Task ValidateCommon(DishBaseRequest  request)
+        public void ValidateCommon(DishBaseRequest  request)
         {
             if (string.IsNullOrWhiteSpace(request.Name))
                 throw new ArgumentException("El nombre del platillo no puede estar vacío");
@@ -50,10 +43,20 @@ namespace Application.Validations
 
             if (request.Price <= 0)
                 throw new InvalidDishPriceException("El precio del platillo debe ser mayor a 0");
+        }
 
-            var category = await _query.GetCategoryById(request.Category);
+        public async Task ValidateCategoryExists(int categoryId)
+        {
+            var category = await _query.GetCategoryById(categoryId);
             if (category == null)
                 throw new CategoryNotFoundException("La categoria no existe");
+        }
+
+        public async Task ValidateDishNameUnique(string name, Guid? id = null)
+        {
+            var dishes = await _query.GetAllDish(name: name);
+            if (dishes.Any(d => id == null  || d.ID != id))
+                throw new DishNameAlreadyExistsException("Ya existe un platillo con ese nombre");
         }
     }
 }
