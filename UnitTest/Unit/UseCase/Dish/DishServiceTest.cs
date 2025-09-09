@@ -15,189 +15,61 @@ using System.Threading.Tasks;
 namespace UnitTest.Unit.UseCase.Dish
 {
 
-    public class DishServiceTest
+    public class DishServiceTest : DishServiceTestBase
     {
         [Fact]
-        public async Task CreateDish_ValidDish_ReturnDishResponse()
+        public async Task CreateDish_WhenValidRequest_ReturnDishResponse()
         {
             // ARRANGE
-            var mockCommand = new Mock<IDishCommand>();
-            var mockQuery = new Mock<IDishQuery>();
-            var mockMapper = new Mock<IDishMapper>();
-
-            var mockValidator = new Mock<IDishValidator>();
-            var service = new DishServices(
-                mockCommand.Object,
-                mockQuery.Object,
-                mockMapper.Object,
-                mockValidator.Object
-            );
-
-            var dishRequest = new DishRequest
-            {
-                Name = "test name",
-                Description = "test description",
-                Price = 1244,
-                Category = 1,
-                Image = "test URL"
-            };
-            var dishEntity = new Domain.Entities.Dish
-            {
-                Name = dishRequest.Name,
-                Description = dishRequest.Description,
-                Price = dishRequest.Price,
-                CategoryId = dishRequest.Category,
-                ImageURL = dishRequest.Image
-            };
-
-            var expectedResponse = new DishResponse
-            {
-                name = dishRequest.Name,
-                Description = dishRequest.Description,
-                Price = dishRequest.Price,
-                Image = dishRequest.Image,
-                category = new GenericResponse 
-                { 
-                    id = dishRequest.Category,
-                    name = "Category Name"
-                }
-            };
+            var validRequest = BuildValidRequest();
+            var dishEntity = BuildEntity(validRequest);
+            var expectedResponse = BuildResponse(dishEntity);
 
             mockMapper.Setup(m => m.ToEntity(It.IsAny<DishRequest>())).Returns(dishEntity);
             mockMapper.Setup(m => m.ToResponse(It.IsAny<Domain.Entities.Dish>())).Returns(expectedResponse);
-
-
+            mockValidator.Setup(v => v.ValidateCreate(It.IsAny<DishRequest>())).Returns(Task.CompletedTask);
+            mockCommand.Setup(c => c.CreateDish(It.IsAny<Domain.Entities.Dish>())).Returns(Task.CompletedTask);
 
             // ACT
-            var result = await service.CreateDish(dishRequest);
+            var result = await service.CreateDish(validRequest);
 
             // ASSERT
-            mockValidator.Verify(v => v.ValidateCreate(dishRequest), Times.Once);
+            mockMapper.Verify(m => m.ToEntity(validRequest), Times.Once);
+            mockMapper.Verify(m => m.ToResponse(dishEntity), Times.Once);
+            mockValidator.Verify(v => v.ValidateCreate(validRequest), Times.Once);
             mockCommand.Verify(c => c.CreateDish(dishEntity), Times.Once);
-            result.name.Should().Be(dishRequest.Name);
-            result.Description.Should().Be(dishRequest.Description);
-            result.Price.Should().Be(dishRequest.Price);
-            result.Image.Should().Be(dishRequest.Image);
+            VerifyNoOtherCalls();
+
+            result.name.Should().Be(validRequest.Name);
+            result.Description.Should().Be(validRequest.Description);
+            result.Price.Should().Be(validRequest.Price);
+            result.Image.Should().Be(validRequest.Image);
             result.category.Should().NotBeNull();
-            result.category.id.Should().Be(dishRequest.Category);
+            result.category.id.Should().Be(validRequest.Category);
         }
 
         [Fact]
-        public async Task GetAllDish_ValidParameters_ReturnDishResponseList()
+        public async Task UpdateDish_ValidRequest_ReturnDishResponse()
         {
             // ARRANGE
-            var mockCommand = new Mock<IDishCommand>();
-            var mockQuery = new Mock<IDishQuery>();
-            var mockMapper = new Mock<IDishMapper>();
-            var mockValidator = new Mock<IDishValidator>();
-            var service = new DishServices(
-                mockCommand.Object,
-                mockQuery.Object,
-                mockMapper.Object,
-                mockValidator.Object
-            );
-
-            var dishEntities = new List<Domain.Entities.Dish>
-            {
-                new Domain.Entities.Dish
-                {
-                    ID = Guid.NewGuid(),
-                    Name = "test name 1",
-                    Description = "test description 1",
-                    Price = 1244,
-                    CategoryId = 1,
-                    ImageURL = "test URL 1"
-                },
-                new Domain.Entities.Dish
-                {
-                    ID = Guid.NewGuid(),
-                    Name = "test name 2",
-                    Description = "test description 2",
-                    Price = 2244,
-                    CategoryId = 2,
-                    ImageURL = "test URL 2"
-                }
-            };
-
-            var expectedResponses = dishEntities.Select(d => new DishResponse
-            {
-                ID = d.ID,
-                name = d.Name,
-                Description = d.Description,
-                Price = d.Price,
-                Image = d.ImageURL,
-                category = new GenericResponse
-                {
-                    id = d.CategoryId,
-                    name = d.CategoryNav?.Name ?? "Category Name"
-                }
-            }).ToList();
-
-            mockQuery.Setup(q => q.GetAllDish(It.IsAny<string?>(), It.IsAny<int?>(), It.IsAny<bool>(), It.IsAny<string?>()))
-                     .ReturnsAsync(dishEntities);
-            mockMapper.Setup(m => m.ToResponse(It.IsAny<Domain.Entities.Dish>()))
-                      .Returns((Domain.Entities.Dish d) => expectedResponses.First(er => er.ID == d.ID));
-
-            // ACT
-            var result = await service.GetAllDish(name: "test", categoryId: null, onlyActive: true, sortByPrice: "asc");
-
-            // ASSERT
-            result.Should().HaveCount(dishEntities.Count);
-            result.Should().BeEquivalentTo(expectedResponses);
-        }
-
-        [Fact]
-        public async Task UpdateDish_ValidDish_ReturnDishResponse()
-        {
-            // ARRANGE
-            var mockCommand = new Mock<IDishCommand>();
-            var mockQuery = new Mock<IDishQuery>();
-            var mockMapper = new Mock<IDishMapper>();
-            var mockValidator = new Mock<IDishValidator>();
-            
-            var service = new DishServices(
-                mockCommand.Object,
-                mockQuery.Object,
-                mockMapper.Object,
-                mockValidator.Object
-            );
-
             var dishId = Guid.NewGuid();
-
+            var validRequest = BuildValidRequest();
+            var dishEntity = BuildEntity(validRequest);
             var dishRequest = new UpdateDishRequest
             {
-                Name = "test name update",
-                Description = "test description update",
-                Price = 1244,
-                Category = 1,
-                Image = "test URL"
-            };
-
-            var dishEntity = new Domain.Entities.Dish
-            {
-                Name = "test name",
-                Description = "test description",
-                Price = 1244,
-                CategoryId = 2,
-                ImageURL = "test URL",
-                IsAvailable = true
-            };
-
-            var expectedResponse = new DishResponse
-            {
-                name = dishRequest.Name,
-                Description = dishRequest.Description,
-                Price = dishRequest.Price,
-                Image = dishRequest.Image,
-                category = new GenericResponse 
-                { 
-                    id = dishRequest.Category,
-                    name = "Category Name"
-                },
+                Name = validRequest.Name,
+                Description = validRequest.Description,
+                Price = validRequest.Price,
+                Category = validRequest.Category,
+                Image = validRequest.Image,
                 IsActive = true
             };
+            var expectedResponse = BuildResponse(dishEntity);
+            expectedResponse.IsActive = true;
 
+            mockValidator.Setup(v => v.ValidateUpdate(It.IsAny<Guid>(), It.IsAny<UpdateDishRequest>())).Returns(Task.CompletedTask);
             mockQuery.Setup(q => q.GetDishById(It.IsAny<Guid>())).ReturnsAsync(dishEntity);
+            mockCommand.Setup(c => c.UpdateDish(It.IsAny<Domain.Entities.Dish>(), It.IsAny<UpdateDishRequest>())).Returns(Task.CompletedTask);
             mockMapper.Setup(m => m.ToResponse(It.IsAny<Domain.Entities.Dish>())).Returns(expectedResponse);
 
             // ACT
@@ -217,37 +89,138 @@ namespace UnitTest.Unit.UseCase.Dish
         }
 
         [Fact]
-        public async  Task CreateDish_ReturnInvalidDishPriceException()
+        public async Task UpdateDish_InvalidIdRequest_ReturnDishResponse()
         {
             // ARRANGE
-            var mockCommand = new Mock<IDishCommand>();
-            var mockQuery = new Mock<IDishQuery>();
-            var mockMapper = new Mock<IDishMapper>();
-            var mockValidator = new Mock<IDishValidator>();
-
-            var service = new DishServices(
-                mockCommand.Object,
-                mockQuery.Object,
-                mockMapper.Object,
-                mockValidator.Object
-            );
-
-            var dishRequest = new DishRequest
+            var dishId = Guid.NewGuid();
+            Domain.Entities.Dish? dishEntity = null;
+            var validRequest = BuildValidRequest();
+            var dishRequest = new UpdateDishRequest
             {
-                Name = "test name",
-                Description = "test description",
-                Price = -1244,
-                Category = 1,
-                Image = "test URL"
+                Name = validRequest.Name,
+                Description = validRequest.Description,
+                Price = validRequest.Price,
+                Category = validRequest.Category,
+                Image = validRequest.Image,
+                IsActive = true
             };
 
-            mockValidator.Setup(v => v.ValidateCreate(It.IsAny<DishRequest>())).Throws(new InvalidDishPriceException("Precio  invalido"));
+            mockValidator.Setup(v => v.ValidateUpdate(It.IsAny<Guid>(), It.IsAny<UpdateDishRequest>())).Returns(Task.CompletedTask);
+            mockQuery.Setup(q => q.GetDishById(It.IsAny<Guid>())).ReturnsAsync(dishEntity);
+
+            //Assert
+            await Assert.ThrowsAsync<DishNotFoundException>(() => service.UpdateDish(dishId, dishRequest));
+            mockValidator.Verify(v => v.ValidateUpdate(dishId, dishRequest), Times.Once);
+            mockQuery.Verify(q => q.GetDishById(dishId), Times.Once);
+            VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        public async Task GetAllDish_WhenCalled_ReturnsMappedResponses()
+        {
+            // ARRANGE
+            var dishes = new List<Domain.Entities.Dish>
+            {
+                new Domain.Entities.Dish { ID = Guid.NewGuid(), Name = "Pizza Napoletana", Description  = "test", ImageURL= "URL", CategoryId = 2 },
+                new Domain.Entities.Dish { ID = Guid.NewGuid(), Name = "Pizza Margherita", Description  = "test", ImageURL= "URL", CategoryId = 2 }
+            };
+            mockQuery.Setup(q => q.GetAllDish("Pizza", 2, true, "asc"))
+                     .ReturnsAsync(dishes);
+
+            mockMapper.Setup(m => m.ToResponse(It.IsAny<Domain.Entities.Dish>()))
+                      .Returns<Domain.Entities.Dish>(d => new DishResponse { name = d.Name, Description = d.Description, Image = d.ImageURL });
 
             // ACT
-            var result = service.CreateDish(dishRequest);
+            var result = await service.GetAllDish("Pizza", 2, true, "asc");
 
             // ASSERT
-            await Assert.ThrowsAsync<InvalidDishPriceException>(() => result);
+            mockQuery.Verify(q => q.GetAllDish("Pizza", 2, true, "asc"), Times.Once);
+            mockMapper.Verify(m => m.ToResponse(It.IsAny<Domain.Entities.Dish>()), Times.Exactly(dishes.Count));
+            VerifyNoOtherCalls();
+
+            result.Should().HaveCount(2);
+            result.Select(r => r.name).Should().Contain(["Pizza Napoletana", "Pizza Margherita"]);
+        }
+
+        [Fact]
+        public async Task GetDishById_WhenDishExists_ReturnsMappedResponse()
+        {
+            // ARRANGE
+            var dishId = Guid.NewGuid();
+            var validRequest = BuildValidRequest();
+            var dishEntity = BuildEntity(validRequest);
+            dishEntity.ID = dishId;
+            var expectedResponse = BuildResponse(dishEntity);
+            expectedResponse.ID = dishId;
+
+            mockQuery.Setup(q => q.GetDishById(dishId)).ReturnsAsync(dishEntity);
+            mockMapper.Setup(m => m.ToResponse(dishEntity)).Returns(expectedResponse);
+
+            // ACT
+            var result = await service.GetDishById(dishId);
+
+            // ASSERT
+            mockQuery.Verify(q => q.GetDishById(dishId), Times.Once);
+            mockMapper.Verify(m => m.ToResponse(dishEntity), Times.Once);
+            VerifyNoOtherCalls();
+
+            result.Should().NotBeNull();
+            result.ID.Should().Be(expectedResponse.ID);
+            result.name.Should().Be(expectedResponse.name);
+            result.Description.Should().Be(expectedResponse.Description);
+            result.Image.Should().Be(expectedResponse.Image);
+            result.category.id.Should().Be(expectedResponse.category.id);
+        }
+
+        [Fact]
+        public async Task GetDishById_WhenDishDoesNotExist_ThrowsDishNotFoundException()
+        {
+            // ARRANGE
+            var dishId = Guid.NewGuid();
+            Domain.Entities.Dish? dishEntity = null;
+           
+            mockQuery.Setup(q => q.GetDishById(dishId)).ReturnsAsync(dishEntity);
+            
+            // ACT & ASSERT
+            await Assert.ThrowsAsync<DishNotFoundException>(() => service.GetDishById(dishId));
+            mockQuery.Verify(q => q.GetDishById(dishId), Times.Once);
+            VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        public async Task DeleteDish_WhenDishExists_ReturnsMappedResponse()
+        {
+            // ARRANGE
+            var dishId = Guid.NewGuid();
+            var validRequest = BuildValidRequest();
+            var dishEntity = BuildEntity(validRequest);
+            dishEntity.ID = dishId;
+
+            mockQuery.Setup(q => q.GetDishById(dishId)).ReturnsAsync(dishEntity);
+            mockCommand.Setup(c => c.DeleteDish(dishEntity)).Returns(Task.CompletedTask);
+
+            // ACT
+            await service.DeleteDish(dishId);
+
+            // ASSERT
+            mockQuery.Verify(q => q.GetDishById(dishId), Times.Once);
+            mockCommand.Verify(c => c.DeleteDish(dishEntity), Times.Once);
+            VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        public async Task DeleteDish_WhenDishDoesNotExists_ReturnsMappedResponse()
+        {
+            // ARRANGE
+            var dishId = Guid.NewGuid();
+            Domain.Entities.Dish? dishEntity = null;
+
+            mockQuery.Setup(q => q.GetDishById(dishId)).ReturnsAsync(dishEntity);
+
+            // ACT & ASSERT
+            await Assert.ThrowsAsync<DishNotFoundException>(() => service.DeleteDish(dishId));
+            mockQuery.Verify(q => q.GetDishById(dishId), Times.Once);
+            VerifyNoOtherCalls();
         }
     }
 }
