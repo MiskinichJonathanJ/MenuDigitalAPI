@@ -9,13 +9,13 @@ namespace Application.Interfaces.IDish
 {
     public interface IDishQuery
     {
-        Task<ICollection<Domain.Entities.Dish>> GetAllDish(
+        Task<ICollection<Dish>> GetAllDish(
             string? name = null,
             int? categoryId = null,
             bool? onlyActive = null,
             string? sortByPrice = null
         );
-        Task<Domain.Entities.Dish?> GetDishById(Guid dishId);
+        Task<Dish?> GetDishById(Guid dishId);
         Task<Category?> GetCategoryById(int id);
     }
 }
