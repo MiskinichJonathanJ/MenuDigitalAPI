@@ -66,6 +66,9 @@ jobs:
             /p:CollectCoverage=true `
             /p:CoverletOutput=UnitTest/coverage/coverage.opencover.xml `
             /p:CoverletOutputFormat=opencover
+        
+      - name: Restore local .NET tools
+        run: dotnet tool restore
 
       - name: Generate HTML coverage report
         shell: powershell
