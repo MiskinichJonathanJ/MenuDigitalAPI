@@ -1,6 +1,6 @@
 ﻿using Application.DataTransfers.Request.Dish;
-using Application.DataTransfers.Response;
-using Application.Interfaces.DishInterfaces;
+using Application.DataTransfers.Response.Dish;
+using Application.Interfaces.IDish;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Management.Compute.Fluent.Models;
