@@ -36,10 +36,11 @@ namespace Application.UseCase.DishUse
             return _mapper.ToResponse(dish);
         }
         
-        public async Task DeleteDish(Guid id)
+        public async Task<DishResponse> DeleteDish(Guid id)
         {
             var dish = await GetDishOrThrow(id);
             await _command.DeleteDish(dish);
+            return _mapper.ToResponse(dish);
         }
 
         public async Task<ICollection<DishResponse>> GetAllDish(
