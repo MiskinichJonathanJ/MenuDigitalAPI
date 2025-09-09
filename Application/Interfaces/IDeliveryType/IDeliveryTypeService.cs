@@ -1,6 +1,6 @@
 ﻿using Application.DataTransfers.Response;
 
-namespace Application.Interfaces.DeliveryType
+namespace Application.Interfaces.IDeliveryType
 {
     public interface IDeliveryTypeService
     {
