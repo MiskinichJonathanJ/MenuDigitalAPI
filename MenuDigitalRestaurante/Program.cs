@@ -1,5 +1,5 @@
-using Application.Interfaces.CategoryInterfaces;
-using Application.Interfaces.DishInterfaces;
+using Application.Interfaces.ICategory;
+using Application.Interfaces.IDish;
 using Application.Mappers;
 using Application.UseCase.DishUse;
 using Application.Validations;
