@@ -16,7 +16,7 @@ namespace Application.UseCase.StatusUse
         public async Task<ICollection<GenericResponse>> GetAllStatus()
         {
             IEnumerable<Status> statuses = await _query.GetAllStatuses();
-            return statuses.Select(s => _mapper.ToResponse(s)).ToList();
+            return [.. statuses.Select(s => _mapper.ToResponse(s))];
         }
     }
 }
