@@ -60,14 +60,11 @@ jobs:
       - name: Build solution
         run: dotnet build --no-restore
 
-      - name: Ensure coverage folder exists
-        run: mkdir UnitTest/coverage
-
       - name: Run tests with coverage
         run: |
           dotnet test UnitTest/UnitTest.csproj `
             /p:CollectCoverage=true `
-            /p:CoverletOutput=UnitTest/coverage/coverage.opencover.xml `
+            /p:CoverletOutput=coverage/coverage.opencover.xml `
             /p:CoverletOutputFormat=opencover
         
       - name: Restore local .NET tools
