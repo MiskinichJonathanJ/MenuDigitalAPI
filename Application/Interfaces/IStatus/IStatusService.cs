@@ -1,6 +1,6 @@
 ﻿using Application.DataTransfers.Response;
 
-namespace Application.Interfaces.Status
+namespace Application.Interfaces.IStatus
 {
     public interface IStatusService
     {
