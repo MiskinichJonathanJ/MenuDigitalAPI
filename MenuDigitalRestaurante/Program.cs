@@ -1,14 +1,18 @@
 using Application.Interfaces.ICategory;
+using Application.Interfaces.IDeliveryType;
 using Application.Interfaces.IDish;
+using Application.Interfaces.IStatus;
 using Application.Mappers;
+using Application.UseCase.Category;
+using Application.UseCase.DeliveryTypeUse;
 using Application.UseCase.DishUse;
+using Application.UseCase.StatusUse;
 using Application.Validations;
 using Infrastructure.Command;
 using Infrastructure.Persistence;
 using Infrastructure.Querys;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
-using Npgsql;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,12 +27,25 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("MenuDigitalConnection")));
 
+
 builder.Services.AddScoped<IDishServices, DishServices>();
 builder.Services.AddScoped<IDishCommand, DishCommand>();
 builder.Services.AddScoped<IDishQuery, DishQuery>();
 builder.Services.AddScoped<IDishMapper, DishMapper>();
 builder.Services.AddScoped<IDishValidator, DishValidator>();
+
+builder.Services.AddScoped<ICategoryQuery, CategoryQuery>();
 builder.Services.AddScoped<ICategoryMapper, CategoryMapper>();
+builder.Services.AddScoped<ICategoryService, CategoryService>();
+
+builder.Services.AddScoped<IDeliveryTypeMapper, DeliveryTypeMapper>();
+builder.Services.AddScoped<IDeliveryTypeQuery, DeliveryTypeQuery>();
+builder.Services.AddScoped<IDeliveryTypeService, DeliveryTypeService>();
+
+builder.Services.AddScoped<IStatusMapper, StatusMapper>();
+builder.Services.AddScoped<IStatusQuery, StatusQuery>();
+builder.Services.AddScoped<IStatusService, StatusService>();
+
 
 builder.Services.AddSwaggerGen(options =>
 {
