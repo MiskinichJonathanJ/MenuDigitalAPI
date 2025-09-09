@@ -1,7 +1,7 @@
 ﻿using Application.DataTransfers.Request.Dish;
 using Domain.Entities;
 
-namespace Application.Interfaces.DishInterfaces
+namespace Application.Interfaces.IDish
 {
     public interface IDishCommand
     {

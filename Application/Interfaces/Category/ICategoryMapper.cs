@@ -1,12 +1,12 @@
 ﻿using Domain.Entities;
-using Application.DataTransfers.Response;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Application.DataTransfers.Response.Category;
 
-namespace Application.Interfaces.CategoryInterfaces
+namespace Application.Interfaces.ICategory
 {
     public interface ICategoryMapper
     {

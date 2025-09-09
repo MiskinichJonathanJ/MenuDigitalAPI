@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Application.Interfaces.DishInterfaces
+namespace Application.Interfaces.IDish
 {
     public interface IDishValidator
     {

@@ -1,5 +1,5 @@
 ﻿using Application.DataTransfers.Request.Dish;
-using Application.DataTransfers.Response;
+using Application.DataTransfers.Response.Dish;
 using Domain.Entities;
 using System;
 using System.Collections.Generic;
@@ -7,11 +7,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Application.Interfaces.DishInterfaces
+namespace Application.Interfaces.IDish
 {
     public interface IDishMapper
     {
-        Dish ToEntity(DishRequest request);
-        DishResponse ToResponse(Dish dish);
+        Domain.Entities.Dish ToEntity(DishRequest request);
+        DishResponse ToResponse(Domain.Entities.Dish dish);
     }
 }
