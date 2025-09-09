@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Application.DataTransfers.Response
+namespace Application.DataTransfers.Response.Category
 {
     public class CategoryResponse
     {

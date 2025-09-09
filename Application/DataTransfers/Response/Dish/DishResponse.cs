@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Application.DataTransfers.Response
+namespace Application.DataTransfers.Response.Dish
 {
     public class DishResponse
     {
