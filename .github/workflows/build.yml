@@ -49,7 +49,7 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
           .\.sonar\scanner\dotnet-sonarscanner begin `
-            /k:"MiskinichJonathanJ_api-rest-menu-digital" `
+            /k:"MiskinichJonathanJ_MenuDigitalAPI" `
             /o:"miskinichjonathanj" `
             /d:sonar.login="${{ secrets.SONAR_TOKEN }}" `
             /d:sonar.cs.opencover.reportsPaths="UnitTest/coverage/coverage.opencover.xml"
