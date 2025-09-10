@@ -1,11 +1,14 @@
 using Application.Interfaces.ICategory;
 using Application.Interfaces.IDeliveryType;
 using Application.Interfaces.IDish;
+using Application.Interfaces.IOrder;
 using Application.Interfaces.IStatus;
 using Application.Mappers;
+using Application.Mappers.OrderMap;
 using Application.UseCase.Category;
 using Application.UseCase.DeliveryTypeUse;
 using Application.UseCase.DishUse;
+using Application.UseCase.OrderUse;
 using Application.UseCase.StatusUse;
 using Application.Validations;
 using Infrastructure.Command;
@@ -45,6 +48,12 @@ builder.Services.AddScoped<IDeliveryTypeService, DeliveryTypeService>();
 builder.Services.AddScoped<IStatusMapper, StatusMapper>();
 builder.Services.AddScoped<IStatusQuery, StatusQuery>();
 builder.Services.AddScoped<IStatusService, StatusService>();
+
+builder.Services.AddScoped<IOrderValidator, OrderValidator>();
+builder.Services.AddScoped<IOrderCommand, OrderCommand>();
+builder.Services.AddScoped<IOrderMapper, OrderMapper>();
+builder.Services.AddScoped<IOrderQuery, OrderQuery>();
+builder.Services.AddScoped<IOrderService, OrderService>();
 
 
 builder.Services.AddSwaggerGen(options =>
