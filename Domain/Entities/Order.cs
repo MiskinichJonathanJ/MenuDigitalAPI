@@ -14,7 +14,7 @@ namespace Domain.Entities
         public DeliveryType? DeliveryTypeNav { get; set; }
 
 
-        public ICollection<OrderItem> Items { get; set; }   = [];
+        public ICollection<OrderItem> Items { get; set; } = [];
         public DateTime CreateDate { get; set; }
         public DateTime UpdateDate { get; set; }
     }

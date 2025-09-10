@@ -7,13 +7,13 @@ namespace Domain.Entities
         public  string?  Notes { get; set; }
         public DateTime CreatedDate { get; set; }
 
-        public  int StatusId { get; set; }
+        public required int StatusId { get; set; }
         public Status? Status { get; set; }
 
-        public int OrderId { get; set; }
+        public required int OrderId { get; set; }
         public Order? OrderNav { get; set; }
 
-        public Guid DishId { get; set; }
+        public required Guid DishId { get; set; }
         public Dish? DishNav { get; set; }
     }
 }
