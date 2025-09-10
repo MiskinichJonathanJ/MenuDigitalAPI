@@ -1,4 +1,5 @@
 ﻿using Application.DataTransfers.Request.Order;
+using Application.DataTransfers.Response.Order;
 using Application.DataTransfers.Response.OrderResponse;
 using Application.Interfaces.IOrder;
 
@@ -19,7 +20,7 @@ namespace Application.UseCase.OrderUse
             _query = query;
         }
 
-        public async Task<OrderResponse> CreateOrder(OrderRequest orderCreate)
+        public async Task<OrderCreateResponse> CreateOrder(OrderRequest orderCreate)
         {
             await _validator.ValidateCreateOrder(orderCreate);
             var dishes = await _query.GetAllDishesOrder(orderCreate.Items);
@@ -39,7 +40,14 @@ namespace Application.UseCase.OrderUse
 
             await _command.CreateOrder(orderEntity);
 
-            return _mapper.ToResponse(orderEntity, totalPrice);
+            return _mapper.ToCreateResponse(orderEntity);
+        }
+
+        public  async Task<ICollection<OrderDetailsResponse>> GetAllOrders(DateTime? desde = null, DateTime? hasta = null, int? statusId = null)
+        {
+            await _validator.ValidateGetAllOrders(desde, hasta, statusId);
+            var orders = await _query.GetAllOrders(desde, hasta, statusId);
+            return _mapper.ToDetailsResponse(orders);
         }
     }
 }

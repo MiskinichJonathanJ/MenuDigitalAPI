@@ -1,4 +1,8 @@
 ﻿using Application.DataTransfers.Request.Order;
+using Application.DataTransfers.Response;
+using Application.DataTransfers.Response.Dish;
+using Application.DataTransfers.Response.Order;
+using Application.DataTransfers.Response.OrderItem;
 using Application.DataTransfers.Response.OrderResponse;
 using Application.Interfaces.IOrder;
 using Domain.Entities;
@@ -47,14 +51,54 @@ namespace Application.Mappers.OrderMap
             })];   
         }
 
-        public OrderResponse ToResponse(Order order, double price)
+        public OrderCreateResponse ToCreateResponse(Order order)
         {
-            return new OrderResponse
+            return new OrderCreateResponse
             {
                 OrderNumber = order.Id,
-                TotalMount = price,
+                TotalMount = (Double)order.Price,
                 CreatedDate = order.CreateDate
             };
+        }
+
+        public ICollection<OrderDetailsResponse> ToDetailsResponse(ICollection<Order> orders)
+        {
+            return [.. orders.Select(o =>  new OrderDetailsResponse
+            {
+                OrderNumber = o.Id,
+                DeliveryTo = o.DeliveryTo,
+                Notes = o.Notes,
+                TotalMount = (Double)o.Price,
+                Status = o.StatusNav == null ? null : new GenericResponse
+                {
+                    id = o.StatusNav.ID,
+                    name = o.StatusNav.Name
+                },
+                DeliveryType = o.DeliveryTypeNav == null ? null : new GenericResponse
+                {
+                    id = o.DeliveryTypeNav.ID,
+                    name = o.DeliveryTypeNav.Name
+                },
+                Items = o.Items == null ? null : [.. o.Items.Select(i => new OrderItemResponse
+                {
+                    Id = i.Id,
+                    Dish = new DishShortResponse
+                    {
+                        Id = i.DishNav.ID,
+                        Name = i.DishNav.Name,
+                        Image = i.DishNav.ImageURL
+                    },
+                    Quantity = i.Quantity,
+                    Notes = i.Notes,
+                    Status = i.Status == null ? null : new GenericResponse
+                    {
+                        id = i.Status.ID,
+                        name = i.Status.Name
+                    }
+                })],
+                CreatedDate = o.CreateDate,
+                UpdateDate = o.UpdateDate
+            })];
         }
     }
 }

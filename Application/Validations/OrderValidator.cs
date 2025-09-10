@@ -26,5 +26,25 @@ namespace Application.Validations
                 throw new Exception("La dirección de entrega es obligatoria para el tipo de entrega a domicilio.");
             return Task.CompletedTask;
         }
+
+        public Task ValidateGetAllOrders(DateTime? from = null, DateTime? to = null, int? status = null)
+        {
+            if  (from != null)
+            {
+                if (from > DateTime.Now)
+                    throw new Exception("La fecha 'desde' no puede ser mayor a la fecha actual.");
+                if (to != null && from > to)
+                    throw new Exception("La fecha 'desde' no puede ser mayor a la fecha 'hasta'.");
+            }
+
+            if (status != null)
+            {
+                var validStatuses = new List<int> { 1, 2, 3, 4 };
+                if (!validStatuses.Contains(status.Value))
+                    throw new Exception("El estado proporcionado no es válido.");
+            }
+
+            return Task.CompletedTask;
+        }
     }
 }

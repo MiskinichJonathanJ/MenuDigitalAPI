@@ -9,7 +9,7 @@ namespace MenuDigitalRestaurante.Controllers
     [Produces("application/json")]
     public class OrderController : Controller
     {
-        public  readonly IOrderService _orderService;
+        public readonly IOrderService _orderService;
         public OrderController(IOrderService orderService)
         {
             _orderService = orderService;
@@ -18,6 +18,17 @@ namespace MenuDigitalRestaurante.Controllers
         public async Task<IActionResult> CreateOrder([FromBody] OrderRequest request)
         {
             var result = await _orderService.CreateOrder(request);
+            return new JsonResult(result);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAllOrders(
+            [FromQuery] DateTime? desde = null,
+            [FromQuery] DateTime? hasta = null,
+            [FromQuery] int? statusId = null
+            )
+        {
+            var result = await _orderService.GetAllOrders(desde, hasta, statusId);
             return new JsonResult(result);
         }
     }
