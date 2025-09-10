@@ -9,6 +9,7 @@ namespace Application.Interfaces.IOrder
 {
     public interface IOrderValidator
     {
-       Task ValidateCreateOrder(OrderRequest orderCreate);
+        Task ValidateCreateOrder(OrderRequest orderCreate);
+        Task ValidateGetAllOrders(DateTime? desde = null, DateTime? hasta = null, int? statusId = null);
     }
 }

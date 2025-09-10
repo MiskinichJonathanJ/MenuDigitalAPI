@@ -1,4 +1,5 @@
 ﻿using Application.DataTransfers.Request.Order;
+using Application.DataTransfers.Response.Order;
 using Application.DataTransfers.Response.OrderResponse;
 using System;
 using System.Collections.Generic;
@@ -10,6 +11,7 @@ namespace Application.Interfaces.IOrder
 {
     public interface IOrderService
     {
-        Task<OrderResponse> CreateOrder(OrderRequest orderCreate);
+        Task<OrderCreateResponse> CreateOrder(OrderRequest orderCreate);
+        Task<ICollection<OrderDetailsResponse>> GetAllOrders(DateTime? desde = null, DateTime? hasta = null, int? statusId = null);
     }
 }
