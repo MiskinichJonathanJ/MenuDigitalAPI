@@ -7,10 +7,10 @@ namespace UnitTest.Unit.UseCase.CategoryTest
     public class CategoryServiceTest : CategoryServiceTestBase
     {
         [Fact]
-        public async Task GetAllCategories_ShouldReturnMappedCategories()
+        public async Task GetAllCategories_ReturnMappedCategories()
         {
             // ARRANGE
-            var categories = new List<Domain.Entities.Category>
+            var categories = new List<Category>
             {
                 new Category { Id = 1, Name = "Category 1", Description = "test"},
                 new Category { Id = 2, Name = "Category 2", Description = "test"}
