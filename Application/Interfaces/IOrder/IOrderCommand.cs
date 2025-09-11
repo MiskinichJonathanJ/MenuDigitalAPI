@@ -1,9 +1,5 @@
-﻿using Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Application.DataTransfers.Request.OrderItem;
+using Domain.Entities;
 
 namespace Application.Interfaces.IOrder
 {
@@ -11,5 +7,6 @@ namespace Application.Interfaces.IOrder
     {
         Task CreateOrder(Order order);
         Task CreateOrderItems(ICollection<OrderItem> orderItems);
+        Task<Order> UpdateStatusItemOrder(int orderId, int itemId, OrderItemUpdateRequest request);
     }
 }

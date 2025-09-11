@@ -1,4 +1,5 @@
 ﻿using Application.DataTransfers.Request.Order;
+using Application.DataTransfers.Request.OrderItem;
 using Application.DataTransfers.Response.Order;
 using Application.DataTransfers.Response.OrderResponse;
 using System;
@@ -13,5 +14,7 @@ namespace Application.Interfaces.IOrder
     {
         Task<OrderCreateResponse> CreateOrder(OrderRequest orderCreate);
         Task<ICollection<OrderDetailsResponse>> GetAllOrders(DateTime? desde = null, DateTime? hasta = null, int? statusId = null);
+        Task<OrderDetailsResponse> GetOrderById(int orderId);
+        Task<OrderUpdateResponse> UpdateStatusItemOrder(int orderId, int itemId, OrderItemUpdateRequest request);
     }
 }
