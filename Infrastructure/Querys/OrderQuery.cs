@@ -13,7 +13,7 @@ namespace Infrastructure.Querys
         {
             _context = context;
         }
-        public async Task<ICollection<Dish>> GetAllDishesOrder(ICollection<ItemRequest> orderItems)
+        public async Task<ICollection<Dish>> GetAllDishesOrder(ICollection<Items> orderItems)
         {
             var orderItemIds = orderItems.Select(oi => oi.Id).ToList();
             IQueryable<Dish> dishes = _context.Dishes.Where(d => orderItemIds.Contains(d.ID) && d.IsAvailable);
@@ -26,7 +26,9 @@ namespace Infrastructure.Querys
                 .Include(o => o.StatusNav)
                 .Include(o => o.DeliveryTypeNav)
                 .Include(o => o.Items)
-                .ThenInclude(oi => oi.DishNav)
+                    .ThenInclude(oi => oi.Status)
+                .Include(o => o.Items)
+                    .ThenInclude(oi => oi.DishNav)
                 .AsNoTracking();
             if (desde.HasValue)
                 orders = orders.Where(o => o.CreateDate >= desde.Value);
@@ -36,6 +38,17 @@ namespace Infrastructure.Querys
                 orders = orders.Where(o => o.OverallStatusID == statusId.Value);
 
             return await orders.ToListAsync();
+        }
+
+        public async Task<Order> GetOrderById(int orderId)
+        {
+            return await _context.Orders
+                .Include(o => o.StatusNav)
+                .Include(o => o.DeliveryTypeNav)
+                .Include(o => o.Items)
+                .ThenInclude(oi => oi.DishNav)
+                .AsNoTracking()
+                .FirstOrDefaultAsync(o => o.Id == orderId) ?? throw new Exception("El pedido no existe.");
         }
     }
 }

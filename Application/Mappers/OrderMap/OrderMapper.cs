@@ -25,7 +25,7 @@ namespace Application.Mappers.OrderMap
             };
         }
 
-        public OrderItem ToEntityItem(ItemRequest request, int  orderId)
+        public OrderItem ToEntityItem(Items request, int  orderId)
         {
             return new OrderItem
             {
@@ -38,7 +38,7 @@ namespace Application.Mappers.OrderMap
             };
         }
 
-        public ICollection<OrderItem> ToEntityItems(ICollection<ItemRequest> items, int orderId)
+        public ICollection<OrderItem> ToEntityItems(ICollection<Items> items, int orderId)
         {
             return [.. items.Select(i => new OrderItem
             {
@@ -61,32 +61,32 @@ namespace Application.Mappers.OrderMap
             };
         }
 
-        public ICollection<OrderDetailsResponse> ToDetailsResponse(ICollection<Order> orders)
+        public OrderDetailsResponse ToDetailsResponse(Order orders)
         {
-            return [.. orders.Select(o =>  new OrderDetailsResponse
+            return new OrderDetailsResponse
             {
-                OrderNumber = o.Id,
-                DeliveryTo = o.DeliveryTo,
-                Notes = o.Notes,
-                TotalMount = (Double)o.Price,
-                Status = o.StatusNav == null ? null : new GenericResponse
+                OrderNumber = orders.Id,
+                DeliveryTo = orders.DeliveryTo,
+                Notes = orders.Notes,
+                TotalMount = (Double)orders.Price,
+                Status = orders.StatusNav == null ? null : new GenericResponse
                 {
-                    id = o.StatusNav.ID,
-                    name = o.StatusNav.Name
+                    id = orders.StatusNav.ID,
+                    name = orders.StatusNav.Name
                 },
-                DeliveryType = o.DeliveryTypeNav == null ? null : new GenericResponse
+                DeliveryType = orders.DeliveryTypeNav == null ? null : new GenericResponse
                 {
-                    id = o.DeliveryTypeNav.ID,
-                    name = o.DeliveryTypeNav.Name
+                    id = orders.DeliveryTypeNav.ID,
+                    name = orders.DeliveryTypeNav.Name
                 },
-                Items = o.Items == null ? null : [.. o.Items.Select(i => new OrderItemResponse
+                Items = orders.Items == null ? null : [.. orders.Items.Select(i => new OrderItemResponse
                 {
                     Id = i.Id,
                     Dish = new DishShortResponse
                     {
-                        Id = i.DishNav.ID,
-                        Name = i.DishNav.Name,
-                        Image = i.DishNav.ImageURL
+                        Id = i.DishNav?.ID ?? Guid.Empty,
+                        Name = i.DishNav?.Name ?? "Sin Nombre",
+                        Image = i.DishNav?.ImageURL ?? "No image"
                     },
                     Quantity = i.Quantity,
                     Notes = i.Notes,
@@ -96,9 +96,19 @@ namespace Application.Mappers.OrderMap
                         name = i.Status.Name
                     }
                 })],
-                CreatedDate = o.CreateDate,
-                UpdateDate = o.UpdateDate
-            })];
+                CreatedDate = orders.CreateDate,
+                UpdateDate = orders.UpdateDate
+            };
+        }
+
+        public OrderUpdateResponse ToUpdateResponse(Order order)
+        {
+            return new OrderUpdateResponse
+            {
+                OrderNumber = order.Id,
+                TotalMount = (double)order.Price,
+                UpdatedDate = order.UpdateDate
+            };
         }
     }
 }
