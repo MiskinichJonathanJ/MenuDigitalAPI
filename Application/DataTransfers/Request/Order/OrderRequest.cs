@@ -8,7 +8,7 @@ namespace Application.DataTransfers.Request.Order
 {
     public class OrderRequest
     {
-        public  required ICollection<ItemRequest> Items { get; set; } = new List<ItemRequest>();
+        public  required ICollection<Items> Items { get; set; } = new List<Items>();
         public required DeliveryRequest Delivery { get; set; }
         public string? Notes { get; set; }
     }

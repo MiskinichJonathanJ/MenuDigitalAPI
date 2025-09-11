@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Application.DataTransfers.Request.Order
 {
-    public class ItemRequest
+    public class Items
     {
         public Guid Id { get; set; }
         public int Quantity { get; set; }
