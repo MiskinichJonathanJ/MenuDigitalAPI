@@ -47,6 +47,7 @@ namespace Infrastructure.Command
 
             if (order.Items.All(i => i.StatusId == (int)OrderItemStatus.Delivered))
                 order.OverallStatusID = (int)OrderItemStatus.Delivered;
+
             order.UpdateDate = DateTime.Now;
 
             await _context.SaveChangesAsync();
