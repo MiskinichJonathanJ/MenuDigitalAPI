@@ -36,27 +36,25 @@ namespace Infrastructure.Middleware
         {
             context.Response.ContentType = "application/json";
 
-            switch (ex)
-            {
-                case DishNameAlreadyExistsException:
-                    context.Response.StatusCode = StatusCodes.Status409Conflict;
-                    break;
-                case DishNotFoundException:
-                    context.Response.StatusCode = StatusCodes.Status404NotFound;
-                    break;
-                case InvalidDishPriceException or ArgumentException:
-                    context.Response.StatusCode = StatusCodes.Status400BadRequest;
-                    break;
-                case CategoryNotFoundException:
-                    context.Response.StatusCode = StatusCodes.Status404NotFound;
-                    break;
-                default:
-                    context.Response.StatusCode = StatusCodes.Status500InternalServerError;
-                    break;
-            }
+            int status = StatusCodes.Status500InternalServerError;
+            if (ex is DomainException dex) status = dex.StatusCode;
 
-            var result = JsonSerializer.Serialize(new { error = ex.Message });
-            return context.Response.WriteAsync(result);
+            context.Response.StatusCode = status;
+
+            var payload = new { message = ex.Message };
+            var options = GetOptions();
+
+            var json = JsonSerializer.Serialize(payload, options);
+            return context.Response.WriteAsync(json);
+
+            static JsonSerializerOptions GetOptions()
+            {
+                return new JsonSerializerOptions
+                {
+                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                    DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull
+                };
+            }
         }
     }
 }
