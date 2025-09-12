@@ -7,7 +7,7 @@ namespace Infrastructure.Querys
 {
     public class DeliveryTypeQuery : IDeliveryTypeQuery
     {
-        public  readonly AppDbContext _context;
+        private readonly AppDbContext _context;
         public DeliveryTypeQuery(AppDbContext context)
         {
             _context = context;

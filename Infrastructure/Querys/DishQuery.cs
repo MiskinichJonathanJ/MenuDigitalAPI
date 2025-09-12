@@ -1,18 +1,14 @@
-﻿using Application.Interfaces.IDish;
+﻿using Application.Exceptions.DishException;
+using Application.Interfaces.IDish;
 using Domain.Entities;
 using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Infrastructure.Querys
 {
     public class DishQuery : IDishQuery
     {
-        public readonly AppDbContext _context;
+        private readonly AppDbContext _context;
 
         public DishQuery(AppDbContext context)
         {
@@ -43,7 +39,7 @@ namespace Infrastructure.Querys
                 {
                     "asc" => query.OrderBy(d => d.Price),
                     "desc" => query.OrderByDescending(d => d.Price),
-                    _ => throw new ArgumentException("Invalid sortByPrice parameter")
+                    _ => throw new InvalidSortByPriceException()
                 };
             }
             

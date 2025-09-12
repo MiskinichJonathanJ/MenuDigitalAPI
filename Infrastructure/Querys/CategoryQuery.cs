@@ -7,7 +7,7 @@ namespace Infrastructure.Querys
 {
     public class CategoryQuery : ICategoryQuery
     {
-        public readonly AppDbContext _context;
+        private readonly AppDbContext _context;
         public CategoryQuery(AppDbContext context)
         {
             _context = context;

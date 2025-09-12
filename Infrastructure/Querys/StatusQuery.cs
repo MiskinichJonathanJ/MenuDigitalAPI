@@ -7,7 +7,7 @@ namespace Infrastructure.Querys
 {
     public class StatusQuery : IStatusQuery
     {
-        public readonly AppDbContext _context;
+        private readonly AppDbContext _context;
         public StatusQuery(AppDbContext context)
         {
             _context = context;

@@ -1,4 +1,5 @@
 ﻿using Application.DataTransfers.Request.OrderItem;
+using Application.Exceptions.OrderException;
 using Application.Interfaces.IOrder;
 using Application.Validations.Helpers;
 using Domain.Entities;
@@ -29,13 +30,13 @@ namespace Infrastructure.Command
 
         public async Task<Order> UpdateStatusItemOrder(int orderId, int itemId, OrderItemUpdateRequest request)
         {
-            var order = await _context.Orders.Where(o => o.Id == orderId).FirstOrDefaultAsync() ?? throw new Exception("La orden no existe");
-            var orderItem = await _context.OrderItems.Where(oi => oi.Id == itemId && oi.OrderId == orderId).FirstOrDefaultAsync() ?? throw new Exception("El item no existe en la orden");
+            var order = await _context.Orders.Where(o => o.Id == orderId).FirstOrDefaultAsync() ?? throw new InvalidOrderIdException();
+            var orderItem = await _context.OrderItems.Where(oi => oi.Id == itemId && oi.OrderId == orderId).FirstOrDefaultAsync() ?? throw new InvalidIdItemException();
 
             var  newStatus  = (OrderItemStatusFlow.OrderItemStatus)request.Status;
 
             if (!OrderItemStatusFlow.CanTransition((OrderItemStatusFlow.OrderItemStatus)orderItem.StatusId, newStatus))
-                throw new Exception($"No se puede cambiar el estado de {(OrderItemStatusFlow.OrderItemStatus)orderItem.StatusId} a {newStatus}");
+                throw new InvalidOrderStatusTransitionException();
 
             orderItem.StatusId = (int)newStatus;
 
