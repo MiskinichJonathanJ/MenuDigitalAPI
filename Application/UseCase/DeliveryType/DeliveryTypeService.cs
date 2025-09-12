@@ -5,8 +5,8 @@ namespace Application.UseCase.DeliveryTypeUse
 {
     public class DeliveryTypeService : IDeliveryTypeService
     {
-        public  readonly IDeliveryTypeQuery _query;
-        public readonly IDeliveryTypeMapper _mapper;
+        private readonly IDeliveryTypeQuery _query;
+        private readonly IDeliveryTypeMapper _mapper;
         public DeliveryTypeService(IDeliveryTypeQuery query, IDeliveryTypeMapper mapper)
         {
             _query = query;

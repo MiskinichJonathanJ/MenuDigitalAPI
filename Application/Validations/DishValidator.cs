@@ -1,5 +1,7 @@
 ﻿using Application.DataTransfers.Request.Dish;
 using Application.Exceptions;
+using Application.Exceptions.CategoryException;
+using Application.Exceptions.DishException;
 using Application.Interfaces.IDish;
 
 namespace Application.Validations
@@ -30,26 +32,26 @@ namespace Application.Validations
         public void ValidateCommon(DishBaseRequest  request)
         {
             if (string.IsNullOrWhiteSpace(request.Name))
-                throw new ArgumentException("El nombre del platillo no puede estar vacío");
+                throw new DishNameAlreadyExistsException();
 
             if (request.Name.Length > 255)
-                throw new ArgumentException("El nombre del platillo no debe exceder los 256 caracteres");
+                throw new InvalidLengthDIshNameException();
 
             if (request.Price <= 0)
-                throw new InvalidDishPriceException("El precio del platillo debe ser mayor a 0");
+                throw new InvalidDishPriceException();
         }
 
         public async Task ValidateCategoryExists(int categoryId)
         {
            if (await _query.GetCategoryById(categoryId) == null)
-            throw new CategoryNotFoundException("La categoria no existe");
+            throw new CategoryNotFoundException();
         }
 
         public async Task ValidateDishNameUnique(string name, Guid? id = null)
         {
             var dishes = await _query.GetAllDish(name: name);
             if (dishes.Any(d => id == null  || d.ID != id))
-                throw new DishNameAlreadyExistsException("Ya existe un platillo con ese nombre");
+                throw new DishNameAlreadyExistsException();
         }
     }
 }

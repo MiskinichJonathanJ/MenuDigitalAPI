@@ -5,8 +5,8 @@ namespace Application.UseCase.Category
 {
     public class CategoryService : ICategoryService
     {
-        public readonly ICategoryQuery _query;
-        public readonly ICategoryMapper _mapper;
+        private readonly ICategoryQuery _query;
+        private readonly ICategoryMapper _mapper;
 
         public  CategoryService(ICategoryQuery query, ICategoryMapper mapper)
         {

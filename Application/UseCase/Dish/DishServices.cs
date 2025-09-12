@@ -13,10 +13,10 @@ namespace Application.UseCase.DishUse
 {
     public class DishServices : IDishServices
     {
-        public readonly IDishCommand _command;
-        public readonly IDishQuery _query;
-        public readonly IDishMapper _mapper;
-        public readonly IDishValidator _validator;
+        private readonly IDishCommand _command;
+        private readonly IDishQuery _query;
+        private readonly IDishMapper _mapper;
+        private readonly IDishValidator _validator;
 
         public DishServices(IDishCommand command, IDishQuery query, IDishMapper mapper, IDishValidator validator)
         {

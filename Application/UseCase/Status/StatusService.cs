@@ -6,8 +6,8 @@ namespace Application.UseCase.StatusUse
 {
     public class StatusService : IStatusService
     {
-        public readonly IStatusQuery _query;
-        public readonly IStatusMapper _mapper;
+        private readonly IStatusQuery _query;
+        private readonly IStatusMapper _mapper;
         public StatusService(IStatusQuery query, IStatusMapper mapper)
         {
             _query = query;
