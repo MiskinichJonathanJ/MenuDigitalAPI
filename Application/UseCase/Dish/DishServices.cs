@@ -1,6 +1,7 @@
 ﻿using Application.DataTransfers.Request.Dish;
 using Application.DataTransfers.Response.Dish;
 using Application.Exceptions;
+using Application.Exceptions.DishException;
 using Application.Interfaces.IDish;
 using Domain.Entities;
 using System;
@@ -74,7 +75,7 @@ namespace Application.UseCase.DishUse
         {
             var dish = await _query.GetDishById(id);
 
-            return dish == null ? throw new DishNotFoundException($"El dish con el ID {id} no fue encontrado") : dish;
+            return dish ?? throw new DishNotFoundException();
         }
     }
 }

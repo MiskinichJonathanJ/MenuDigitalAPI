@@ -2,6 +2,7 @@
 using Application.DataTransfers.Request.OrderItem;
 using Application.Exceptions;
 using Application.Exceptions.OrderException;
+using Application.Exceptions.StatusException;
 using Application.Interfaces.IOrder;
 using Application.Validations.Helpers;
 
@@ -57,7 +58,7 @@ namespace Application.Validations
         {
             if (orderId <=  0 || itemId <= 0)
                 throw new InvalidOrderIdException();
-            if(Enum.IsDefined(typeof(OrderItemStatusFlow.OrderItemStatus), request.Status))
+            if(!Enum.IsDefined(typeof(OrderItemStatusFlow.OrderItemStatus), request.Status))
                 throw new StatusNotFoundException();
 
             return Task.CompletedTask;
