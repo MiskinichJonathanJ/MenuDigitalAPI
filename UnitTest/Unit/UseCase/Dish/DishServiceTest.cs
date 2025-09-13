@@ -1,6 +1,7 @@
 ﻿using Application.DataTransfers.Request.Dish;
 using Application.DataTransfers.Response.Dish;
 using Application.Exceptions;
+using Application.Exceptions.DishException;
 using FluentAssertions;
 using Moq;
 
