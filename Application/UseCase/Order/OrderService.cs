@@ -4,7 +4,6 @@ using Application.DataTransfers.Response.Order;
 using Application.DataTransfers.Response.OrderResponse;
 using Application.Exceptions.OrderException;
 using Application.Interfaces.IOrder;
-using Domain.Entities;
 
 namespace Application.UseCase.OrderUse
 {
@@ -39,7 +38,7 @@ namespace Application.UseCase.OrderUse
             }
 
             var orderEntity = _mapper.ToEntity(orderCreate);
-            orderEntity.Price = totalPrice; 
+            orderEntity.Price = totalPrice;
 
             await _command.CreateOrder(orderEntity);
 

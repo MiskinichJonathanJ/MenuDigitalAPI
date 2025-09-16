@@ -1,7 +1,11 @@
 ﻿using Application.DataTransfers.Request.Dish;
+using Application.Exceptions.DishException;
 using Application.Interfaces.IDish;
+using Application.Validations.Helpers;
 using Domain.Entities;
 using Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
+using static Application.Validations.Helpers.OrderItemStatusFlow;
 
 namespace Infrastructure.Command
 {
@@ -14,16 +18,22 @@ namespace Infrastructure.Command
             _context = context;
         }
 
-        public async Task CreateDish(Dish dish)
+        public async Task<Dish> CreateDish(Dish dish)
         {
-            _context.Add(dish);
-
+            var addedEntity = _context.Dishes.Add(dish);
             await _context.SaveChangesAsync();
+            return addedEntity.Entity;
         }
 
-        public async Task DeleteDish(Dish dish)
+        public async Task DeleteDish(Guid dishId)
         {
-            dish.IsAvailable = false;
+            Dish dish = await _context.Dishes.Where(d => d.ID == dishId).Include(d =>  d.OrderItems).FirstOrDefaultAsync() ?? throw new KeyNotFoundException("Dish not found");
+            if (dish.OrderItems.Count == 0)
+                _context.Dishes.Remove(dish);
+            else if (dish.OrderItems.All(oi => oi.StatusId == (int)OrderItemStatus.Closed))
+                dish.IsAvailable = false;
+            else
+                throw new InvlidDeleteDishException();
 
             await _context.SaveChangesAsync();
         }
@@ -39,7 +49,7 @@ namespace Infrastructure.Command
             dishEnDB.UpdatedDate = DateTime.UtcNow;
             dishEnDB.IsAvailable = dishActualizado.IsActive;
 
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync();  
         }
     }
 }

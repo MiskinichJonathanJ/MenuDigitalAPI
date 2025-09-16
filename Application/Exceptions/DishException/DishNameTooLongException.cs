@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace Application.Exceptions.DishException
 {
-    public class InvalidLengthDIshNameException : ValidationException
+    public class DishNameTooLongException : ValidationException
     {
-        public InvalidLengthDIshNameException() : base("El nombre del platillo no debe exceder los 256 caracteres")
+        public DishNameTooLongException() : base("El nombre del platillo no debe exceder los 256 caracteres")
         {
         }
     }

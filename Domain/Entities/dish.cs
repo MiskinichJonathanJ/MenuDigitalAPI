@@ -12,7 +12,7 @@ namespace Domain.Entities
         public required string ImageURL { get; set; }
         public int CategoryId { get; set; }
         public Category? CategoryNav { get; set; }
-
+        public ICollection<OrderItem> OrderItems { get; set; } = [];
         public DateTime CreatedDate { get; set; }
         public DateTime UpdatedDate { get; set; }
     }

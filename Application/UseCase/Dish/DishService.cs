@@ -12,14 +12,14 @@ using System.Threading.Tasks;
 
 namespace Application.UseCase.DishUse
 {
-    public class DishServices : IDishServices
+    public class DishService : IDishServices
     {
         private readonly IDishCommand _command;
         private readonly IDishQuery _query;
         private readonly IDishMapper _mapper;
         private readonly IDishValidator _validator;
 
-        public DishServices(IDishCommand command, IDishQuery query, IDishMapper mapper, IDishValidator validator)
+        public DishService(IDishCommand command, IDishQuery query, IDishMapper mapper, IDishValidator validator)
         {
             _command = command;
             _query = query;
@@ -33,14 +33,14 @@ namespace Application.UseCase.DishUse
 
             var dish = _mapper.ToEntity(request);
 
-            await _command.CreateDish(dish);
-            return _mapper.ToResponse(dish);
+            var dishCreated = await _command.CreateDish(dish);
+            return _mapper.ToResponse(dishCreated);
         }
         
         public async Task<DishResponse> DeleteDish(Guid id)
         {
             var dish = await GetDishOrThrow(id);
-            await _command.DeleteDish(dish);
+            await _command.DeleteDish(id);
             return _mapper.ToResponse(dish);
         }
 

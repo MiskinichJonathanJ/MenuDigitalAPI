@@ -14,7 +14,7 @@ namespace UnitTest.Unit.UseCase.Dish
         protected Mock<IDishQuery> mockQuery = new();
         protected Mock<IDishMapper> mockMapper = new();
         protected Mock<IDishValidator> mockValidator = new();
-        protected DishServices service;
+        protected DishService service;
 
         protected DishServiceTestBase()
         {
@@ -23,7 +23,7 @@ namespace UnitTest.Unit.UseCase.Dish
             mockMapper = new Mock<IDishMapper>(MockBehavior.Strict);
             mockValidator = new Mock<IDishValidator>(MockBehavior.Strict);
 
-            service = new DishServices(
+            service = new DishService(
                 mockCommand.Object,
                 mockQuery.Object,
                 mockMapper.Object,

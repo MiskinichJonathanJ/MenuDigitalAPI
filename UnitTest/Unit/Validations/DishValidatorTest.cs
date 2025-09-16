@@ -18,15 +18,17 @@ namespace UnitTest.Unit.Validations
             // ACT & ASSERT
            FluentActions.Invoking(() => validator.ValidateCommon(validRequest)).Should().NotThrow();
         }
-
-        [Fact]
-        public void ValidateCommon_InvalidName_ThrowsArgumentException()
+        [Theory]
+        [InlineData("")]
+        [InlineData("  ")]
+        [InlineData(null)]
+        public void ValidateCommon_InvalidName_ThrowsArgumentException(string invalidName)
         {
             // ARRANGE
             var invalidRequest = BuildValidBaseRequest();
-            invalidRequest.Name = "";
+            invalidRequest.Name = invalidName;
             // ACT & ASSERT
-            Assert.Throws<ArgumentException>(() => validator.ValidateCommon(invalidRequest));
+            Assert.Throws<DishNameIsNullException>(() => validator.ValidateCommon(invalidRequest));
         }
 
         [Fact]
@@ -37,7 +39,7 @@ namespace UnitTest.Unit.Validations
             invalidRequest.Name = new string('a', 256);
 
             // ACT & ASSERT
-            Assert.Throws<ArgumentException>(() => validator.ValidateCommon(invalidRequest));
+            Assert.Throws<DishNameTooLongException>(() => validator.ValidateCommon(invalidRequest));
         }
 
         [Fact]
@@ -48,6 +50,13 @@ namespace UnitTest.Unit.Validations
             invalidRequest.Price = 0;
             // ACT & ASSERT
             Assert.Throws<InvalidDishPriceException>(() => validator.ValidateCommon(invalidRequest));
+        }
+        [Fact]
+        public void ValidateCommon_WithNullRequest_ThrowsArgumentNullException()
+        {
+            // ACT & ASSERT
+            FluentActions.Invoking(() => validator.ValidateCommon(null!))
+                .Should().Throw<RequestNullException>();
         }
 
         [Fact]

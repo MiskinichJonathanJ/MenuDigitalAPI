@@ -5,8 +5,8 @@ namespace Application.Interfaces.IDish
 {
     public interface IDishCommand
     {
-        Task CreateDish(Dish dish);
-        Task DeleteDish(Dish dish);
+        Task<Dish> CreateDish(Dish dish);
+        Task DeleteDish(Guid dishId);
         Task UpdateDish(Dish dishEnDB, UpdateDishRequest dishActualizado);
     }
 }

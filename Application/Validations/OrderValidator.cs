@@ -1,6 +1,5 @@
 ﻿using Application.DataTransfers.Request.Order;
 using Application.DataTransfers.Request.OrderItem;
-using Application.Exceptions;
 using Application.Exceptions.OrderException;
 using Application.Exceptions.StatusException;
 using Application.Interfaces.IOrder;
@@ -22,7 +21,7 @@ namespace Application.Validations
                     throw new InvalidIdItemException();
             }
 
-            if  (orderCreate.Delivery.Id == 1 && string.IsNullOrEmpty(orderCreate.Delivery.To))
+            if  (orderCreate.Delivery.Id == 1 && string.IsNullOrWhiteSpace(orderCreate.Delivery.To))
                 throw new MissingAdrresDeliveryException();
             return Task.CompletedTask;
         }
@@ -31,18 +30,12 @@ namespace Application.Validations
         {
             if  (from != null)
             {
-                if (from > DateTime.Now)
-                    throw new InvalidDateOrderException();
                 if (to != null && from > to)
                     throw new InvalidDateOrderException();
             }
 
-            if (status != null)
-            {
-                var validStatuses = new List<int> { 1, 2, 3, 4 };
-                if (!validStatuses.Contains(status.Value))
-                    throw new StatusNotFoundException();
-            }
+            if (status != null && !Enum.IsDefined(typeof(OrderItemStatusFlow.OrderItemStatus), status))
+                throw new StatusNotFoundException();
 
             return Task.CompletedTask;
         }

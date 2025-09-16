@@ -17,6 +17,8 @@ namespace Application.Validations
 
         public async Task ValidateCreate(DishBaseRequest request)
         {
+            if (request == null)
+                throw new RequestNullException();
             ValidateCommon(request);
             await ValidateCategoryExists(request.Category);
             await ValidateDishNameUnique(request.Name);
@@ -24,18 +26,22 @@ namespace Application.Validations
 
         public async Task ValidateUpdate(Guid idDish, UpdateDishRequest request)
         {
+            if (request == null)
+                throw new RequestNullException();
             ValidateCommon(request);
             await ValidateCategoryExists(request.Category);
             await ValidateDishNameUnique(request.Name, idDish);
         }
 
-        public void ValidateCommon(DishBaseRequest  request)
+        public void ValidateCommon(DishBaseRequest request)
         {
+            if (request == null)
+                throw new RequestNullException();
             if (string.IsNullOrWhiteSpace(request.Name))
-                throw new DishNameAlreadyExistsException();
+                throw new DishNameIsNullException();
 
             if (request.Name.Length > 255)
-                throw new InvalidLengthDIshNameException();
+                throw new DishNameTooLongException();
 
             if (request.Price <= 0)
                 throw new InvalidDishPriceException();

@@ -18,8 +18,8 @@ namespace Application.Mappers.OrderMap
                 DeliveryTo = request.Delivery.To ?? (request.Delivery.Id == 2 ? "Take away" : "Dine In"),
                 Notes = request.Notes,
                 Price = 0,
-                OverallStatusID = 1, 
-                DeliveryTypeID = request.Delivery.Id, 
+                OverallStatusID = 1,
+                DeliveryTypeID = request.Delivery.Id,
                 CreateDate = DateTime.UtcNow,
                 UpdateDate = DateTime.UtcNow
             };
