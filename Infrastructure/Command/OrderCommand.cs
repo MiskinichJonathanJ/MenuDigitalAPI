@@ -16,11 +16,12 @@ namespace Infrastructure.Command
         {
             _context = context;
         }
-        public async Task CreateOrder(Order order)
+        public async Task<Order> CreateOrder(Order order)
         {
             await _context.Orders.AddAsync(order);
 
             await _context.SaveChangesAsync();
+            return order;
         }
 
         public async Task<Order> UpdateStatusItemOrder(int orderId, int itemId, OrderItemUpdateRequest request)
@@ -37,7 +38,7 @@ namespace Infrastructure.Command
 
             orderItem.StatusId = (int)newStatus;
 
-            if (order.Items.Any(i => i.StatusId == (int)OrderItemStatus.Preparing))
+            if (order.Items.All(i => i.StatusId == (int)OrderItemStatus.Preparing))
                 order.OverallStatusID = (int)OrderItemStatus.Preparing;
 
             else if (order.Items.All(i => i.StatusId == (int)OrderItemStatus.Ready))
