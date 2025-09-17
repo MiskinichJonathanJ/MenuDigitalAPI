@@ -58,5 +58,14 @@ namespace MenuDigitalRestaurante.Controllers
             var result = await _orderService.UpdateStatusItemOrder(id, itemId, request);
             return new JsonResult(result);
         }
+
+        [HttpPatch("{id}")]
+        [ProducesResponseType(typeof(OrderUpdateResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiError), StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> UpdateOrder(OrderUpdateRequest  request, int id)
+        {
+            var result = await _orderService.UpdateOrder(request,  id);
+            return new JsonResult(result);
+        }
     }
 }

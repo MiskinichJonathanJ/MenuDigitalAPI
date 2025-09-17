@@ -22,14 +22,13 @@ namespace Application.UseCase.OrderUse
             _query = query;
         }
 
-        public async Task<OrderCreateResponse> CreateOrder(OrderRequest orderCreate)
+        private async  Task<decimal> CalculatePriceOrder(ICollection<Items> orderItems)
         {
-            await _validator.ValidateCreateOrder(orderCreate);
-            var dishes = await _query.GetAllDishesOrder(orderCreate.Items);
+            var dishes = await _query.GetAllDishesOrder(orderItems);
             var dishesById = dishes.ToDictionary(d => d.ID);
 
             decimal totalPrice = 0m;
-            foreach (var item in orderCreate.Items)
+            foreach (var item in orderItems)
             {
                 if (!dishesById.TryGetValue(item.Id, out var dish))
                     throw new DishNotAvailableException();
@@ -37,8 +36,15 @@ namespace Application.UseCase.OrderUse
                 totalPrice += dish.Price * item.Quantity;
             }
 
+            return totalPrice;
+        }
+
+        public async Task<OrderCreateResponse> CreateOrder(OrderRequest orderCreate)
+        {
+            await _validator.ValidateCreateOrder(orderCreate);
+
             var orderEntity = _mapper.ToEntity(orderCreate);
-            orderEntity.Price = totalPrice;
+            orderEntity.Price = await CalculatePriceOrder(orderCreate.Items);
             orderEntity.Items = _mapper.ToEntityItems(orderCreate.Items);
 
             var orderCreated = await _command.CreateOrder(orderEntity);
@@ -58,6 +64,18 @@ namespace Application.UseCase.OrderUse
             await _validator.ValidateGetOrderById(orderId);
             var order = await _query.GetOrderById(orderId);
             return _mapper.ToDetailsResponse(order);
+        }
+
+        public async Task<OrderUpdateResponse> UpdateOrder(OrderUpdateRequest request, int id)
+        {
+            await _validator.ValidateUpdateOrder(request);
+
+            var orderItemEntity = _mapper.ToEntityItems(request.Items);
+            decimal newPrice = await CalculatePriceOrder(request.Items); 
+            var order = await _command.UpdateOrder(orderItemEntity, id, newPrice);
+            
+
+            return _mapper.ToUpdateResponse(order);
         }
 
         public async Task<OrderUpdateResponse> UpdateStatusItemOrder(int orderId, int itemId, OrderItemUpdateRequest request)
