@@ -1,7 +1,11 @@
 ﻿using Application.Exceptions;
+using Application.Exceptions.CategoryException;
 using Application.Exceptions.DishException;
+using Application.Validations;
+using Domain.Entities;
 using FluentAssertions;
 using Moq;
+using System;
 
 namespace UnitTest.Unit.Validations
 {
@@ -18,6 +22,18 @@ namespace UnitTest.Unit.Validations
             // ACT & ASSERT
            FluentActions.Invoking(() => validator.ValidateCommon(validRequest)).Should().NotThrow();
         }
+        public static IEnumerable<object[]> ValidateMethodsTestData =>
+            new List<object[]>
+            {
+                new object[]
+                {
+                    () => new DishValidatorTest().validator.ValidateCreate(null!)
+                },
+                new object[]
+                {
+                    () => new DishValidatorTest().validator.ValidateUpdate(Guid.NewGuid(), null!)
+                }
+            };
         [Theory]
         [InlineData("")]
         [InlineData("  ")]
@@ -124,6 +140,26 @@ namespace UnitTest.Unit.Validations
 
             // ASSERT
             await act.Should().ThrowAsync<DishNameAlreadyExistsException>();
+        }
+
+        [Fact]
+        public async Task ValidateCategoryExist_WithCategoryNull_ThrowsCategoryNotFoundException()
+        {
+            // ARRANGES
+            mockQuery.Setup(q => q.GetCategoryById(It.IsAny<int>())).ReturnsAsync((Category?)null);
+            // ACT  
+            Func<Task> act = async () => await validator.ValidateCategoryExists(1);
+            // ASSERT
+            await act.Should().ThrowAsync<CategoryNotFoundException>();
+        }
+
+        [Theory]
+        [MemberData(nameof(ValidateMethodsTestData))]
+        public async Task ValidateMethods_WithNullRequest_ThrowsRequestNullException(Func<Task> action)
+        {
+            // ACT & ASSERT
+            await FluentActions.Invoking(action)
+                .Should().ThrowAsync<RequestNullException>();
         }
     }
 }

@@ -7,6 +7,8 @@ namespace UnitTest.Unit.Validations.OrderTest
 {
     public class OrderValidateCreateOrderTest
     {
+        private const int HOME_DELIVERY_TYPE = 1;
+        private const int PICKUP_DELIVERY_TYPE = 2;
         private readonly OrderValidator _validator = new();
         private static OrderRequest CreateOrderRequestValid() => new()
         {
@@ -20,13 +22,32 @@ namespace UnitTest.Unit.Validations.OrderTest
                 To = "123 Main St"
             }
         };
-        [Fact]
-        public async Task ValidateCreateOrder_WithValidParams_Sucess()
+        public static IEnumerable<object[]> InvalidItemsData =>
+            [
+                [null!],                    
+                [new List<Items>()]     
+            ];
+        public static IEnumerable<object[]> ValidDeliveryData =>
+            [
+                [HOME_DELIVERY_TYPE, "123 Main St"],
+                [PICKUP_DELIVERY_TYPE, null!],    
+                [PICKUP_DELIVERY_TYPE, ""],          
+                [3, null!],                
+                [3, "Some address"]
+            ];
+
+        [Theory]
+        [MemberData(nameof(ValidDeliveryData))]
+        public async Task ValidateCreateOrder_WithValidDeliveryParams_Succeeds(int deliveryId, string? deliveryAddress)
         {
             // ARRANGE
             var request = CreateOrderRequestValid();
+            request.Delivery.Id = deliveryId;
+            request.Delivery.To = deliveryAddress;
+
             // ACT & ASSERT
-            await FluentActions.Invoking(() => _validator.ValidateCreateOrder(request)).Should().NotThrowAsync();
+            await FluentActions.Invoking(() => _validator.ValidateCreateOrder(request))
+                .Should().NotThrowAsync();
         }
 
         [Theory]
@@ -52,12 +73,13 @@ namespace UnitTest.Unit.Validations.OrderTest
             await FluentActions.Invoking(() => _validator.ValidateCreateOrder(request)).Should().ThrowAsync<InvalidIdItemException>();
         }
 
-        [Fact]
-        public async Task ValidateCreateOrder_WithInvalidItems_ThrowsEmptyOrderItemsException()
+        [Theory]
+        [MemberData(nameof(InvalidItemsData))]
+        public async Task ValidateCreateOrder_WithInvalidItems_ThrowsEmptyOrderItemsException(ICollection<Items>? items)
         {
             // ARRANGE
             var request = CreateOrderRequestValid();
-            request.Items = [];
+            request.Items = items!;
             // ACT & ASSERT
             await FluentActions.Invoking(() => _validator.ValidateCreateOrder(request)).Should().ThrowAsync<EmptyOrderItemsException>();
         }

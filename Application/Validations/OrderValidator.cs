@@ -28,11 +28,8 @@ namespace Application.Validations
 
         public Task ValidateGetAllOrders(DateTime? from = null, DateTime? to = null, int? status = null)
         {
-            if  (from != null)
-            {
-                if (to != null && from > to)
+            if  (from != null && to != null && from > to)
                     throw new InvalidDateOrderException();
-            }
 
             if (status != null && !Enum.IsDefined(typeof(OrderItemStatusFlow.OrderItemStatus), status))
                 throw new StatusNotFoundException();
