@@ -1,7 +1,7 @@
 ﻿using Application.DataTransfers.Request.Order;
 using Application.DataTransfers.Request.OrderItem;
-using Application.Exceptions;
 using Application.Exceptions.OrderException;
+using Application.Exceptions.StatusException;
 using Application.Interfaces.IOrder;
 using Application.Validations.Helpers;
 
@@ -21,27 +21,18 @@ namespace Application.Validations
                     throw new InvalidIdItemException();
             }
 
-            if  (orderCreate.Delivery.Id == 1 && string.IsNullOrEmpty(orderCreate.Delivery.To))
+            if  (orderCreate.Delivery.Id == 1 && string.IsNullOrWhiteSpace(orderCreate.Delivery.To))
                 throw new MissingAdrresDeliveryException();
             return Task.CompletedTask;
         }
 
         public Task ValidateGetAllOrders(DateTime? from = null, DateTime? to = null, int? status = null)
         {
-            if  (from != null)
-            {
-                if (from > DateTime.Now)
+            if  (from != null && to != null && from > to)
                     throw new InvalidDateOrderException();
-                if (to != null && from > to)
-                    throw new InvalidDateOrderException();
-            }
 
-            if (status != null)
-            {
-                var validStatuses = new List<int> { 1, 2, 3, 4 };
-                if (!validStatuses.Contains(status.Value))
-                    throw new StatusNotFoundException();
-            }
+            if (status != null && !Enum.IsDefined(typeof(OrderItemStatusFlow.OrderItemStatus), status))
+                throw new StatusNotFoundException();
 
             return Task.CompletedTask;
         }
@@ -57,7 +48,7 @@ namespace Application.Validations
         {
             if (orderId <=  0 || itemId <= 0)
                 throw new InvalidOrderIdException();
-            if(Enum.IsDefined(typeof(OrderItemStatusFlow.OrderItemStatus), request.Status))
+            if(!Enum.IsDefined(typeof(OrderItemStatusFlow.OrderItemStatus), request.Status))
                 throw new StatusNotFoundException();
 
             return Task.CompletedTask;

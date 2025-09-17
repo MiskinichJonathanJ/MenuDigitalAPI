@@ -1,4 +1,4 @@
 ﻿namespace Application.Exceptions.OrderException
 {
-    public class StatusNotFoundException : NotFoundException { public StatusNotFoundException() : base("Estado no encontrado") { } }
+    public class OrderNotFoundException : NotFoundException { public OrderNotFoundException() : base("Orden no encontrada") { } }
 }

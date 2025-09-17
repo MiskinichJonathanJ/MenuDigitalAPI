@@ -31,7 +31,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("MenuDigitalConnection")));
 
 
-builder.Services.AddScoped<IDishServices, DishServices>();
+builder.Services.AddScoped<IDishServices, DishService>();
 builder.Services.AddScoped<IDishCommand, DishCommand>();
 builder.Services.AddScoped<IDishQuery, DishQuery>();
 builder.Services.AddScoped<IDishMapper, DishMapper>();

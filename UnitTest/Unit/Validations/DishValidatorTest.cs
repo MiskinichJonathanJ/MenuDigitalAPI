@@ -1,6 +1,11 @@
 ﻿using Application.Exceptions;
+using Application.Exceptions.CategoryException;
+using Application.Exceptions.DishException;
+using Application.Validations;
+using Domain.Entities;
 using FluentAssertions;
 using Moq;
+using System;
 
 namespace UnitTest.Unit.Validations
 {
@@ -17,15 +22,29 @@ namespace UnitTest.Unit.Validations
             // ACT & ASSERT
            FluentActions.Invoking(() => validator.ValidateCommon(validRequest)).Should().NotThrow();
         }
-
-        [Fact]
-        public void ValidateCommon_InvalidName_ThrowsArgumentException()
+        public static IEnumerable<object[]> ValidateMethodsTestData =>
+            new List<object[]>
+            {
+                new object[]
+                {
+                    () => new DishValidatorTest().validator.ValidateCreate(null!)
+                },
+                new object[]
+                {
+                    () => new DishValidatorTest().validator.ValidateUpdate(Guid.NewGuid(), null!)
+                }
+            };
+        [Theory]
+        [InlineData("")]
+        [InlineData("  ")]
+        [InlineData(null)]
+        public void ValidateCommon_InvalidName_ThrowsArgumentException(string invalidName)
         {
             // ARRANGE
             var invalidRequest = BuildValidBaseRequest();
-            invalidRequest.Name = "";
+            invalidRequest.Name = invalidName;
             // ACT & ASSERT
-            Assert.Throws<ArgumentException>(() => validator.ValidateCommon(invalidRequest));
+            Assert.Throws<DishNameIsNullException>(() => validator.ValidateCommon(invalidRequest));
         }
 
         [Fact]
@@ -36,7 +55,7 @@ namespace UnitTest.Unit.Validations
             invalidRequest.Name = new string('a', 256);
 
             // ACT & ASSERT
-            Assert.Throws<ArgumentException>(() => validator.ValidateCommon(invalidRequest));
+            Assert.Throws<DishNameTooLongException>(() => validator.ValidateCommon(invalidRequest));
         }
 
         [Fact]
@@ -47,6 +66,13 @@ namespace UnitTest.Unit.Validations
             invalidRequest.Price = 0;
             // ACT & ASSERT
             Assert.Throws<InvalidDishPriceException>(() => validator.ValidateCommon(invalidRequest));
+        }
+        [Fact]
+        public void ValidateCommon_WithNullRequest_ThrowsArgumentNullException()
+        {
+            // ACT & ASSERT
+            FluentActions.Invoking(() => validator.ValidateCommon(null!))
+                .Should().Throw<RequestNullException>();
         }
 
         [Fact]
@@ -114,6 +140,26 @@ namespace UnitTest.Unit.Validations
 
             // ASSERT
             await act.Should().ThrowAsync<DishNameAlreadyExistsException>();
+        }
+
+        [Fact]
+        public async Task ValidateCategoryExist_WithCategoryNull_ThrowsCategoryNotFoundException()
+        {
+            // ARRANGES
+            mockQuery.Setup(q => q.GetCategoryById(It.IsAny<int>())).ReturnsAsync((Category?)null);
+            // ACT  
+            Func<Task> act = async () => await validator.ValidateCategoryExists(1);
+            // ASSERT
+            await act.Should().ThrowAsync<CategoryNotFoundException>();
+        }
+
+        [Theory]
+        [MemberData(nameof(ValidateMethodsTestData))]
+        public async Task ValidateMethods_WithNullRequest_ThrowsRequestNullException(Func<Task> action)
+        {
+            // ACT & ASSERT
+            await FluentActions.Invoking(action)
+                .Should().ThrowAsync<RequestNullException>();
         }
     }
 }

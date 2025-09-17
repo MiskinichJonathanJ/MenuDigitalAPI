@@ -4,13 +4,54 @@ using Application.DataTransfers.Response.Dish;
 using Application.DataTransfers.Response.Order;
 using Application.DataTransfers.Response.OrderItem;
 using Application.DataTransfers.Response.OrderResponse;
+using Application.Exceptions.OrderException;
 using Domain.Entities;
+using FluentAssertions;
 using Moq;
 
 namespace UnitTest.Unit.UseCase.OrderTest
 {
     public class OrderServiceTest : OrderServiceTestBase
     {
+        [Fact]
+        public async Task CreateOrder_WithNonExistentDish_ThrowsDishNotAvailableException()
+        {
+            // ARRANGE
+            var nonExistentDishId = Guid.NewGuid();
+            var existingDishId = Guid.NewGuid();
+
+            var orderRequest = new OrderRequest
+            {
+                Items =
+            [
+                new() { Id = existingDishId, Quantity = 2 },      
+                new() { Id = nonExistentDishId, Quantity = 1 },   
+                new() { Id = Guid.NewGuid(), Quantity = 3 }       
+            ],
+                Delivery = new DeliveryRequest { Id = 1, To = "123 Main St" }
+            };
+
+            validator.Setup(v => v.ValidateCreateOrder(It.IsAny<OrderRequest>()))
+                       .Returns(Task.CompletedTask);
+
+            // Mock query - solo devuelve UN plato (falta uno de los solicitados)
+            List<Domain.Entities.Dish> availableDishes = new List<Domain.Entities.Dish>
+            {
+                new() { ID = existingDishId, Name = "Pizza", Price = 15.50m, Description = "test", ImageURL = "url" }
+            };
+
+            query.Setup(q => q.GetAllDishesOrder(It.IsAny<ICollection<Items>>()))
+                    .ReturnsAsync(availableDishes);
+
+            // ACT & ASSERT
+            await FluentActions.Invoking(() => service.CreateOrder(orderRequest))
+                .Should().ThrowAsync<DishNotAvailableException>();
+
+            validator.Verify(v => v.ValidateCreateOrder(orderRequest), Times.Once);
+            query.Verify(q => q.GetAllDishesOrder(orderRequest.Items), Times.Once);
+            command.Verify(c => c.CreateOrder(It.IsAny<Order>()), Times.Never);
+            mapper.Verify(m => m.ToCreateResponse(It.IsAny<Order>()), Times.Never);
+        }
         [Fact]
         public async Task CreateOrder_ValidParams_ReturnsOrderResponse()
         {

@@ -26,20 +26,19 @@ namespace Application.UseCase.OrderUse
         {
             await _validator.ValidateCreateOrder(orderCreate);
             var dishes = await _query.GetAllDishesOrder(orderCreate.Items);
-            if (dishes.Count != orderCreate.Items.Count)
-                throw new DishNotAvailableException();
+            var dishesById = dishes.ToDictionary(d => d.ID);
 
-            double totalPrice = 0;
+            decimal totalPrice = 0m;
             foreach (var item in orderCreate.Items)
             {
-                var dish = dishes.First(d => d.ID == item.Id);
-                totalPrice += (double)(dish.Price * item.Quantity);
+                if (!dishesById.TryGetValue(item.Id, out var dish))
+                    throw new DishNotAvailableException();
+
+                totalPrice += dish.Price * item.Quantity;
             }
 
             var orderEntity = _mapper.ToEntity(orderCreate);
-            orderEntity.Price = (decimal)totalPrice;
-
-            orderEntity.Items = _mapper.ToEntityItems(orderCreate.Items, orderEntity.Id);
+            orderEntity.Price = totalPrice;
 
             await _command.CreateOrder(orderEntity);
 

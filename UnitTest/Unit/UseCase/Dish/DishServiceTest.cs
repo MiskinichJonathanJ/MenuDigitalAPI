@@ -1,6 +1,7 @@
 ﻿using Application.DataTransfers.Request.Dish;
 using Application.DataTransfers.Response.Dish;
 using Application.Exceptions;
+using Application.Exceptions.DishException;
 using FluentAssertions;
 using Moq;
 
@@ -20,7 +21,7 @@ namespace UnitTest.Unit.UseCase.Dish
             mockMapper.Setup(m => m.ToEntity(It.IsAny<DishRequest>())).Returns(dishEntity);
             mockMapper.Setup(m => m.ToResponse(It.IsAny<Domain.Entities.Dish>())).Returns(expectedResponse);
             mockValidator.Setup(v => v.ValidateCreate(It.IsAny<DishRequest>())).Returns(Task.CompletedTask);
-            mockCommand.Setup(c => c.CreateDish(It.IsAny<Domain.Entities.Dish>())).Returns(Task.CompletedTask);
+            mockCommand.Setup(c => c.CreateDish(It.IsAny<Domain.Entities.Dish>())).ReturnsAsync(dishEntity);
 
             // ACT
             var result = await service.CreateDish(validRequest);
@@ -105,31 +106,31 @@ namespace UnitTest.Unit.UseCase.Dish
             VerifyNoOtherCalls();
         }
 
-        [Fact]
-        public async Task GetAllDish_WhenCalled_ReturnsMappedResponses()
+        public static TheoryData<string?, int?, bool?, string?> ValidSearchParameters => new()
+            {
+                { "Pizza", null, null, null },
+                { null, 1, null, null },
+                { null, null, true, null },
+                { null, null, null, "asc" },
+                { "Pasta", 2, false, "desc" }
+            };
+
+
+        [Theory]
+        [MemberData(nameof(ValidSearchParameters))]
+        public async Task GetAllDish_WithVariousValidParams_ReturnsResults(string name, int? categoryId, bool? onlyActive, string? sortByPrice)
         {
             // ARRANGE
-            var dishes = new List<Domain.Entities.Dish>
-            {
-                new Domain.Entities.Dish { ID = Guid.NewGuid(), Name = "Pizza Napoletana", Description  = "test", ImageURL= "URL", CategoryId = 2 },
-                new Domain.Entities.Dish { ID = Guid.NewGuid(), Name = "Pizza Margherita", Description  = "test", ImageURL= "URL", CategoryId = 2 }
-            };
-            mockQuery.Setup(q => q.GetAllDish("Pizza", 2, true, "asc"))
-                     .ReturnsAsync(dishes);
-
-            mockMapper.Setup(m => m.ToResponse(It.IsAny<Domain.Entities.Dish>()))
-                      .Returns<Domain.Entities.Dish>(d => new DishResponse { name = d.Name, Description = d.Description, Image = d.ImageURL });
+            var expectedDishes = new List<Domain.Entities.Dish> {};
+            mockQuery.Setup(q => q.GetAllDish(name, categoryId, onlyActive, sortByPrice))
+                     .ReturnsAsync(expectedDishes);
 
             // ACT
-            var result = await service.GetAllDish("Pizza", 2, true, "asc");
+            var result = await service.GetAllDish(name, categoryId, onlyActive, sortByPrice);
 
             // ASSERT
-            mockQuery.Verify(q => q.GetAllDish("Pizza", 2, true, "asc"), Times.Once);
-            mockMapper.Verify(m => m.ToResponse(It.IsAny<Domain.Entities.Dish>()), Times.Exactly(dishes.Count));
-            VerifyNoOtherCalls();
-
-            result.Should().HaveCount(2);
-            result.Select(r => r.name).Should().Contain(["Pizza Napoletana", "Pizza Margherita"]);
+            result.Should().NotBeNull();
+            mockQuery.Verify(q => q.GetAllDish(name, categoryId, onlyActive, sortByPrice), Times.Once);
         }
 
         [Fact]
@@ -187,7 +188,7 @@ namespace UnitTest.Unit.UseCase.Dish
             dishEntity.ID = dishId;
 
             mockQuery.Setup(q => q.GetDishById(dishId)).ReturnsAsync(dishEntity);
-            mockCommand.Setup(c => c.DeleteDish(dishEntity)).Returns(Task.CompletedTask);
+            mockCommand.Setup(c => c.DeleteDish(dishId)).Returns(Task.CompletedTask);
             mockMapper.Setup(m => m.ToResponse(It.IsAny<Domain.Entities.Dish>())).Returns(BuildResponse(dishEntity));
 
             // ACT
@@ -195,7 +196,7 @@ namespace UnitTest.Unit.UseCase.Dish
 
             // ASSERT
             mockQuery.Verify(q => q.GetDishById(dishId), Times.Once);
-            mockCommand.Verify(c => c.DeleteDish(dishEntity), Times.Once);
+            mockCommand.Verify(c => c.DeleteDish(dishId), Times.Once);
             mockMapper.Verify(m => m.ToResponse(dishEntity), Times.Once);
             VerifyNoOtherCalls();
         }

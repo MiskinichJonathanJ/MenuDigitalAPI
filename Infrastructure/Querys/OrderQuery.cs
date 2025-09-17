@@ -1,4 +1,5 @@
 ﻿using Application.DataTransfers.Request.Order;
+using Application.Exceptions.OrderException;
 using Application.Interfaces.IOrder;
 using Domain.Entities;
 using Infrastructure.Persistence;
@@ -48,7 +49,7 @@ namespace Infrastructure.Querys
                 .Include(o => o.Items)
                 .ThenInclude(oi => oi.DishNav)
                 .AsNoTracking()
-                .FirstOrDefaultAsync(o => o.Id == orderId) ?? throw new Exception("El pedido no existe.");
+                .FirstOrDefaultAsync(o => o.Id == orderId) ?? throw new OrderNotFoundException();
         }
     }
 }
