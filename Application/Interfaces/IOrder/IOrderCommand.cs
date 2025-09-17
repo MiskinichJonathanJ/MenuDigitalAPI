@@ -5,7 +5,7 @@ namespace Application.Interfaces.IOrder
 {
     public interface IOrderCommand
     {
-        Task CreateOrder(Order order);
+        Task<Order> CreateOrder(Order order);
         Task<Order> UpdateStatusItemOrder(int orderId, int itemId, OrderItemUpdateRequest request);
     }
 }

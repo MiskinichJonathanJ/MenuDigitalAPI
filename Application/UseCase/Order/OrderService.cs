@@ -39,10 +39,11 @@ namespace Application.UseCase.OrderUse
 
             var orderEntity = _mapper.ToEntity(orderCreate);
             orderEntity.Price = totalPrice;
+            orderEntity.Items = _mapper.ToEntityItems(orderCreate.Items);
 
-            await _command.CreateOrder(orderEntity);
+            var orderCreated = await _command.CreateOrder(orderEntity);
 
-            return _mapper.ToCreateResponse(orderEntity);
+            return _mapper.ToCreateResponse(orderCreated);
         }
 
         public  async Task<ICollection<OrderDetailsResponse>> GetAllOrders(DateTime? desde = null, DateTime? hasta = null, int? statusId = null)
