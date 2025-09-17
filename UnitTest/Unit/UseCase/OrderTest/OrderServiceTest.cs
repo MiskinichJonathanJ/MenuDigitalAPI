@@ -77,8 +77,10 @@ namespace UnitTest.Unit.UseCase.OrderTest
             mapper.Setup(m => m.ToEntity(It.IsAny<OrderRequest>()))
                   .Returns(new Order { Id = 1000, DeliveryTo = "calle test", Price = (decimal)total });
 
-            mapper.Setup(m => m.ToEntityItems(It.IsAny<ICollection<Items>>(), It.IsAny<int>()))
+            mapper.Setup(m => m.ToEntityItems(It.IsAny<ICollection<Items>>()))
                   .Returns(new List<OrderItem>());
+
+            command.Setup(c => c.CreateOrder(It.IsAny<Order>())).ReturnsAsync(new Order { DeliveryTo  = "Calle 123", Id  = 1000});
 
             mapper.Setup(m => m.ToCreateResponse(It.IsAny<Order>()))
                   .Returns((Order o) => new OrderCreateResponse
