@@ -1,4 +1,5 @@
-﻿using Application.DataTransfers.Request.OrderItem;
+﻿using Application.DataTransfers.Request.Order;
+using Application.DataTransfers.Request.OrderItem;
 using Domain.Entities;
 
 namespace Application.Interfaces.IOrder
@@ -7,5 +8,6 @@ namespace Application.Interfaces.IOrder
     {
         Task<Order> CreateOrder(Order order);
         Task<Order> UpdateStatusItemOrder(int orderId, int itemId, OrderItemUpdateRequest request);
+        Task<Order> UpdateOrder(ICollection<OrderItem> request, int id, decimal newPrice);
     }
 }
