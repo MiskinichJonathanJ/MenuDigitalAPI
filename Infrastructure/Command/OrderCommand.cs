@@ -22,7 +22,17 @@ namespace Infrastructure.Command
             return await _context.Orders
                 .Include(o => o.Items)
                 .FirstOrDefaultAsync(o => o.Id == orderId)
-                ?? throw new InvalidOrderIdException();
+                ?? throw new OrderNotFoundException();
+        }
+        private async Task<Order> GetOrderWithItemsNotClosedAsync(int orderId)
+        {
+            var closedStatuses = new[] {  (int)OrderItemStatus.Closed  };
+
+            return await _context.Orders
+                .Where(o => o.Id == orderId && !closedStatuses.Contains(o.OverallStatusID))
+                .Include(o => o.Items)
+                .FirstOrDefaultAsync()
+                ?? throw new OrderNotFoundException(); 
         }
         private static void UpdateExistingItem(OrderItem existingItem, OrderItem itemRequest)
         {
@@ -75,7 +85,7 @@ namespace Infrastructure.Command
 
         public async Task<Order> UpdateOrder(ICollection<OrderItem> request, int id, decimal price)
         {
-            var order = await GetOrderWithItemsAsync(id);
+            var order = await GetOrderWithItemsNotClosedAsync(id);
             var existingItemsDict = order.Items.ToDictionary(item => item.DishId);
 
             foreach (var itemRequest in request)

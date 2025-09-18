@@ -1,109 +1,13 @@
 ﻿using Application.DataTransfers.Request.OrderItem;
 using Application.Exceptions.OrderException;
-using Domain.Entities;
 using FluentAssertions;
-using Infrastructure.Command;
-using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using static Application.Validations.Helpers.OrderItemStatusFlow;
 
-namespace UnitTest.Unit.Command
+namespace UnitTest.Unit.Command.OrderCommandTest
 {
-    public class OrderCommandTest
+    public class UpdateStatusItemOrderTest : OrderCommandTestBase
     {
-        private readonly AppDbContext _context;
-        private readonly OrderCommand _orderCommand;
-
-        public OrderCommandTest()
-        {
-            var options = new DbContextOptionsBuilder<AppDbContext>()
-                .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
-                .Options;
-
-            _context = new AppDbContext(options);
-            _orderCommand = new OrderCommand(_context);
-        }
-
-        private  static Order CreateOrderValid()
-        {
-            return new Order
-            {
-                DeliveryTo = "Calle 123",
-                Price = 1233.3M,
-                OverallStatusID = 1,
-                DeliveryTypeID = 1,
-                Items = {
-                    new OrderItem { StatusId= 1, DishId = Guid.NewGuid(), OrderId = 0}
-                },
-                CreateDate = DateTime.Now,
-            };
-        }
-        private async Task<Order> CreateValidOrderOnDB()
-        {
-            var order = CreateOrderValid();
-
-            _context.Orders.Add(order);
-            await _context.SaveChangesAsync();
-            return order;
-        }
-        private async Task<Order> CreateOrderWithMultipleItems(int itemCount)
-        {
-            var items = new List<OrderItem>();
-            for (int i = 0; i < itemCount; i++)
-            {
-                items.Add(new OrderItem
-                {
-                    OrderId = 0,
-                    DishId = Guid.NewGuid(),
-                    Quantity = i + 1, 
-                    Notes = $"Test Item {i + 1}",
-                    CreatedDate = DateTime.UtcNow,
-                    StatusId = (int)OrderItemStatus.Pending
-                });
-            }
-
-            var order = new Order
-            {
-                DeliveryTo = "Test Address Multiple Items",
-                Notes = $"Test Order with {itemCount} Items",
-                Price = itemCount * 50m,
-                OverallStatusID = (int)OrderItemStatus.Pending, 
-                DeliveryTypeID = 1,
-                CreateDate = DateTime.UtcNow,
-                UpdateDate = DateTime.UtcNow,
-                Items = items
-            };
-
-            _context.Orders.Add(order);
-            await _context.SaveChangesAsync();
-
-            return await _context.Orders
-                .Include(o => o.Items)
-                .FirstAsync(o => o.Id == order.Id);
-        }
-
-        [Fact]
-        public async Task CreateOrder_WithValidOrder_ReturnsOrderWithGeneratedID()
-        {
-            // ARRANGE
-            var order = CreateOrderValid();
-            var countOrders = await _context.Orders.CountAsync();
-
-            //  ACT
-            var result = await _orderCommand.CreateOrder(order);
-
-            // ASSERT
-            Assert.NotNull(result);
-            result.Id.Should().Be(order.Id);
-            result.Items.First().OrderId.Should().Be(result.Id);
-
-            var countAfter = await _context.Orders.CountAsync();
-            countAfter.Should().Be(countOrders + 1);
-
-            var savedOrder = await _context.Orders.FindAsync(result.Id);
-            savedOrder.Should().NotBeNull();
-        }
-
         [Fact]
         public async Task UpdateStatusItemOrder_ValidTransition_UpdatesItemStatusSuccessfully()
         {
@@ -192,7 +96,7 @@ namespace UnitTest.Unit.Command
             var request = new OrderItemUpdateRequest { Status = (int)OrderItemStatus.Preparing };
 
             // ACT & ASSERT
-            await Assert.ThrowsAsync<InvalidOrderIdException>(
+            await Assert.ThrowsAsync<OrderNotFoundException>(
                 () => _orderCommand.UpdateStatusItemOrder(nonExistentOrderId, 1, request));
         }
 
