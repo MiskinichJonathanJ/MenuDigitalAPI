@@ -16,5 +16,6 @@ namespace Application.Interfaces.IOrder
         Task<ICollection<OrderDetailsResponse>> GetAllOrders(DateTime? desde = null, DateTime? hasta = null, int? statusId = null);
         Task<OrderDetailsResponse> GetOrderById(int orderId);
         Task<OrderUpdateResponse> UpdateStatusItemOrder(int orderId, int itemId, OrderItemUpdateRequest request);
+        Task<OrderUpdateResponse> UpdateOrder(OrderUpdateRequest request, int id);
     }
 }

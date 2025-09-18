@@ -14,5 +14,6 @@ namespace Application.Interfaces.IOrder
         Task ValidateGetAllOrders(DateTime? desde = null, DateTime? hasta = null, int? statusId = null);
         Task ValidateGetOrderById(int orderId);
         Task ValidateUpdateStatusItemOrder(int orderId, int itemId, OrderItemUpdateRequest request);
+        Task ValidateUpdateOrder(OrderUpdateRequest request);
     }
 }

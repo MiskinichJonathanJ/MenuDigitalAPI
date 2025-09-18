@@ -5,6 +5,7 @@ using Application.DataTransfers.Response.Order;
 using Application.DataTransfers.Response.OrderItem;
 using Application.DataTransfers.Response.OrderResponse;
 using Application.Interfaces.IOrder;
+using Application.Validations.Helpers;
 using Domain.Entities;
 
 namespace Application.Mappers.OrderMap
@@ -18,7 +19,7 @@ namespace Application.Mappers.OrderMap
                 DeliveryTo = request.Delivery.To ?? (request.Delivery.Id == 2 ? "Take away" : "Dine In"),
                 Notes = request.Notes,
                 Price = 0,
-                OverallStatusID = 1,
+                OverallStatusID = (int)OrderItemStatusFlow.OrderItemStatus.Pending,
                 DeliveryTypeID = request.Delivery.Id,
                 CreateDate = DateTime.UtcNow,
                 UpdateDate = DateTime.UtcNow
@@ -38,12 +39,12 @@ namespace Application.Mappers.OrderMap
             };
         }
 
-        public ICollection<OrderItem> ToEntityItems(ICollection<Items> items, int orderId)
+        public ICollection<OrderItem> ToEntityItems(ICollection<Items> items)
         {
             return [.. items.Select(i => new OrderItem
             {
                 DishId = i.Id,
-                OrderId = orderId,
+                OrderId = 0,
                 Quantity = i.Quantity,
                 Notes = i.Notes,
                 CreatedDate = DateTime.UtcNow,

@@ -8,7 +8,7 @@ namespace Application.Interfaces.IOrder
     public interface IOrderMapper
     {
         Order ToEntity(OrderRequest request);
-        ICollection<OrderItem> ToEntityItems(ICollection<Items> items, int orderId);
+        ICollection<OrderItem> ToEntityItems(ICollection<Items> items);
         OrderCreateResponse ToCreateResponse(Order order);
         OrderItem ToEntityItem(Items request,  int orderId);
         OrderDetailsResponse ToDetailsResponse(Order orders);
