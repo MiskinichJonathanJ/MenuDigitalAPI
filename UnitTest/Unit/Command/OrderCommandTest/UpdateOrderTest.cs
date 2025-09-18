@@ -1,4 +1,5 @@
-﻿using Domain.Entities;
+﻿using Application.Exceptions.OrderException;
+using Domain.Entities;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using static Application.Validations.Helpers.OrderItemStatusFlow;
@@ -127,6 +128,29 @@ namespace UnitTest.Unit.Command.OrderCommandTest
             var newItem = result.Items.First(i => i.DishId == newDishId);
             newItem.Quantity.Should().Be(3);
             newItem.Notes.Should().Be("Item completamente nuevo");
+        }
+        [Fact]
+        public async Task UpdateOrder_OrderClosed_ThrowsOrderNotFoundException()
+        {
+            // ARRANGE
+            var order = await CreateOrderWithMultipleItems(2);
+            order.OverallStatusID = (int)OrderItemStatus.Closed;
+            await _context.SaveChangesAsync();
+            var newPrice = 300.25m;
+            var updateRequest = new List<OrderItem>
+            {
+                new() {
+                    OrderId = order.Id,
+                    DishId = Guid.NewGuid(),
+                    Quantity = 10,
+                    Notes = "Cantidad modificada",
+                    CreatedDate = DateTime.UtcNow,
+                    StatusId = (int)OrderItemStatus.Pending
+                }
+            };
+
+            // ACT  & ASSERT
+            await Assert.ThrowsAsync<OrderNotFoundException>(() => _orderCommand.UpdateOrder(updateRequest, order.Id, newPrice));
         }
     }
 }
