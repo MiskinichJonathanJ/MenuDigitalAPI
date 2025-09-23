@@ -17,17 +17,13 @@ namespace Application.Validations
 
         public async Task ValidateCreate(DishBaseRequest request)
         {
-            if (request == null)
-                throw new RequestNullException();
             ValidateCommon(request);
             await ValidateCategoryExists(request.Category);
             await ValidateDishNameUnique(request.Name);
         }
 
-        public async Task ValidateUpdate(Guid idDish, UpdateDishRequest request)
+        public async Task ValidateUpdate(Guid idDish, DishUpdateRequest request)
         {
-            if (request == null)
-                throw new RequestNullException();
             ValidateCommon(request);
             await ValidateCategoryExists(request.Category);
             await ValidateDishNameUnique(request.Name, idDish);
@@ -56,7 +52,7 @@ namespace Application.Validations
         public async Task ValidateDishNameUnique(string name, Guid? id = null)
         {
             var dishes = await _query.GetAllDish(name: name);
-            if (dishes.Any(d => id == null  || d.ID != id))
+            if (dishes.Any(d => id == null  || d.DishId != id))
                 throw new DishNameAlreadyExistsException();
         }
     }

@@ -4,7 +4,7 @@ namespace Application.DataTransfers.Response.OrderItem
 {
     public class OrderItemResponse
     {
-        public int Id { get; set; }
+        public long Id { get; set; }
         public int Quantity { get; set; }
         public string? Notes { get; set; }
         public GenericResponse? Status { get; set; }

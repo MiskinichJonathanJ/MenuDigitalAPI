@@ -21,17 +21,17 @@ namespace Infrastructure.Querys
             string? sortByPrice = null
         )
         {
-            IQueryable<Dish> query = _context.Dishes.Include(d =>  d.CategoryNav);
+            IQueryable<Dish> query = _context.Dish.Include(d =>  d.CategoryNav);
 
             if (!string.IsNullOrEmpty(name))
-                query = query.Where(d => d.Name.Contains(name, StringComparison.OrdinalIgnoreCase));
+                query = query.Where(d => EF.Functions.ILike(d.Name, $"%{name}%"));
 
 
             if (categoryId.HasValue)
-                query = query.Where(d => d.CategoryId == categoryId);
+                query = query.Where(d => d.Category == categoryId);
 
             if (onlyActive == true)
-                query = query.Where(d => d.IsAvailable);
+                query = query.Where(d => d.Available);
 
             if (!string.IsNullOrEmpty(sortByPrice))
             {
@@ -48,12 +48,12 @@ namespace Infrastructure.Querys
 
         public async Task<Dish?> GetDishById(Guid dishId)
         {
-            return await _context.Dishes.Include(d => d.CategoryNav).FirstOrDefaultAsync(d=> d.ID == dishId);
+            return await _context.Dish.Include(d => d.CategoryNav).FirstOrDefaultAsync(d=> d.DishId == dishId);
         }
 
         public async Task<Category?> GetCategoryById(int id)
         {
-            return await _context.Categories.FirstOrDefaultAsync(c => c.Id == id);
+            return await _context.Category.FirstOrDefaultAsync(c => c.Id == id);
         }
     }
 }

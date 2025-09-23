@@ -2,8 +2,8 @@
 {
     public abstract class OrderResponseBase
     {
-        public int OrderNumber { get; set; }
-        public double TotalMount { get; set; }
-        public DateTime CreatedDate { get; set; } = DateTime.Now;
+        public long OrderNumber { get; set; }
+        public double TotalAmount { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
     }
 }

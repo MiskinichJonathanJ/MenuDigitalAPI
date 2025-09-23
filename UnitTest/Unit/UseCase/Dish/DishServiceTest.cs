@@ -48,7 +48,7 @@ namespace UnitTest.Unit.UseCase.Dish
             var dishId = Guid.NewGuid();
             var validRequest = BuildValidRequest();
             var dishEntity = BuildEntity(validRequest);
-            var dishRequest = new UpdateDishRequest
+            var dishRequest = new DishUpdateRequest
             {
                 Name = validRequest.Name,
                 Description = validRequest.Description,
@@ -60,9 +60,9 @@ namespace UnitTest.Unit.UseCase.Dish
             var expectedResponse = BuildResponse(dishEntity);
             expectedResponse.IsActive = true;
 
-            mockValidator.Setup(v => v.ValidateUpdate(It.IsAny<Guid>(), It.IsAny<UpdateDishRequest>())).Returns(Task.CompletedTask);
+            mockValidator.Setup(v => v.ValidateUpdate(It.IsAny<Guid>(), It.IsAny<DishUpdateRequest>())).Returns(Task.CompletedTask);
             mockQuery.Setup(q => q.GetDishById(It.IsAny<Guid>())).ReturnsAsync(dishEntity);
-            mockCommand.Setup(c => c.UpdateDish(It.IsAny<Domain.Entities.Dish>(), It.IsAny<UpdateDishRequest>())).Returns(Task.CompletedTask);
+            mockCommand.Setup(c => c.UpdateDish(It.IsAny<Domain.Entities.Dish>(), It.IsAny<DishUpdateRequest>())).Returns(Task.CompletedTask);
             mockMapper.Setup(m => m.ToResponse(It.IsAny<Domain.Entities.Dish>())).Returns(expectedResponse);
 
             // ACT
@@ -88,7 +88,7 @@ namespace UnitTest.Unit.UseCase.Dish
             var dishId = Guid.NewGuid();
             Domain.Entities.Dish? dishEntity = null;
             var validRequest = BuildValidRequest();
-            var dishRequest = new UpdateDishRequest
+            var dishRequest = new DishUpdateRequest
             {
                 Name = validRequest.Name,
                 Description = validRequest.Description,
@@ -140,7 +140,7 @@ namespace UnitTest.Unit.UseCase.Dish
             var dishId = Guid.NewGuid();
             var validRequest = BuildValidRequest();
             var dishEntity = BuildEntity(validRequest);
-            dishEntity.ID = dishId;
+            dishEntity.DishId = dishId;
             var expectedResponse = BuildResponse(dishEntity);
             expectedResponse.ID = dishId;
 
@@ -185,7 +185,7 @@ namespace UnitTest.Unit.UseCase.Dish
             var dishId = Guid.NewGuid();
             var validRequest = BuildValidRequest();
             var dishEntity = BuildEntity(validRequest);
-            dishEntity.ID = dishId;
+            dishEntity.DishId = dishId;
 
             mockQuery.Setup(q => q.GetDishById(dishId)).ReturnsAsync(dishEntity);
             mockCommand.Setup(c => c.DeleteDish(dishId)).Returns(Task.CompletedTask);

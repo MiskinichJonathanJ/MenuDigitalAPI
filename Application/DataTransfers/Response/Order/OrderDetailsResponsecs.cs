@@ -9,6 +9,6 @@ namespace Application.DataTransfers.Response.Order
         public GenericResponse? Status { get; set; }
         public  GenericResponse? DeliveryType { get; set; }
         public List<OrderItemResponse>? Items { get; set; }
-        public DateTime? UpdateDate { get; set; }
+        public DateTime? UpdatedAt { get; set; }
     }
 }

@@ -10,20 +10,20 @@ namespace UnitTest.Unit.Command.OrderCommandTest
         {
             // ARRANGE
             var order = CreateOrderValid();
-            var countOrders = await _context.Orders.CountAsync();
+            var countOrders = await _context.Order.CountAsync();
 
             //  ACT
             var result = await _orderCommand.CreateOrder(order);
 
             // ASSERT
             Assert.NotNull(result);
-            result.Id.Should().Be(order.Id);
-            result.Items.First().OrderId.Should().Be(result.Id);
+            result.OrderId.Should().Be(order.OrderId);
+            result.Items.First().Order.Should().Be(result.OrderId);
 
-            var countAfter = await _context.Orders.CountAsync();
+            var countAfter = await _context.Order.CountAsync();
             countAfter.Should().Be(countOrders + 1);
 
-            var savedOrder = await _context.Orders.FindAsync(result.Id);
+            var savedOrder = await _context.Order.FindAsync(result.OrderId);
             savedOrder.Should().NotBeNull();
         }
     }

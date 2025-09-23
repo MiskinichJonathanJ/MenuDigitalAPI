@@ -45,8 +45,8 @@ namespace UnitTest.Unit.UseCase.Dish
             Name = req.Name,
             Description = req.Description,
             Price = req.Price,
-            CategoryId = req.Category,
-            ImageURL = req.Image
+            Category = req.Category,
+            ImageUrl = req.Image
         };
 
         protected static DishResponse BuildResponse(Domain.Entities.Dish entity) => new()
@@ -54,8 +54,8 @@ namespace UnitTest.Unit.UseCase.Dish
             name = entity.Name,
             Description = entity.Description,
             Price = entity.Price,
-            Image = entity.ImageURL,
-            category = new GenericResponse { id = entity.CategoryId, name = "Category Name" }
+            Image = entity.ImageUrl,
+            category = new GenericResponse { id = entity.Category, name = "Category Name" }
         };
         protected void VerifyNoOtherCalls()
         {

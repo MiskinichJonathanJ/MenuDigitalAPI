@@ -15,7 +15,7 @@ namespace Infrastructure.Querys
 
         public async Task<ICollection<Category>> GetAllCategories()
         {
-            IQueryable<Category> query = _context.Categories;
+            IQueryable<Category> query = _context.Category;
             return await query.ToListAsync();
         }
     }

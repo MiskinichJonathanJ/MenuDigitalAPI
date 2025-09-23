@@ -15,7 +15,7 @@ namespace Infrastructure.Querys
 
         public async Task<ICollection<DeliveryType>> GetAllDeliveryTypes()
         {
-            IQueryable<DeliveryType> query = _context.DeliveryTypes;
+            IQueryable<DeliveryType> query = _context.DeliveryType;
             return await query.ToListAsync();
         }
     }

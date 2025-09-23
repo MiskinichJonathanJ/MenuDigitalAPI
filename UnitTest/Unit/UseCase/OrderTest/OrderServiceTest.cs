@@ -28,7 +28,7 @@ namespace UnitTest.Unit.UseCase.OrderTest
                 new() { Id = nonExistentDishId, Quantity = 1 },   
                 new() { Id = Guid.NewGuid(), Quantity = 3 }       
             ],
-                Delivery = new DeliveryRequest { Id = 1, To = "123 Main St" }
+                Delivery = new Delivery { Id = 1, To = "123 Main St" }
             };
 
             validator.Setup(v => v.ValidateCreateOrder(It.IsAny<OrderRequest>()))
@@ -37,7 +37,7 @@ namespace UnitTest.Unit.UseCase.OrderTest
             // Mock query - solo devuelve UN plato (falta uno de los solicitados)
             List<Domain.Entities.Dish> availableDishes = new List<Domain.Entities.Dish>
             {
-                new() { ID = existingDishId, Name = "Pizza", Price = 15.50m, Description = "test", ImageURL = "url" }
+                new() { DishId = existingDishId, Name = "Pizza", Price = 15.50m, Description = "test", ImageUrl = "url" }
             };
 
             query.Setup(q => q.GetAllDishesOrder(It.IsAny<ICollection<Items>>()))
@@ -62,32 +62,32 @@ namespace UnitTest.Unit.UseCase.OrderTest
                     new Items { Id = Guid.NewGuid(), Quantity = 1, Notes = "Sin queso" },
             new Items { Id = Guid.NewGuid(), Quantity = 2, Notes = "Con todo" }
                 ],
-                Delivery = new DeliveryRequest { Id = 1, To = "Calle 123" },
+                Delivery = new Delivery { Id = 1, To = "Calle 123" },
                 Notes = "Por favor, llegar antes de las 8 PM"
             };
 
             query.Setup(q => q.GetAllDishesOrder(orderCreate.Items)).ReturnsAsync(new List<Domain.Entities.Dish>
             {
-                new() { ID = orderCreate.Items.First().Id, Price = 8000, Description = "test", ImageURL = "test", Name = "test"},
-                new() {ID = orderCreate.Items.Last().Id, Price = 10000.5M, Description = "test", ImageURL= "test", Name = "test"}
+                new() { DishId = orderCreate.Items.First().Id, Price = 8000, Description = "test", ImageUrl = "test", Name = "test"},
+                new() {DishId = orderCreate.Items.Last().Id, Price = 10000.5M, Description = "test", ImageUrl= "test", Name = "test"}
             });
 
             double total = 8000 * 1 + 10000.5 * 2;
 
             mapper.Setup(m => m.ToEntity(It.IsAny<OrderRequest>()))
-                  .Returns(new Order { Id = 1000, DeliveryTo = "calle test", Price = (decimal)total });
+                  .Returns(new Order { OrderId = 1000, DeliveryTo = "calle test", Price = (decimal)total });
 
             mapper.Setup(m => m.ToEntityItems(It.IsAny<ICollection<Items>>()))
                   .Returns(new List<OrderItem>());
 
-            command.Setup(c => c.CreateOrder(It.IsAny<Order>())).ReturnsAsync(new Order { DeliveryTo  = "Calle 123", Id  = 1000});
+            command.Setup(c => c.CreateOrder(It.IsAny<Order>())).ReturnsAsync(new Order { DeliveryTo  = "Calle 123", OrderId  = 1000});
 
             mapper.Setup(m => m.ToCreateResponse(It.IsAny<Order>()))
                   .Returns((Order o) => new OrderCreateResponse
                   {
-                      OrderNumber = o.Id,
-                      TotalMount = total,
-                      CreatedDate = DateTime.Now
+                      OrderNumber = o.OrderId,
+                      TotalAmount = total,
+                      CreatedAt = DateTime.Now
                   });
 
             // ACT
@@ -96,7 +96,7 @@ namespace UnitTest.Unit.UseCase.OrderTest
             // ASSERT
             Assert.NotNull(result);
             Assert.Equal(1000, result.OrderNumber);
-            Assert.Equal(28001, result.TotalMount, 1);
+            Assert.Equal(28001, result.TotalAmount, 1);
         }
 
         [Fact]
@@ -105,8 +105,8 @@ namespace UnitTest.Unit.UseCase.OrderTest
             // ARRANGE
             var orders = new List<Order>
             {
-                new() { Id = 1, DeliveryTo = "Calle 123", CreateDate = DateTime.Now },
-                new() { Id = 2, DeliveryTo = "Avenida 456", CreateDate = DateTime.Now }
+                new() { OrderId = 1, DeliveryTo = "Calle 123", CreateDate = DateTime.Now },
+                new() { OrderId = 2, DeliveryTo = "Avenida 456", CreateDate = DateTime.Now }
             };
             DateTime desde = DateTime.Now.AddDays(-10);
             DateTime hasta = DateTime.Now;
@@ -117,8 +117,8 @@ namespace UnitTest.Unit.UseCase.OrderTest
             mapper.Setup(m => m.ToDetailsResponse(It.IsAny<Order>()))
                   .Returns((Order o) => new OrderDetailsResponse
                   {
-                    OrderNumber = o.Id,
-                    CreatedDate = o.CreateDate,
+                    OrderNumber = o.OrderId,
+                    CreatedAt = o.CreateDate,
                     Items = new List<OrderItemResponse>()
                   });
 
@@ -140,13 +140,13 @@ namespace UnitTest.Unit.UseCase.OrderTest
             Guid dishId2 = Guid.NewGuid();
             var order = new Order
             {
-                Id = orderId,
+                OrderId = orderId,
                 DeliveryTo = "Calle 123",
                 CreateDate = DateTime.Now,
                 Items = new List<OrderItem>
                 {
-                    new() { Id = 1, Quantity = 1, Notes = "Sin queso",OrderId = orderId, StatusId =  1, DishId = dishId, DishNav = new Domain.Entities.Dish { Name = "Pizza", Description = "test", ImageURL = "URLtest" } },
-                    new() { Id = 2, Quantity = 2, Notes = "Con todo", OrderId = orderId, StatusId =  1, DishId = dishId2, DishNav = new Domain.Entities.Dish { Name = "Pasta", Description = "test", ImageURL = "URLtest" } }
+                    new() { OrderItemId = 1, Quantity = 1, Notes = "Sin queso",Order = orderId, Status =  1, Dish = dishId, DishNav = new Domain.Entities.Dish { Name = "Pizza", Description = "test", ImageUrl = "URLtest" } },
+                    new() { OrderItemId = 2, Quantity = 2, Notes = "Con todo", Order = orderId, Status =  1, Dish = dishId2, DishNav = new Domain.Entities.Dish { Name = "Pasta", Description = "test", ImageUrl = "URLtest" } }
                 }
             };
 
@@ -155,18 +155,18 @@ namespace UnitTest.Unit.UseCase.OrderTest
             mapper.Setup(m => m.ToDetailsResponse(It.IsAny<Order>()))
                   .Returns((Order o) => new OrderDetailsResponse
                   {
-                      OrderNumber = o.Id,
-                      CreatedDate = o.CreateDate,
+                      OrderNumber = o.OrderId,
+                      CreatedAt = o.CreateDate,
                       Items = o.Items.Select(i => new OrderItemResponse
                       {
-                          Id = i.Id,
+                          Id = i.OrderItemId,
                           Quantity = i.Quantity,
                           Notes = i.Notes,
                           Dish = new DishShortResponse
                           {
-                              Id = i.DishId,
+                              Id = i.Dish,
                               Name = i.DishNav?.Name ?? "Unknown",
-                              Image = i.DishNav?.ImageURL ?? "No image"
+                              Image = i.DishNav?.ImageUrl ?? "No image"
                           }
                       }).ToList()
                   });
@@ -204,12 +204,12 @@ namespace UnitTest.Unit.UseCase.OrderTest
             };
             var orderItem = new OrderItem
             {
-                Id = itemId,
-                OrderId = orderId,
-                StatusId = 1,
+                OrderItemId = itemId,
+                Order = orderId,
+                Status = 1,
                 Quantity = 1,
                 Notes = "Sin queso",
-                DishId = Guid.NewGuid(),
+                Dish = Guid.NewGuid(),
                 CreatedDate = DateTime.Now
             };
 
@@ -219,7 +219,7 @@ namespace UnitTest.Unit.UseCase.OrderTest
                 .Returns((Order o) => new OrderUpdateResponse
                 {
                     OrderNumber = orderId,
-                    UpdatedDate = DateTime.Now
+                    UpdatedAt = DateTime.Now
                 });
 
             // ACT

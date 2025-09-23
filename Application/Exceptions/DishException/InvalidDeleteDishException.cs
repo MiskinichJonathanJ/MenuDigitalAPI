@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace Application.Exceptions.DishException
 {
-    public class InvlidDeleteDishException : ConflictException
+    public class InvalidDeleteDishException : ConflictException
     {
-        public InvlidDeleteDishException() : base("No se puded borrar un plato con ordenes activas.") { }
+        public InvalidDeleteDishException() : base("No se puded borrar un plato con ordenes activas.") { }
     }
 }

@@ -28,13 +28,13 @@ namespace UnitTest.Unit.Command
         {
             return new Dish
             {
-                ID = Guid.NewGuid(),
+                DishId = Guid.NewGuid(),
                 Name = "Pizza Margherita",
                 Description = "Classic Italian pizza",
                 Price = 15.50m,
-                CategoryId = 1,
-                ImageURL = "pizza.jpg",
-                IsAvailable = true
+                Category = 1,
+                ImageUrl = "pizza.jpg",
+                Available = true
             };
         }
         [Fact]
@@ -48,15 +48,15 @@ namespace UnitTest.Unit.Command
 
             // ASSERT
             result.Should().NotBeNull();
-            result.ID.Should().NotBe(Guid.Empty);
+            result.DishId.Should().NotBe(Guid.Empty);
             result.Name.Should().Be("Pizza Margherita");
             result.Description.Should().Be("Classic Italian pizza");
             result.Price.Should().Be(15.50m);
-            result.CategoryId.Should().Be(1);
-            result.ImageURL.Should().Be("pizza.jpg");
-            result.IsAvailable.Should().BeTrue();
+            result.Category.Should().Be(1);
+            result.ImageUrl.Should().Be("pizza.jpg");
+            result.Available.Should().BeTrue();
 
-            var savedDish = await _context.Dishes.FindAsync(result.ID);
+            var savedDish = await _context.Dish.FindAsync(result.DishId);
             savedDish.Should().NotBeNull();
             savedDish!.Name.Should().Be("Pizza Margherita");
         }
@@ -65,14 +65,14 @@ namespace UnitTest.Unit.Command
         public async Task CreateDish_AddsToContextAndSaves()
         {
             // ARRANGE
-            var dishCountBefore = await _context.Dishes.CountAsync();
+            var dishCountBefore = await _context.Dish.CountAsync();
             var newDish = CreateDishTest();
 
             // ACT
             await _command.CreateDish(newDish);
 
             // ASSERT
-            var dishCountAfter = await _context.Dishes.CountAsync();
+            var dishCountAfter = await _context.Dish.CountAsync();
             dishCountAfter.Should().Be(dishCountBefore + 1);
         }
 
@@ -82,13 +82,13 @@ namespace UnitTest.Unit.Command
         {
             // ARRANGE
             var originalDish = CreateDishTest();
-            originalDish.CreatedDate = DateTime.UtcNow.AddDays(-10);
-            originalDish.UpdatedDate = DateTime.UtcNow.AddDays(-5);
+            originalDish.CreateDate = DateTime.UtcNow.AddDays(-10);
+            originalDish.UpdateDate = DateTime.UtcNow.AddDays(-5);
 
-            _context.Dishes.Add(originalDish);
+            _context.Dish.Add(originalDish);
             await _context.SaveChangesAsync();
 
-            var updateRequest = new UpdateDishRequest
+            var updateRequest = new DishUpdateRequest
             {
                 Name = "Updated Name",
                 Description = "Updated Description",
@@ -107,12 +107,12 @@ namespace UnitTest.Unit.Command
             originalDish.Name.Should().Be("Updated Name");
             originalDish.Description.Should().Be("Updated Description");
             originalDish.Price.Should().Be(25.50m);
-            originalDish.CategoryId.Should().Be(2);
-            originalDish.ImageURL.Should().Be("updated.jpg");
-            originalDish.IsAvailable.Should().BeFalse();
-            originalDish.UpdatedDate.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(5));
+            originalDish.Category.Should().Be(2);
+            originalDish.ImageUrl.Should().Be("updated.jpg");
+            originalDish.Available.Should().BeFalse();
+            originalDish.UpdateDate.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(5));
 
-            var updatedDish = await _context.Dishes.FindAsync(originalDish.ID);
+            var updatedDish = await _context.Dish.FindAsync(originalDish.DishId);
             updatedDish!.Name.Should().Be("Updated Name");
             updatedDish.Price.Should().Be(25.50m);
         }
@@ -124,19 +124,19 @@ namespace UnitTest.Unit.Command
             var dish = CreateDishTest();
             dish.OrderItems = [];
 
-            _context.Dishes.Add(dish);
+            _context.Dish.Add(dish);
             await _context.SaveChangesAsync();
 
-            var dishCountBefore = await _context.Dishes.CountAsync();
+            var dishCountBefore = await _context.Dish.CountAsync();
 
             // ACT
-            await _command.DeleteDish(dish.ID);
+            await _command.DeleteDish(dish.DishId);
 
             // ASSERT
-            var dishCountAfter = await _context.Dishes.CountAsync();
+            var dishCountAfter = await _context.Dish.CountAsync();
             dishCountAfter.Should().Be(dishCountBefore - 1);
 
-            var deletedDish = await _context.Dishes.FindAsync(dish.ID);
+            var deletedDish = await _context.Dish.FindAsync(dish.DishId);
             deletedDish.Should().BeNull();
         }
 
@@ -148,22 +148,22 @@ namespace UnitTest.Unit.Command
             var dish = CreateDishTest();
             dish.OrderItems =
             [
-                new() { Id = 1, StatusId = (int)OrderItemStatus.Closed, OrderId = 1, DishId = dish.ID },
-                new() { Id = 2, StatusId = (int)OrderItemStatus.Closed, OrderId = 1, DishId = dish.ID }
+                new() { OrderItemId = 1, Status = (int)OrderItemStatus.Closed, Order = 1, Dish = dish.DishId },
+                new() { OrderItemId = 2, Status = (int)OrderItemStatus.Closed, Order = 1, Dish = dish.DishId }
             ];
 
-            _context.Dishes.Add(dish);
+            _context.Dish.Add(dish);
             await _context.SaveChangesAsync();
 
             // ACT
-            await _command.DeleteDish(dish.ID);
+            await _command.DeleteDish(dish.DishId);
 
             // ASSERT
-            var updatedDish = await _context.Dishes.FindAsync(dish.ID);
+            var updatedDish = await _context.Dish.FindAsync(dish.DishId);
             updatedDish.Should().NotBeNull();
-            updatedDish!.IsAvailable.Should().BeFalse();
+            updatedDish!.Available.Should().BeFalse();
 
-            var dishCount = await _context.Dishes.CountAsync();
+            var dishCount = await _context.Dish.CountAsync();
             dishCount.Should().BeGreaterThan(0);
         }
 
@@ -175,21 +175,21 @@ namespace UnitTest.Unit.Command
             var dish = CreateDishTest();
             dish.OrderItems =
                 [
-                    new() { Id = 1, StatusId = (int)OrderItemStatus.Pending,OrderId = 1, DishId = dish.ID },
-                    new() { Id = 2, StatusId = (int)OrderItemStatus.Closed,OrderId = 1, DishId = dish.ID }
+                    new() { OrderItemId = 1, Status = (int)OrderItemStatus.Pending,Order = 1, Dish = dish.DishId },
+                    new() { OrderItemId = 2, Status = (int)OrderItemStatus.Closed,Order = 1, Dish = dish.DishId }
                 ];
 
-            _context.Dishes.Add(dish);
+            _context.Dish.Add(dish);
             await _context.SaveChangesAsync();
 
             // ACT & ASSERT
-            await FluentActions.Invoking(() => _command.DeleteDish(dish.ID))
-                .Should().ThrowAsync<InvlidDeleteDishException>();
+            await FluentActions.Invoking(() => _command.DeleteDish(dish.DishId))
+                .Should().ThrowAsync<InvalidDeleteDishException>();
 
 
-            var unchangedDish = await _context.Dishes.FindAsync(dish.ID);
+            var unchangedDish = await _context.Dish.FindAsync(dish.DishId);
             unchangedDish.Should().NotBeNull();
-            unchangedDish!.IsAvailable.Should().BeTrue();
+            unchangedDish!.Available.Should().BeTrue();
         }
 
         [Fact]
@@ -199,16 +199,16 @@ namespace UnitTest.Unit.Command
             var dish = CreateDishTest();
             dish.OrderItems =
                 [
-                    new() { Id = 1, StatusId = (int)OrderItemStatus.Closed,OrderId = 1, DishId = dish.ID },
-                    new() { Id = 2, StatusId = (int)OrderItemStatus.Preparing,OrderId = 1, DishId = dish.ID },
-                    new() { Id = 3, StatusId = (int)OrderItemStatus.Closed,OrderId = 1, DishId = dish.ID }
+                    new() { OrderItemId = 1, Status = (int)OrderItemStatus.Closed,Order = 1, Dish = dish.DishId },
+                    new() { OrderItemId = 2, Status = (int)OrderItemStatus.Preparing,Order = 1, Dish = dish.DishId },
+                    new() { OrderItemId = 3, Status = (int)OrderItemStatus.Closed,Order = 1, Dish = dish.DishId }
                 ];
-            _context.Dishes.Add(dish);
+            _context.Dish.Add(dish);
             await _context.SaveChangesAsync();
 
             // ACT & ASSERT
-            await FluentActions.Invoking(() => _command.DeleteDish(dish.ID))
-                .Should().ThrowAsync<InvlidDeleteDishException>();
+            await FluentActions.Invoking(() => _command.DeleteDish(dish.DishId))
+                .Should().ThrowAsync<InvalidDeleteDishException>();
         }
 
         [Fact]
@@ -231,14 +231,14 @@ namespace UnitTest.Unit.Command
             var dish = CreateDishTest();
             dish.OrderItems = [];
 
-            _context.Dishes.Add(dish);
+            _context.Dish.Add(dish);
             await _context.SaveChangesAsync();
 
             // ACT
-            await _command.DeleteDish(dish.ID);
+            await _command.DeleteDish(dish.DishId);
 
             // ASSERT
-            var deletedDish = await _context.Dishes.FindAsync(dish.ID);
+            var deletedDish = await _context.Dish.FindAsync(dish.DishId);
             deletedDish.Should().BeNull();
         }
 
@@ -252,15 +252,15 @@ namespace UnitTest.Unit.Command
             var dish = CreateDishTest();
             dish.OrderItems =
             [
-                new() { Id = 1, StatusId = (int)activeStatus, OrderId = 1, DishId = dish.ID }
+                new() { OrderItemId = 1, Status = (int)activeStatus, Order = 1, Dish = dish.DishId }
             ];
 
-            _context.Dishes.Add(dish);
+            _context.Dish.Add(dish);
             await _context.SaveChangesAsync();
 
             // ACT & ASSERT
-            await FluentActions.Invoking(() => _command.DeleteDish(dish.ID))
-                .Should().ThrowAsync<InvlidDeleteDishException>();
+            await FluentActions.Invoking(() => _command.DeleteDish(dish.DishId))
+                .Should().ThrowAsync<InvalidDeleteDishException>();
         }
 
         [Fact]
@@ -271,17 +271,17 @@ namespace UnitTest.Unit.Command
             var dish2 = CreateDishTest();
             dish2.Name = "Dish 2";
 
-            _context.Dishes.AddRange(dish1, dish2);
+            _context.Dish.AddRange(dish1, dish2);
             await _context.SaveChangesAsync();
 
-            var updateRequest = new UpdateDishRequest { Name = "Updated Dish 1", Description = "New", Price = 15m, Category = 1, Image = "new.jpg", IsActive = true };
+            var updateRequest = new DishUpdateRequest { Name = "Updated Dish 1", Description = "New", Price = 15m, Category = 1, Image = "new.jpg", IsActive = true };
 
             // ACT
             await _command.UpdateDish(dish1, updateRequest);
 
             // ASSERT
-            var updatedDish1 = await _context.Dishes.FindAsync(dish1.ID);
-            var unchangedDish2 = await _context.Dishes.FindAsync(dish2.ID);
+            var updatedDish1 = await _context.Dish.FindAsync(dish1.DishId);
+            var unchangedDish2 = await _context.Dish.FindAsync(dish2.DishId);
 
             updatedDish1!.Name.Should().Be("Updated Dish 1");
             unchangedDish2!.Name.Should().Be("Dish 2");

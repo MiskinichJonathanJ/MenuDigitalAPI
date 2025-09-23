@@ -26,7 +26,7 @@ namespace MenuDigitalRestaurante.Controllers
         public async Task<IActionResult> CreateDish([FromBody] DishRequest request)
         {
             var result = await _services.CreateDish(request);
-            return new JsonResult(result);
+            return StatusCode(StatusCodes.Status201Created, result);
         }
 
         [HttpGet]
@@ -57,7 +57,7 @@ namespace MenuDigitalRestaurante.Controllers
         [ProducesResponseType(typeof(ApiError), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ApiError), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ApiError), StatusCodes.Status409Conflict)]
-        public async Task<IActionResult> UpdateDish(Guid id,[FromBody] UpdateDishRequest request)
+        public async Task<IActionResult> UpdateDish(Guid id,[FromBody] DishUpdateRequest request)
         {
             var result = await _services.UpdateDish(id, request);
             return Ok(result);

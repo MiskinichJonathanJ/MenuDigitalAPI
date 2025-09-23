@@ -30,10 +30,10 @@ namespace UnitTest.Unit.Command.OrderCommandTest
             {
                 DeliveryTo = "Calle 123",
                 Price = 1233.3M,
-                OverallStatusID = 1,
-                DeliveryTypeID = 1,
+                OverallStatus = 1,
+                DeliveryType = 1,
                 Items = {
-                    new OrderItem { StatusId= 1, DishId = Guid.NewGuid(), OrderId = 0}
+                    new OrderItem { Status= 1, Dish = Guid.NewGuid(), Order = 0}
                 },
                 CreateDate = DateTime.Now,
             };
@@ -42,7 +42,7 @@ namespace UnitTest.Unit.Command.OrderCommandTest
         {
             var order = CreateOrderValid();
 
-            _context.Orders.Add(order);
+            _context.Order.Add(order);
             await _context.SaveChangesAsync();
             return order;
         }
@@ -53,12 +53,12 @@ namespace UnitTest.Unit.Command.OrderCommandTest
             {
                 items.Add(new OrderItem
                 {
-                    OrderId = 0,
-                    DishId = Guid.NewGuid(),
+                    Order = 0,
+                    Dish = Guid.NewGuid(),
                     Quantity = i + 1, 
                     Notes = $"Test Item {i + 1}",
                     CreatedDate = DateTime.UtcNow,
-                    StatusId = (int)OrderItemStatus.Pending
+                    Status = (int)OrderItemStatus.Pending
                 });
             }
 
@@ -67,19 +67,19 @@ namespace UnitTest.Unit.Command.OrderCommandTest
                 DeliveryTo = "Test Address Multiple Items",
                 Notes = $"Test Order with {itemCount} Items",
                 Price = itemCount * 50m,
-                OverallStatusID = (int)OrderItemStatus.Pending, 
-                DeliveryTypeID = 1,
+                OverallStatus = (int)OrderItemStatus.Pending, 
+                DeliveryType = 1,
                 CreateDate = DateTime.UtcNow,
                 UpdateDate = DateTime.UtcNow,
                 Items = items
             };
 
-            _context.Orders.Add(order);
+            _context.Order.Add(order);
             await _context.SaveChangesAsync();
 
-            return await _context.Orders
+            return await _context.Order
                 .Include(o => o.Items)
-                .FirstAsync(o => o.Id == order.Id);
+                .FirstAsync(o => o.OrderId == order.OrderId);
         }
 
        

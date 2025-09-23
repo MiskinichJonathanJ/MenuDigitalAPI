@@ -1,10 +1,10 @@
 ﻿using Application.DataTransfers.Request.Dish;
 using Application.Exceptions.DishException;
 using Application.Interfaces.IDish;
-using Application.Validations.Helpers;
 using Domain.Entities;
 using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using static Application.Validations.Helpers.OrderItemStatusFlow;
 
 namespace Infrastructure.Command
@@ -20,36 +20,59 @@ namespace Infrastructure.Command
 
         public async Task<Dish> CreateDish(Dish dish)
         {
-            var addedEntity = _context.Dishes.Add(dish);
+            var addedEntity = _context.Dish.Add(dish);
             await _context.SaveChangesAsync();
             return addedEntity.Entity;
         }
 
         public async Task DeleteDish(Guid dishId)
         {
-            Dish dish = await _context.Dishes.Where(d => d.ID == dishId).Include(d =>  d.OrderItems).FirstOrDefaultAsync() ?? throw new KeyNotFoundException("Dish not found");
-            if (dish.OrderItems.Count == 0)
-                _context.Dishes.Remove(dish);
-            else if (dish.OrderItems.All(oi => oi.StatusId == (int)OrderItemStatus.Closed))
-                dish.IsAvailable = false;
-            else
-                throw new InvlidDeleteDishException();
+            var dish = await _context.Dish
+                .FirstOrDefaultAsync(d => d.DishId == dishId)
+                ?? throw new KeyNotFoundException("Dish not found");
 
-            await _context.SaveChangesAsync();
+            bool hasAnyOrders = await _context.OrderItem
+                .AnyAsync(oi => oi.Dish== dishId);
+
+            if (!hasAnyOrders)
+            {
+                _context.Dish.Remove(dish);
+                await _context.SaveChangesAsync();
+                return;
+            }
+
+            bool hasNonClosed = await _context.OrderItem
+                .AnyAsync(oi => oi.Dish == dishId && oi.Status != (int)OrderItemStatus.Closed);
+
+            if (!hasNonClosed)
+            {
+                dish.Available = false;
+                await _context.SaveChangesAsync();
+                return;
+            }
+
+            throw new InvalidDeleteDishException();
         }
 
-        public async  Task UpdateDish(Dish dishEnDB, UpdateDishRequest dishActualizado)
+        public async Task<Dish> UpdateDish(Guid id, DishUpdateRequest dishActualizado)
         {
+            var dishEnDB = await _context.Dish.Where(d => d.DishId == id).FirstOrDefaultAsync() ?? throw new DishNotFoundException();
+
+            bool exists = await _context.Dish.AnyAsync(d => d.DishId != id && d.Name == dishActualizado.Name);
+
+            if (exists)
+                throw new DishNameAlreadyExistsException();
 
             dishEnDB.Name = dishActualizado.Name;
             dishEnDB.Description = dishActualizado.Description;
             dishEnDB.Price = dishActualizado.Price;
-            dishEnDB.CategoryId = dishActualizado.Category;
-            dishEnDB.ImageURL = dishActualizado.Image;
-            dishEnDB.UpdatedDate = DateTime.UtcNow;
-            dishEnDB.IsAvailable = dishActualizado.IsActive;
+            dishEnDB.Category = dishActualizado.Category;
+            dishEnDB.ImageUrl = dishActualizado.Image;
+            dishEnDB.UpdateDate = DateTime.UtcNow;
+            dishEnDB.Available = dishActualizado.IsActive;
 
-            await _context.SaveChangesAsync();  
+            await _context.SaveChangesAsync(); 
+            return dishEnDB;
         }
     }
 }

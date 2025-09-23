@@ -15,11 +15,11 @@ namespace Application.Mappers
                 Name = request.Name,
                 Description = request.Description,
                 Price = request.Price,
-                IsAvailable = true,
-                ImageURL = request.Image,
-                CategoryId = request.Category,
-                CreatedDate = DateTime.UtcNow,
-                UpdatedDate = DateTime.UtcNow
+                Available = true,
+                ImageUrl = request.Image,
+                Category = request.Category,
+                CreateDate = DateTime.UtcNow,
+                UpdateDate = DateTime.UtcNow
             };
             return dish;
         }
@@ -28,17 +28,17 @@ namespace Application.Mappers
         {
             var dishResponse = new DishResponse
             {
-                ID = dish.ID,
+                ID = dish.DishId,
                 name = dish.Name,
                 Description = dish.Description,
                 Price = dish.Price,
-                IsActive = dish.IsAvailable,
-                Image = dish.ImageURL,
-                CreatedAt = dish.CreatedDate,
-                UpdatedAt = dish.UpdatedDate,
+                IsActive = dish.Available,
+                Image = dish.ImageUrl,
+                CreatedAt = dish.CreateDate,
+                UpdatedAt = dish.UpdateDate,
                 category = new GenericResponse
                 {
-                    id = dish.CategoryId,
+                    id = dish.Category,
                     name = dish.CategoryNav?.Name ?? "Sin categoría"
                 }
             };

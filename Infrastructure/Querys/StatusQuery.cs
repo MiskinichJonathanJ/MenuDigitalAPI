@@ -14,7 +14,7 @@ namespace Infrastructure.Querys
         }
         public async Task<ICollection<Status>> GetAllStatuses()
         {
-            IQueryable<Status> statuses = _context.Statuses;
+            IQueryable<Status> statuses = _context.Status;
             return await statuses.ToListAsync();
         }
     }

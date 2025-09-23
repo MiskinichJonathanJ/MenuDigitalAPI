@@ -11,7 +11,7 @@ namespace Application.Interfaces.IDish
     {
         Task ValidateCreate(DishBaseRequest request);
         void ValidateCommon(DishBaseRequest request);
-        Task ValidateUpdate(Guid idDish,  UpdateDishRequest request);
+        Task ValidateUpdate(Guid idDish,  DishUpdateRequest request);
         Task ValidateCategoryExists(int categoryId);
         Task ValidateDishNameUnique(string name, Guid? id = null);
     }

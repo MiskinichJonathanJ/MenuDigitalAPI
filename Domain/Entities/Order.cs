@@ -2,15 +2,15 @@ namespace Domain.Entities
 {
     public class  Order
     {
-        public int Id { get; set; }
+        public long OrderId { get; set; }
         public required string DeliveryTo { get; set; }
         public  string? Notes { get; set; }
         public decimal Price { get; set; }
 
-        public int OverallStatusID { get; set; }
+        public int OverallStatus { get; set; }
         public Status? StatusNav { get; set; }
 
-        public int DeliveryTypeID { get; set; }
+        public int DeliveryType { get; set; }
         public DeliveryType? DeliveryTypeNav { get; set; }
 
 

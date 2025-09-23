@@ -15,7 +15,7 @@ namespace Application.Mappers
         {
             return new GenericResponse
             {
-                id = entity.ID,
+                id = entity.Id,
                 name = entity.Name
             };
         }

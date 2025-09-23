@@ -7,6 +7,6 @@ namespace Application.Interfaces.IDish
     {
         Task<Dish> CreateDish(Dish dish);
         Task DeleteDish(Guid dishId);
-        Task UpdateDish(Dish dishEnDB, UpdateDishRequest dishActualizado);
+        Task<Dish> UpdateDish(Guid id, DishUpdateRequest dishActualizado);
     }
 }

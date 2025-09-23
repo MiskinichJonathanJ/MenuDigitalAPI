@@ -17,19 +17,19 @@ namespace Infrastructure.Command
         {
             _context = context;
         }
-        private async Task<Order> GetOrderWithItemsAsync(int orderId)
+        private async Task<Order> GetOrderWithItemsAsync(long orderId)
         {
-            return await _context.Orders
+            return await _context.Order
                 .Include(o => o.Items)
-                .FirstOrDefaultAsync(o => o.Id == orderId)
+                .FirstOrDefaultAsync(o => o.OrderId == orderId)
                 ?? throw new OrderNotFoundException();
         }
-        private async Task<Order> GetOrderWithItemsNotClosedAsync(int orderId)
+        private async Task<Order> GetOrderWithItemsNotClosedAsync(long orderId)
         {
             var closedStatuses = new[] {  (int)OrderItemStatus.Closed  };
 
-            return await _context.Orders
-                .Where(o => o.Id == orderId && !closedStatuses.Contains(o.OverallStatusID))
+            return await _context.Order
+                .Where(o => o.OrderId == orderId && !closedStatuses.Contains(o.OverallStatus))
                 .Include(o => o.Items)
                 .FirstOrDefaultAsync()
                 ?? throw new OrderNotFoundException(); 
@@ -41,39 +41,39 @@ namespace Infrastructure.Command
         }
         private static void UpdateOrderOverallStatus(Order order)
         {
-            if (order.Items.Any(i => i.StatusId == (int)OrderItemStatus.Preparing))
+            if (order.Items.Any(i => i.Status == (int)OrderItemStatus.Preparing))
             {
-                order.OverallStatusID = (int)OrderItemStatus.Preparing;
+                order.OverallStatus = (int)OrderItemStatus.Preparing;
             }
-            else if (order.Items.All(i => i.StatusId == (int)OrderItemStatus.Ready))
+            else if (order.Items.All(i => i.Status == (int)OrderItemStatus.Ready))
             {
-                order.OverallStatusID = (int)OrderItemStatus.Ready;
+                order.OverallStatus = (int)OrderItemStatus.Ready;
             }
-            else if (order.Items.All(i => i.StatusId == (int)OrderItemStatus.Delivered))
+            else if (order.Items.All(i => i.Status == (int)OrderItemStatus.Delivered))
             {
-                order.OverallStatusID = (int)OrderItemStatus.Delivered;
+                order.OverallStatus = (int)OrderItemStatus.Delivered;
             }
         }
 
         public async Task<Order> CreateOrder(Order order)
         {
-            await _context.Orders.AddAsync(order);
+            await _context.Order.AddAsync(order);
 
             await _context.SaveChangesAsync();
             return order;
         }
         
-        public async Task<Order> UpdateStatusItemOrder(int orderId, int itemId, OrderItemUpdateRequest request)
+        public async Task<Order> UpdateStatusItemOrder(long orderId, long itemId, OrderItemUpdateRequest request)
         {
             var order = await GetOrderWithItemsAsync(orderId);
 
-            var orderItem = order.Items.FirstOrDefault(item => item.Id == itemId)
+            var orderItem = order.Items.FirstOrDefault(item => item.OrderItemId == itemId)
                 ?? throw new OrderItemNotFoundException();
 
             var  newStatus  = (OrderItemStatusFlow.OrderItemStatus)request.Status;
-            if (!OrderItemStatusFlow.CanTransition((OrderItemStatusFlow.OrderItemStatus)orderItem.StatusId, newStatus))
+            if (!OrderItemStatusFlow.CanTransition((OrderItemStatusFlow.OrderItemStatus)orderItem.Status, newStatus))
                 throw new InvalidOrderStatusTransitionException();
-            orderItem.StatusId = (int)newStatus;
+            orderItem.Status = (int)newStatus;
 
             UpdateOrderOverallStatus(order);
 
@@ -83,14 +83,14 @@ namespace Infrastructure.Command
             return order;
         }
 
-        public async Task<Order> UpdateOrder(ICollection<OrderItem> request, int id, decimal price)
+        public async Task<Order> UpdateOrder(ICollection<OrderItem> request, long id, decimal price)
         {
             var order = await GetOrderWithItemsNotClosedAsync(id);
-            var existingItemsDict = order.Items.ToDictionary(item => item.DishId);
+            var existingItemsDict = order.Items.ToDictionary(item => item.Dish);
 
             foreach (var itemRequest in request)
             {
-                if (existingItemsDict.TryGetValue(itemRequest.DishId, out var existingItem))
+                if (existingItemsDict.TryGetValue(itemRequest.Dish, out var existingItem))
                     UpdateExistingItem(existingItem, itemRequest);
                 else
                     order.Items.Add(itemRequest);

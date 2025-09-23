@@ -2,6 +2,6 @@
 {
     public class OrderItemUpdateRequest
     {
-        public int Status { get; set; }
+        public required int Status { get; set; }
     }
 }

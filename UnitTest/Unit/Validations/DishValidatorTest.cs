@@ -97,7 +97,7 @@ namespace UnitTest.Unit.Validations
             var validRequest = BuildValidBaseRequest();
 
             mockQuery.Setup(q => q.GetCategoryById(It.IsAny<int>())).ReturnsAsync(new Domain.Entities.Category { Id = 1, Name = "test", Description = "test" });
-            mockQuery.Setup(q => q.GetAllDish(It.IsAny<string?>(), It.IsAny<int?>(), It.IsAny<bool?>(), It.IsAny<string?>())).ReturnsAsync([new Domain.Entities.Dish() { Name = "test", Description = "test", ImageURL = "URL"}]);
+            mockQuery.Setup(q => q.GetAllDish(It.IsAny<string?>(), It.IsAny<int?>(), It.IsAny<bool?>(), It.IsAny<string?>())).ReturnsAsync([new Domain.Entities.Dish() { Name = "test", Description = "test", ImageUrl = "URL"}]);
 
             // ACT
             Func<Task> act = async () => await validator.ValidateCreate(validRequest);
@@ -113,9 +113,9 @@ namespace UnitTest.Unit.Validations
             var validRequest = BuildValidUpdateRequest();
             Guid guid = Guid.NewGuid();
 
-            mockQuery.Setup(q => q.GetDishById(It.IsAny<Guid>())).ReturnsAsync(new Domain.Entities.Dish() { ID = guid, Name = "test", Description = "test", ImageURL = "URL" });
+            mockQuery.Setup(q => q.GetDishById(It.IsAny<Guid>())).ReturnsAsync(new Domain.Entities.Dish() { DishId = guid, Name = "test", Description = "test", ImageUrl = "URL" });
             mockQuery.Setup(q => q.GetCategoryById(It.IsAny<int>())).ReturnsAsync(new Domain.Entities.Category { Id = 1, Name = "test", Description = "test" });
-            mockQuery.Setup(q => q.GetAllDish(It.IsAny<string?>(), It.IsAny<int?>(), It.IsAny<bool?>(), It.IsAny<string?>())).ReturnsAsync([new Domain.Entities.Dish() { ID = guid, Name = "test", Description = "test", ImageURL = "URL" }]);
+            mockQuery.Setup(q => q.GetAllDish(It.IsAny<string?>(), It.IsAny<int?>(), It.IsAny<bool?>(), It.IsAny<string?>())).ReturnsAsync([new Domain.Entities.Dish() { DishId = guid, Name = "test", Description = "test", ImageUrl = "URL" }]);
 
             // ACT
             Func<Task> act = async () => await validator.ValidateUpdate(guid, validRequest);
@@ -131,9 +131,9 @@ namespace UnitTest.Unit.Validations
             var validRequest = BuildValidUpdateRequest();
             Guid guid = Guid.NewGuid();
 
-            mockQuery.Setup(q => q.GetDishById(It.IsAny<Guid>())).ReturnsAsync(new Domain.Entities.Dish() { ID = guid, Name = "test", Description = "test", ImageURL = "URL" });
+            mockQuery.Setup(q => q.GetDishById(It.IsAny<Guid>())).ReturnsAsync(new Domain.Entities.Dish() { DishId = guid, Name = "test", Description = "test", ImageUrl = "URL" });
             mockQuery.Setup(q => q.GetCategoryById(It.IsAny<int>())).ReturnsAsync(new Domain.Entities.Category { Id = 1, Name = "test", Description = "test" });
-            mockQuery.Setup(q => q.GetAllDish(It.IsAny<string?>(), It.IsAny<int?>(), It.IsAny<bool?>(), It.IsAny<string?>())).ReturnsAsync([new Domain.Entities.Dish() {ID=Guid.NewGuid(), Name = "test", Description = "test", ImageURL = "URL" }]);
+            mockQuery.Setup(q => q.GetAllDish(It.IsAny<string?>(), It.IsAny<int?>(), It.IsAny<bool?>(), It.IsAny<string?>())).ReturnsAsync([new Domain.Entities.Dish() {DishId=Guid.NewGuid(), Name = "test", Description = "test", ImageUrl = "URL" }]);
 
             // ACT
             Func<Task> act = async () => await validator.ValidateUpdate(guid, validRequest);

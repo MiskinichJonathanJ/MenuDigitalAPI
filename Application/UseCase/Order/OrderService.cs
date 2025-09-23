@@ -25,7 +25,7 @@ namespace Application.UseCase.OrderUse
         private async  Task<decimal> CalculatePriceOrder(ICollection<Items> orderItems)
         {
             var dishes = await _query.GetAllDishesOrder(orderItems);
-            var dishesById = dishes.ToDictionary(d => d.ID);
+            var dishesById = dishes.ToDictionary(d => d.DishId);
 
             decimal totalPrice = 0m;
             foreach (var item in orderItems)

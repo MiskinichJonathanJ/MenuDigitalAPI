@@ -16,7 +16,7 @@ namespace UnitTest.Unit.Validations.OrderTest
                 [
                     new() { Id = Guid.NewGuid(), Quantity = 2 }
                 ],
-            Delivery = new DeliveryRequest
+            Delivery = new Delivery
             {
                 Id = 1,
                 To = "123 Main St"

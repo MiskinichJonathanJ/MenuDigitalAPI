@@ -24,20 +24,20 @@ namespace MenuDigitalRestaurante.Controllers
         public async Task<IActionResult> CreateOrder([FromBody] OrderRequest request)
         {
             var result = await _orderService.CreateOrder(request);
-            return new JsonResult(result);
+            return StatusCode(StatusCodes.Status201Created, result);
         }
 
         [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<OrderDetailsResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiError), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> GetAllOrders(
-            [FromQuery] DateTime? desde = null,
-            [FromQuery] DateTime? hasta = null,
-            [FromQuery] int? statusId = null
+            [FromQuery] DateTime? from = null,
+            [FromQuery] DateTime? to = null,
+            [FromQuery] int? status = null
             )
         {
-            var result = await _orderService.GetAllOrders(desde, hasta, statusId);
-            return new JsonResult(result);
+            var result = await _orderService.GetAllOrders(from, to, status);
+            return Ok(result);
         }
 
         [HttpGet("{id}")]
@@ -46,17 +46,17 @@ namespace MenuDigitalRestaurante.Controllers
         public async Task<IActionResult> GetOrderById([FromRoute] int id)
         {
             var result = await _orderService.GetOrderById(id);
-            return new JsonResult(result);
+            return Ok(result);
         }
 
-        [HttpPatch("{id}/Item/{itemId}")]
+        [HttpPatch("{id}/item/{itemId}")]
         [ProducesResponseType(typeof(OrderUpdateResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiError), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ApiError), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> UpdateStatusItemOrder([FromRoute] int id, [FromRoute] int itemId, [FromBody] OrderItemUpdateRequest request)
         {
             var result = await _orderService.UpdateStatusItemOrder(id, itemId, request);
-            return new JsonResult(result);
+            return Ok(result);
         }
 
         [HttpPatch("{id}")]
@@ -65,7 +65,7 @@ namespace MenuDigitalRestaurante.Controllers
         public async Task<IActionResult> UpdateOrder(OrderUpdateRequest  request, int id)
         {
             var result = await _orderService.UpdateOrder(request,  id);
-            return new JsonResult(result);
+            return Ok(result);
         }
     }
 }

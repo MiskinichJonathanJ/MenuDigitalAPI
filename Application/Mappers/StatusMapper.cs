@@ -10,7 +10,7 @@ namespace Application.Mappers
         {
             return new GenericResponse
             {
-                id = status.ID,
+                id = status.Id,
                 name = status.Name
             };
         }

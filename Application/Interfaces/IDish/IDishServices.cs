@@ -20,7 +20,7 @@ namespace Application.Interfaces.IDish
             string? sortByPrice = null
         );
         Task<DishResponse> GetDishById(Guid id);
-        Task<DishResponse> UpdateDish(Guid id, UpdateDishRequest request);
+        Task<DishResponse> UpdateDish(Guid id, DishUpdateRequest request);
 
     }
 }

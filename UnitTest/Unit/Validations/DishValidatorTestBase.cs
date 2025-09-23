@@ -27,9 +27,9 @@ namespace UnitTest.Unit.Validations
             };
         }
 
-        protected static UpdateDishRequest BuildValidUpdateRequest()
+        protected static DishUpdateRequest BuildValidUpdateRequest()
         {
-            return new UpdateDishRequest
+            return new DishUpdateRequest
             {
                 Name = "Pizza",
                 Description = "test",

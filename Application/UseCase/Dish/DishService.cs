@@ -61,12 +61,11 @@ namespace Application.UseCase.DishUse
             return _mapper.ToResponse(dish);
         }
 
-        public async Task<DishResponse> UpdateDish(Guid id, UpdateDishRequest request)
+        public async Task<DishResponse> UpdateDish(Guid id, DishUpdateRequest request)
         {
-            var dish = await GetDishOrThrow(id);
             await _validator.ValidateUpdate(id, request);
 
-            await _command.UpdateDish(dish, request);
+            var dish = await _command.UpdateDish(id, request);
             
             return _mapper.ToResponse(dish);
         }

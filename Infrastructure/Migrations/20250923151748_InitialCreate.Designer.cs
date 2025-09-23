@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250905200354_RequiredNull")]
-    partial class RequiredNull
+    [Migration("20250923151748_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -46,49 +46,48 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Categories");
+                    b.ToTable("Category");
                 });
 
             modelBuilder.Entity("Domain.Entities.DeliveryType", b =>
                 {
-                    b.Property<int>("ID")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ID"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("varchar(25)");
 
-                    b.HasKey("ID");
+                    b.HasKey("Id");
 
-                    b.ToTable("DeliveryTypes");
+                    b.ToTable("DeliveryType");
                 });
 
             modelBuilder.Entity("Domain.Entities.Dish", b =>
                 {
-                    b.Property<Guid>("ID")
+                    b.Property<Guid>("DishId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasDefaultValueSql("uuid_generate_v4()");
+                        .HasColumnType("uuid");
 
-                    b.Property<int>("CategoryId")
+                    b.Property<bool>("Available")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("Category")
                         .HasColumnType("integer");
 
-                    b.Property<DateTime>("CreatedDate")
+                    b.Property<DateTime>("CreateDate")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("ImageURL")
+                    b.Property<string>("ImageUrl")
                         .IsRequired()
                         .HasColumnType("text");
-
-                    b.Property<bool>("IsAvailable")
-                        .HasColumnType("boolean");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -97,23 +96,23 @@ namespace Infrastructure.Migrations
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal");
 
-                    b.Property<DateTime>("UpdatedDate")
+                    b.Property<DateTime>("UpdateDate")
                         .HasColumnType("timestamp with time zone");
 
-                    b.HasKey("ID");
+                    b.HasKey("DishId");
 
-                    b.HasIndex("CategoryId");
+                    b.HasIndex("Category");
 
-                    b.ToTable("Dishes");
+                    b.ToTable("Dish");
                 });
 
             modelBuilder.Entity("Domain.Entities.Order", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<long>("OrderId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
+                        .HasColumnType("bigint");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("OrderId"));
 
                     b.Property<DateTime>("CreateDate")
                         .HasColumnType("timestamp with time zone");
@@ -122,13 +121,13 @@ namespace Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("varchar(255)");
 
-                    b.Property<int>("DeliveryTypeID")
+                    b.Property<int>("DeliveryType")
                         .HasColumnType("integer");
 
                     b.Property<string>("Notes")
                         .HasColumnType("text");
 
-                    b.Property<int>("OverallStatusID")
+                    b.Property<int>("OverallStatus")
                         .HasColumnType("integer");
 
                     b.Property<decimal>("Price")
@@ -137,16 +136,58 @@ namespace Infrastructure.Migrations
                     b.Property<DateTime>("UpdateDate")
                         .HasColumnType("timestamp with time zone");
 
-                    b.HasKey("Id");
+                    b.HasKey("OrderId");
 
-                    b.HasIndex("DeliveryTypeID");
+                    b.HasIndex("DeliveryType");
 
-                    b.HasIndex("OverallStatusID");
+                    b.HasIndex("OverallStatus");
 
-                    b.ToTable("Orders");
+                    b.ToTable("Order");
                 });
 
             modelBuilder.Entity("Domain.Entities.OrderItem", b =>
+                {
+                    b.Property<long>("OrderItemId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("OrderItemId"));
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("Dish")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("DishId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Notes")
+                        .HasColumnType("text");
+
+                    b.Property<long>("Order")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.HasKey("OrderItemId");
+
+                    b.HasIndex("Dish");
+
+                    b.HasIndex("DishId");
+
+                    b.HasIndex("Order");
+
+                    b.HasIndex("Status");
+
+                    b.ToTable("OrderItem");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Status", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -154,57 +195,20 @@ namespace Infrastructure.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<Guid>("DishId")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("Notes")
-                        .HasColumnType("text");
-
-                    b.Property<int>("OrderId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("Quantity")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("StatusId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("DishId");
-
-                    b.HasIndex("OrderId");
-
-                    b.HasIndex("StatusId");
-
-                    b.ToTable("OrderItems");
-                });
-
-            modelBuilder.Entity("Domain.Entities.Status", b =>
-                {
-                    b.Property<int>("ID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ID"));
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("varchar(25)");
 
-                    b.HasKey("ID");
+                    b.HasKey("Id");
 
-                    b.ToTable("Statuses");
+                    b.ToTable("Status");
                 });
 
             modelBuilder.Entity("Domain.Entities.Dish", b =>
                 {
                     b.HasOne("Domain.Entities.Category", "CategoryNav")
                         .WithMany("Dishes")
-                        .HasForeignKey("CategoryId")
+                        .HasForeignKey("Category")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
@@ -215,13 +219,13 @@ namespace Infrastructure.Migrations
                 {
                     b.HasOne("Domain.Entities.DeliveryType", "DeliveryTypeNav")
                         .WithMany("OrdersNav")
-                        .HasForeignKey("DeliveryTypeID")
+                        .HasForeignKey("DeliveryType")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("Domain.Entities.Status", "StatusNav")
                         .WithMany("OrdersNav")
-                        .HasForeignKey("OverallStatusID")
+                        .HasForeignKey("OverallStatus")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
@@ -234,19 +238,23 @@ namespace Infrastructure.Migrations
                 {
                     b.HasOne("Domain.Entities.Dish", "DishNav")
                         .WithMany()
-                        .HasForeignKey("DishId")
+                        .HasForeignKey("Dish")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.HasOne("Domain.Entities.Dish", null)
+                        .WithMany("OrderItems")
+                        .HasForeignKey("DishId");
 
                     b.HasOne("Domain.Entities.Order", "OrderNav")
                         .WithMany("Items")
-                        .HasForeignKey("OrderId")
+                        .HasForeignKey("Order")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Domain.Entities.Status", "Status")
+                    b.HasOne("Domain.Entities.Status", "StatusNav")
                         .WithMany("OrderItemsNav")
-                        .HasForeignKey("StatusId")
+                        .HasForeignKey("Status")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
@@ -254,7 +262,7 @@ namespace Infrastructure.Migrations
 
                     b.Navigation("OrderNav");
 
-                    b.Navigation("Status");
+                    b.Navigation("StatusNav");
                 });
 
             modelBuilder.Entity("Domain.Entities.Category", b =>
@@ -265,6 +273,11 @@ namespace Infrastructure.Migrations
             modelBuilder.Entity("Domain.Entities.DeliveryType", b =>
                 {
                     b.Navigation("OrdersNav");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Dish", b =>
+                {
+                    b.Navigation("OrderItems");
                 });
 
             modelBuilder.Entity("Domain.Entities.Order", b =>

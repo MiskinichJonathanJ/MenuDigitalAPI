@@ -8,8 +8,8 @@ namespace Application.DataTransfers.Request.Order
 {
     public class Items
     {
-        public Guid Id { get; set; }
-        public int Quantity { get; set; }
+        public required Guid Id { get; set; }
+        public required int Quantity { get; set; }
         public string? Notes { get; set; }
     }
 }

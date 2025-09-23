@@ -19,8 +19,8 @@ namespace Application.Mappers.OrderMap
                 DeliveryTo = request.Delivery.To ?? (request.Delivery.Id == 2 ? "Take away" : "Dine In"),
                 Notes = request.Notes,
                 Price = 0,
-                OverallStatusID = (int)OrderItemStatusFlow.OrderItemStatus.Pending,
-                DeliveryTypeID = request.Delivery.Id,
+                OverallStatus = (int)OrderItemStatusFlow.OrderItemStatus.Pending,
+                DeliveryType = request.Delivery.Id,
                 CreateDate = DateTime.UtcNow,
                 UpdateDate = DateTime.UtcNow
             };
@@ -30,12 +30,12 @@ namespace Application.Mappers.OrderMap
         {
             return new OrderItem
             {
-                DishId = request.Id,
-                OrderId = orderId,
+                Dish = request.Id,
+                Order = orderId,
                 Quantity = request.Quantity,
                 Notes = request.Notes,
                 CreatedDate = DateTime.UtcNow,
-                StatusId = 1
+                Status = 1
             };
         }
 
@@ -43,12 +43,12 @@ namespace Application.Mappers.OrderMap
         {
             return [.. items.Select(i => new OrderItem
             {
-                DishId = i.Id,
-                OrderId = 0,
+                Dish = i.Id,
+                Order = 0,
                 Quantity = i.Quantity,
                 Notes = i.Notes,
                 CreatedDate = DateTime.UtcNow,
-                StatusId = 1
+                Status = 1
             })];   
         }
 
@@ -56,9 +56,9 @@ namespace Application.Mappers.OrderMap
         {
             return new OrderCreateResponse
             {
-                OrderNumber = order.Id,
-                TotalMount = (Double)order.Price,
-                CreatedDate = order.CreateDate
+                OrderNumber = order.OrderId,
+                TotalAmount = (Double)order.Price,
+                CreatedAt = order.CreateDate
             };
         }
 
@@ -66,39 +66,39 @@ namespace Application.Mappers.OrderMap
         {
             return new OrderDetailsResponse
             {
-                OrderNumber = orders.Id,
+                OrderNumber = orders.OrderId,
                 DeliveryTo = orders.DeliveryTo,
                 Notes = orders.Notes,
-                TotalMount = (Double)orders.Price,
+                TotalAmount = (Double)orders.Price,
                 Status = orders.StatusNav == null ? null : new GenericResponse
                 {
-                    id = orders.StatusNav.ID,
+                    id = orders.StatusNav.Id,
                     name = orders.StatusNav.Name
                 },
                 DeliveryType = orders.DeliveryTypeNav == null ? null : new GenericResponse
                 {
-                    id = orders.DeliveryTypeNav.ID,
+                    id = orders.DeliveryTypeNav.Id,
                     name = orders.DeliveryTypeNav.Name
                 },
                 Items = orders.Items == null ? null : [.. orders.Items.Select(i => new OrderItemResponse
                 {
-                    Id = i.Id,
+                    Id = i.OrderItemId,
                     Dish = new DishShortResponse
                     {
-                        Id = i.DishNav?.ID ?? Guid.Empty,
+                        Id = i.DishNav?.DishId ?? Guid.Empty,
                         Name = i.DishNav?.Name ?? "Sin Nombre",
-                        Image = i.DishNav?.ImageURL ?? "No image"
+                        Image = i.DishNav?.ImageUrl ?? "No image"
                     },
                     Quantity = i.Quantity,
                     Notes = i.Notes,
-                    Status = i.Status == null ? null : new GenericResponse
+                    Status = i.StatusNav == null ? null : new GenericResponse
                     {
-                        id = i.Status.ID,
-                        name = i.Status.Name
+                        id = i.StatusNav.Id,
+                        name = i.StatusNav.Name
                     }
                 })],
-                CreatedDate = orders.CreateDate,
-                UpdateDate = orders.UpdateDate
+                CreatedAt = orders.CreateDate,
+                UpdatedAt = orders.UpdateDate
             };
         }
 
@@ -106,9 +106,9 @@ namespace Application.Mappers.OrderMap
         {
             return new OrderUpdateResponse
             {
-                OrderNumber = order.Id,
-                TotalMount = (double)order.Price,
-                UpdatedDate = order.UpdateDate
+                OrderNumber = order.OrderId,
+                TotalAmount = (double)order.Price,
+                UpdatedAt = order.UpdateDate
             };
         }
     }

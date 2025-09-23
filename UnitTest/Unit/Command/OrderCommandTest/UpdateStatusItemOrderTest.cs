@@ -14,15 +14,15 @@ namespace UnitTest.Unit.Command.OrderCommandTest
             // ARRANGE
             var order = await CreateValidOrderOnDB();
             var request = new OrderItemUpdateRequest { Status = (int)OrderItemStatus.Preparing };
-            var itemId = order.Items.First().Id;
+            var itemId = order.Items.First().OrderItemId;
 
             // ACT
-            var result = await _orderCommand.UpdateStatusItemOrder(order.Id, itemId, request);
+            var result = await _orderCommand.UpdateStatusItemOrder(order.OrderId, itemId, request);
 
             // ASSERT
             result.Should().NotBeNull();
-            var updatedItem = result.Items.First(i => i.Id == itemId);
-            updatedItem.StatusId.Should().Be((int)OrderItemStatus.Preparing);
+            var updatedItem = result.Items.First(i => i.OrderItemId == itemId);
+            updatedItem.Status.Should().Be((int)OrderItemStatus.Preparing);
         }
 
 
@@ -36,11 +36,11 @@ namespace UnitTest.Unit.Command.OrderCommandTest
             // ACT
             foreach (var item in order.Items)
             {
-                await _orderCommand.UpdateStatusItemOrder(order.Id, item.Id, request);
+                await _orderCommand.UpdateStatusItemOrder(order.OrderId, item.OrderItemId, request);
             }
 
             // ASSERT
-            order.OverallStatusID.Should().Be((int)OrderItemStatus.Preparing);
+            order.OverallStatus.Should().Be((int)OrderItemStatus.Preparing);
         }
 
         [Fact]
@@ -50,21 +50,21 @@ namespace UnitTest.Unit.Command.OrderCommandTest
             var order = await CreateOrderWithMultipleItems(2);
             foreach (var item in order.Items)
             {
-                await _orderCommand.UpdateStatusItemOrder(order.Id, item.Id,
+                await _orderCommand.UpdateStatusItemOrder(order.OrderId, item.OrderItemId,
                     new OrderItemUpdateRequest { Status = (int)OrderItemStatus.Preparing });
             }
 
             // ACT
             foreach (var item in order.Items)
             {
-                await _orderCommand.UpdateStatusItemOrder(order.Id, item.Id,
+                await _orderCommand.UpdateStatusItemOrder(order.OrderId, item.OrderItemId,
                     new OrderItemUpdateRequest { Status = (int)OrderItemStatus.Ready });
             }
 
-            var result = await _context.Orders.Include(o => o.Items).FirstAsync(o => o.Id == order.Id);
+            var result = await _context.Order.Include(o => o.Items).FirstAsync(o => o.OrderId == order.OrderId);
 
             // ASSERT
-            result.OverallStatusID.Should().Be((int)OrderItemStatus.Ready);
+            result.OverallStatus.Should().Be((int)OrderItemStatus.Ready);
         }
 
         [Fact]
@@ -74,18 +74,18 @@ namespace UnitTest.Unit.Command.OrderCommandTest
             var order = await CreateOrderWithMultipleItems(2);
             foreach (var item in order.Items)
             {
-                await _orderCommand.UpdateStatusItemOrder(order.Id, item.Id,
+                await _orderCommand.UpdateStatusItemOrder(order.OrderId, item.OrderItemId,
                     new OrderItemUpdateRequest { Status = (int)OrderItemStatus.Preparing });
-                await _orderCommand.UpdateStatusItemOrder(order.Id, item.Id,
+                await _orderCommand.UpdateStatusItemOrder(order.OrderId, item.OrderItemId,
                     new OrderItemUpdateRequest { Status = (int)OrderItemStatus.Ready });
-                await _orderCommand.UpdateStatusItemOrder(order.Id, item.Id,
+                await _orderCommand.UpdateStatusItemOrder(order.OrderId, item.OrderItemId,
                     new OrderItemUpdateRequest { Status = (int)OrderItemStatus.Delivered });
             }
 
-            var result = await _context.Orders.Include(o => o.Items).FirstAsync(o => o.Id == order.Id);
+            var result = await _context.Order.Include(o => o.Items).FirstAsync(o => o.OrderId == order.OrderId);
 
             // ASSERT
-            result.OverallStatusID.Should().Be((int)OrderItemStatus.Delivered);
+            result.OverallStatus.Should().Be((int)OrderItemStatus.Delivered);
         }
 
         [Fact]
@@ -110,7 +110,7 @@ namespace UnitTest.Unit.Command.OrderCommandTest
 
             // ACT & ASSERT
             await Assert.ThrowsAsync<OrderItemNotFoundException>(
-                () => _orderCommand.UpdateStatusItemOrder(order.Id, nonExistentItemId, request));
+                () => _orderCommand.UpdateStatusItemOrder(order.OrderId, nonExistentItemId, request));
         }
 
         [Fact]
@@ -119,12 +119,12 @@ namespace UnitTest.Unit.Command.OrderCommandTest
             // ARRANGE
             var order1 = await CreateValidOrderOnDB();
             var order2 = await CreateValidOrderOnDB();
-            var itemFromOrder2 = order2.Items.First().Id;
+            var itemFromOrder2 = order2.Items.First().OrderItemId;
             var request = new OrderItemUpdateRequest { Status = (int)OrderItemStatus.Preparing };
 
             // ACT & ASSERT
             await Assert.ThrowsAsync<OrderItemNotFoundException>(
-                () => _orderCommand.UpdateStatusItemOrder(order1.Id, itemFromOrder2, request));
+                () => _orderCommand.UpdateStatusItemOrder(order1.OrderId, itemFromOrder2, request));
         }
 
         [Fact]
@@ -132,13 +132,13 @@ namespace UnitTest.Unit.Command.OrderCommandTest
         {
             // ARRANGE
             var order = await CreateValidOrderOnDB();
-            var itemId = order.Items.First().Id;
+            var itemId = order.Items.First().OrderItemId;
 
             var request = new OrderItemUpdateRequest { Status = (int)OrderItemStatus.Delivered };
 
             // ACT & ASSERT
             await Assert.ThrowsAsync<InvalidOrderStatusTransitionException>(
-                () => _orderCommand.UpdateStatusItemOrder(order.Id, itemId, request));
+                () => _orderCommand.UpdateStatusItemOrder(order.OrderId, itemId, request));
         }
     }
 }

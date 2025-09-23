@@ -14,6 +14,7 @@ using Application.Validations;
 using Infrastructure.Command;
 using Infrastructure.Persistence;
 using Infrastructure.Querys;
+using Microsoft.Azure.Management.Storage.Fluent.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 
@@ -82,6 +83,7 @@ using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     await db.Database.MigrateAsync();
+    await AppDbContextSeed.SeedAsync(db);
 }
 
 app.UseHttpsRedirection();
