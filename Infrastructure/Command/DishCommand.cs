@@ -27,9 +27,7 @@ namespace Infrastructure.Command
 
         public async Task DeleteDish(Guid dishId)
         {
-            var dish = await _context.Dish
-                .FirstOrDefaultAsync(d => d.DishId == dishId)
-                ?? throw new KeyNotFoundException("Dish not found");
+            var dish = await _context.Dish.FindAsync(dishId) ?? throw new DishNotFoundException();
 
             bool hasAnyOrders = await _context.OrderItem
                 .AnyAsync(oi => oi.Dish== dishId);
@@ -56,7 +54,7 @@ namespace Infrastructure.Command
 
         public async Task<Dish> UpdateDish(Guid id, DishUpdateRequest dishActualizado)
         {
-            var dishEnDB = await _context.Dish.Where(d => d.DishId == id).FirstOrDefaultAsync() ?? throw new DishNotFoundException();
+            var dishEnDB = await _context.Dish.FindAsync(id) ?? throw new DishNotFoundException();
 
             bool exists = await _context.Dish.AnyAsync(d => d.DishId != id && d.Name == dishActualizado.Name);
 

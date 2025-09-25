@@ -108,7 +108,7 @@ namespace Application.Mappers.OrderMap
             {
                 OrderNumber = order.OrderId,
                 TotalAmount = (double)order.Price,
-                UpdatedAt = order.UpdateDate
+                UpdateAt = order.UpdateDate
             };
         }
     }

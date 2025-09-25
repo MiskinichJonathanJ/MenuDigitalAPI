@@ -38,20 +38,17 @@ namespace Infrastructure.Command
             existingItem.Notes = itemRequest.Notes;
             existingItem.Quantity = itemRequest.Quantity;
         }
-        private static void UpdateOrderOverallStatus(Order order)
+        private async Task UpdateOrderOverallStatus(Order orderUpd)
         {
-            if (order.Items.Any(i => i.Status == (int)OrderItemStatus.Preparing))
-            {
-                order.OverallStatus = (int)OrderItemStatus.Preparing;
-            }
-            else if (order.Items.All(i => i.Status == (int)OrderItemStatus.Ready))
-            {
-                order.OverallStatus = (int)OrderItemStatus.Ready;
-            }
-            else if (order.Items.All(i => i.Status == (int)OrderItemStatus.Delivered))
-            {
-                order.OverallStatus = (int)OrderItemStatus.Delivered;
-            }
+            ArgumentNullException.ThrowIfNull(orderUpd);
+
+            var minStatus = await _context.OrderItem
+                .Where(oi => oi.Order == orderUpd.OrderId)
+                .MinAsync(oi => (int?)oi.Status);
+
+            if (!minStatus.HasValue) return;
+
+            orderUpd.OverallStatus = minStatus.Value;
         }
 
         public async Task<Order> CreateOrder(Order order)
@@ -66,7 +63,8 @@ namespace Infrastructure.Command
         {
             var order = await GetOrderWithItemsAsync(orderId);
 
-            var orderItem = order.Items.FirstOrDefault(item => item.OrderItemId == itemId)
+            var orderItem = await _context.OrderItem
+                .FirstOrDefaultAsync(oi => oi.OrderItemId == itemId && oi.Order == orderId)
                 ?? throw new OrderItemNotFoundException();
 
             var  newStatus  = (OrderItemStatusFlow.OrderItemStatus)request.Status;
@@ -74,7 +72,7 @@ namespace Infrastructure.Command
                 throw new InvalidOrderStatusTransitionException();
             orderItem.Status = (int)newStatus;
 
-            UpdateOrderOverallStatus(order);
+            await UpdateOrderOverallStatus(order);
 
             order.UpdateDate = DateTime.UtcNow;
 
@@ -90,24 +88,24 @@ namespace Infrastructure.Command
 
             var existingItems = await _context.OrderItem
                 .Where(oi => oi.Order == id && requestDishes.Contains(oi.Dish))
-                .ToListAsync();
+                .ToDictionaryAsync(oi => oi.Dish);
 
-            var existingItemsDict = existingItems.ToDictionary(item => item.Dish);
             var itemsToAdd = new List<OrderItem>();
 
             foreach (var itemRequest in request)
             {
-                if (existingItemsDict.TryGetValue(itemRequest.Dish, out var existingItem))
+                if (existingItems.TryGetValue(itemRequest.Dish, out var existingItem))
                     UpdateExistingItem(existingItem, itemRequest);
                 else
-                {
+                { 
                     itemRequest.Order = id;
                     itemsToAdd.Add(itemRequest);
                 }
             }
 
-            if (itemsToAdd.Count != 0)
+            if (itemsToAdd.Count > 0)
                 await _context.OrderItem.AddRangeAsync(itemsToAdd);
+
             order.UpdateDate = DateTime.UtcNow;
             order.Price = newPrice;
 
