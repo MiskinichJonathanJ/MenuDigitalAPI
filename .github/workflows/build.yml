@@ -16,7 +16,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # necesario para SonarCloud
+          fetch-depth: 0
 
       - name: Setup .NET 8
         uses: actions/setup-dotnet@v3
@@ -52,7 +52,9 @@ jobs:
             /k:"MiskinichJonathanJ_MenuDigitalAPI" `
             /o:"miskinichjonathanj" `
             /d:sonar.login="${{ secrets.SONAR_TOKEN }}" `
-            /d:sonar.cs.opencover.reportsPaths="UnitTest/coverage/coverage.opencover.xml"
+            /d:sonar.cs.opencover.reportsPaths="UnitTest/coverage/coverage.opencover.xml `
+            /d:sonar.exclusions="**/Migrations/**,**/*Migrations/*.cs,**/Seeds/**,**/*Seed*.cs,**/Infrastructure/**/Persistence/**/Seed*.cs" `
+            /d:sonar.coverage.exclusions="**/Migrations/**,**/Seeds/**,**/*Seed*.cs"
 
       - name: Restore dependencies
         run: dotnet restore
