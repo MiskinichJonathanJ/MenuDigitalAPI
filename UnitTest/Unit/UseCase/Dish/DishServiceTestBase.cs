@@ -43,10 +43,10 @@ namespace UnitTest.Unit.UseCase.Dish
         protected static Domain.Entities.Dish BuildEntity(DishRequest req) => new()
         {
             Name = req.Name,
-            Description = req.Description,
+            Description = req.Description ?? "",
             Price = req.Price,
             Category = req.Category,
-            ImageUrl = req.Image
+            ImageUrl = req.Image ?? ""
         };
 
         protected static DishResponse BuildResponse(Domain.Entities.Dish entity) => new()

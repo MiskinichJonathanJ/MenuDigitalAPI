@@ -13,10 +13,10 @@ namespace Application.Mappers
             var dish = new Dish
             {
                 Name = request.Name,
-                Description = request.Description,
+                Description = request.Description ?? "Sin Desc",
                 Price = request.Price,
                 Available = true,
-                ImageUrl = request.Image,
+                ImageUrl = request.Image ?? "No Image",
                 Category = request.Category,
                 CreateDate = DateTime.UtcNow,
                 UpdateDate = DateTime.UtcNow

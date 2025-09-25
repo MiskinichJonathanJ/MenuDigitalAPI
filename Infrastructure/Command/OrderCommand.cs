@@ -82,7 +82,7 @@ namespace Infrastructure.Command
             return order;
         }
 
-        public async Task<Order> UpdateOrder(ICollection<OrderItem> request, long id, decimal price)
+        public async Task<Order> UpdateOrder(ICollection<OrderItem> request, long id, decimal newPrice)
         {
             var order = await GetOrderWithItemsNotClosedAsync(id);
 
@@ -109,7 +109,7 @@ namespace Infrastructure.Command
             if (itemsToAdd.Count != 0)
                 await _context.OrderItem.AddRangeAsync(itemsToAdd);
             order.UpdateDate = DateTime.UtcNow;
-            order.Price = price;
+            order.Price = newPrice;
 
             await _context.SaveChangesAsync();
             return order;

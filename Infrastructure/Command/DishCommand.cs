@@ -64,10 +64,10 @@ namespace Infrastructure.Command
                 throw new DishNameAlreadyExistsException();
 
             dishEnDB.Name = dishActualizado.Name;
-            dishEnDB.Description = dishActualizado.Description;
+            dishEnDB.Description = dishActualizado.Description ?? "";
             dishEnDB.Price = dishActualizado.Price;
             dishEnDB.Category = dishActualizado.Category;
-            dishEnDB.ImageUrl = dishActualizado.Image;
+            dishEnDB.ImageUrl = dishActualizado.Image ?? "";
             dishEnDB.UpdateDate = DateTime.UtcNow;
             dishEnDB.Available = dishActualizado.IsActive;
 

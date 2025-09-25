@@ -36,4 +36,8 @@
     <Folder Include="Unit\Query\" />
   </ItemGroup>
 
+	<PropertyGroup>
+		<ExcludeByFile>**/Migrations/*.cs</ExcludeByFile>
+	</PropertyGroup>
+
 </Project>
