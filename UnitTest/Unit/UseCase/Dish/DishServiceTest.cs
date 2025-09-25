@@ -61,8 +61,7 @@ namespace UnitTest.Unit.UseCase.Dish
             expectedResponse.IsActive = true;
 
             mockValidator.Setup(v => v.ValidateUpdate(It.IsAny<Guid>(), It.IsAny<DishUpdateRequest>())).Returns(Task.CompletedTask);
-            mockQuery.Setup(q => q.GetDishById(It.IsAny<Guid>())).ReturnsAsync(dishEntity);
-            mockCommand.Setup(c => c.UpdateDish(It.IsAny<Domain.Entities.Dish>(), It.IsAny<DishUpdateRequest>())).Returns(Task.CompletedTask);
+            mockCommand.Setup(c => c.UpdateDish(It.IsAny<Guid>(), It.IsAny<DishUpdateRequest>())).ReturnsAsync(dishEntity);
             mockMapper.Setup(m => m.ToResponse(It.IsAny<Domain.Entities.Dish>())).Returns(expectedResponse);
 
             // ACT
@@ -70,7 +69,7 @@ namespace UnitTest.Unit.UseCase.Dish
 
             // ASSERT
             mockValidator.Verify(v => v.ValidateUpdate(dishId, dishRequest), Times.Once);
-            mockCommand.Verify(c => c.UpdateDish(dishEntity, dishRequest), Times.Once);
+            mockCommand.Verify(c => c.UpdateDish(dishId, dishRequest), Times.Once);
             result.name.Should().Be(expectedResponse.name);
             result.Description.Should().Be(expectedResponse.Description);
             result.Price.Should().Be(expectedResponse.Price);
@@ -86,7 +85,6 @@ namespace UnitTest.Unit.UseCase.Dish
         {
             // ARRANGE
             var dishId = Guid.NewGuid();
-            Domain.Entities.Dish? dishEntity = null;
             var validRequest = BuildValidRequest();
             var dishRequest = new DishUpdateRequest
             {
@@ -98,12 +96,11 @@ namespace UnitTest.Unit.UseCase.Dish
                 IsActive = true
             };
 
-            mockQuery.Setup(q => q.GetDishById(It.IsAny<Guid>())).ReturnsAsync(dishEntity);
+            mockValidator.Setup(v => v.ValidateUpdate(It.IsAny<Guid>(), It.IsAny<DishUpdateRequest>())).Returns(Task.CompletedTask);
+            mockCommand.Setup(c => c.UpdateDish(It.IsAny<Guid>(), It.IsAny<DishUpdateRequest>())).ThrowsAsync(new DishNotFoundException());
 
             //Assert
             await Assert.ThrowsAsync<DishNotFoundException>(() => service.UpdateDish(dishId, dishRequest));
-            mockQuery.Verify(q => q.GetDishById(dishId), Times.Once);
-            VerifyNoOtherCalls();
         }
 
         public static TheoryData<string?, int?, bool?, string?> ValidSearchParameters => new()

@@ -101,7 +101,7 @@ namespace UnitTest.Unit.Command
             var timeBefore = DateTime.UtcNow;
 
             // ACT
-            await _command.UpdateDish(originalDish, updateRequest);
+            await _command.UpdateDish(originalDish.DishId, updateRequest);
 
             // ASSERT
             originalDish.Name.Should().Be("Updated Name");
@@ -277,7 +277,7 @@ namespace UnitTest.Unit.Command
             var updateRequest = new DishUpdateRequest { Name = "Updated Dish 1", Description = "New", Price = 15m, Category = 1, Image = "new.jpg", IsActive = true };
 
             // ACT
-            await _command.UpdateDish(dish1, updateRequest);
+            await _command.UpdateDish(dish1.DishId, updateRequest);
 
             // ASSERT
             var updatedDish1 = await _context.Dish.FindAsync(dish1.DishId);
