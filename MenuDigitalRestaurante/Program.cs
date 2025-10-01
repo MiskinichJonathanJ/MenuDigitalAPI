@@ -63,13 +63,22 @@ builder.Services.AddSwaggerGen(options =>
     {
         Version = "v1",
         Title = "Restaurante API",
-        Description = "API para la gestión de platos en un restaurante"
+        Description = "API para la gestiï¿½n de platos en un restaurante"
     });
     var xmlFile = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
     var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
     options.IncludeXmlComments(xmlPath);
 });
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend", policy =>
+    {
+        policy.WithOrigins("http://localhost:3000")
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
+});
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -85,6 +94,8 @@ using (var scope = app.Services.CreateScope())
     await db.Database.MigrateAsync();
     await AppDbContextSeed.SeedAsync(db);
 }
+
+app.UseCors("AllowFrontend");
 
 app.UseHttpsRedirection();
 

@@ -25,7 +25,15 @@ services:
             ASPNETCORE_ENVIRONMENT: Development
             ASPNETCORE_URLS: http://+:80
         ports:
-            - 8080:80
+            - 5000:80
+    frontend:
+        image: nginx:latest
+        volumes:
+            - ./frontend:/usr/share/nginx/html:ro
+        ports:
+            - "3000:80"
+        depends_on:
+            - api
 
 volumes:
     db_data:

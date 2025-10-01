@@ -1,0 +1,161 @@
+/* styles.css - Estilos globales */
+
+/* LOADER - Pantalla de carga */
+.loader-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.95);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    transition: opacity 0.3s ease;
+}
+
+    .loader-container.fade-out {
+        opacity: 0;
+        pointer-events: none;
+    }
+
+/* BOTONES DE CATEGORÍA */
+.category-btn {
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    margin-bottom: 5px;
+}
+
+    .category-btn:hover {
+        transform: translateX(5px);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .category-btn.active {
+        background-color: #0d6efd !important;
+        color: white !important;
+        border-color: #0d6efd !important;
+        transform: translateX(5px);
+    }
+
+/* CARRITO */
+#empty-cart {
+    opacity: 0.7;
+}
+
+#cart-items {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+/* CONTADOR DEL CARRITO */
+#cart-count {
+    min-width: 20px;
+    height: 20px;
+    font-size: 0.75rem;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* GRID DE PLATOS */
+#dishes-container {
+    min-height: 400px;
+}
+
+/* STICKY SIDEBAR */
+.sticky-sidebar {
+    position: sticky;
+    top: 100px;
+    max-height: calc(100vh - 120px);
+    overflow-y: auto;
+}
+
+/* BÚSQUEDA */
+.search-highlight {
+    background-color: yellow;
+    padding: 2px 4px;
+    border-radius: 3px;
+}
+
+/* ANIMACIONES */
+.fade-in {
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.slide-in {
+    animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(-20px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+    .navbar-brand span {
+        font-size: 0.9rem;
+    }
+
+    .category-btn {
+        font-size: 0.9rem;
+        padding: 0.5rem 0.75rem;
+    }
+
+    #dishes-container {
+        padding: 0 10px;
+    }
+}
+
+/* ESTADOS DE HOVER */
+.btn:hover {
+    transform: translateY(-2px);
+    transition: all 0.2s ease;
+}
+
+.card:hover {
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+}
+
+/* SCROLLBAR PERSONALIZADA */
+::-webkit-scrollbar {
+    width: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 3px;
+}
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: #a8a8a8;
+    }
