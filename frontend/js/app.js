@@ -3,6 +3,7 @@ import { appState } from './store.js';
 import { renderLoader } from './components/loader.js';
 import { CategoryService } from './services/categoryService.js';
 import { DishService } from './services/dishService.js';
+import { CartService } from './services/cartService.js';
 
 async function initApp() {
     try {
@@ -17,6 +18,7 @@ async function initApp() {
         if (DishService) {
             await DishService.init();
         }
+        CartService.updateCartUI();
 
         showSuccess('Aplicación cargada correctamente!');
     } catch (error) {
