@@ -1,4 +1,4 @@
-export const API_CONFIG = {
+﻿export const API_CONFIG = {
   BASE_URL: 'http://localhost:5000/api/v1',
   ENDPOINTS: {
     DISHES: '/Dish',
@@ -8,8 +8,8 @@ export const API_CONFIG = {
     DELIVERY_TYPES: '/Deliverytype'
   },
   HEADERS: {
-    'Content-Type': 'application/json',
-    'Accept': 'application/json'
+      'Content-Type': 'application/json; charset=utf-8',
+      'Accept': 'application/json; charset=utf-8'
   }
 };
 

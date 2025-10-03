@@ -1,4 +1,4 @@
-import { toastHTML } from "../components/toast.js";
+﻿import { toastHTML } from "../components/toast.js";
 export function showError(message) {
     let toastContainer = document.getElementById('toast-container');
     if (!toastContainer) {

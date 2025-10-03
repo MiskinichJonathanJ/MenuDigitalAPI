@@ -1,4 +1,4 @@
-export const appState = {
+﻿export const appState = {
     dishes: [],
     categories: [],
     cart: [],

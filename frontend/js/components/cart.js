@@ -1,4 +1,4 @@
-console.log('cart.js cargado');
+﻿console.log('cart.js cargado');
 
 const CartService = {
     updateCartUI() {

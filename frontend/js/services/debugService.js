@@ -1,19 +1,18 @@
-console.log('debugService.js cargado');
+锘縞onsole.log('debugService.js cargado');
 
 const DebugService = {
   async testApiConnection() {
-    console.log('Probando conexi髇 con API...');
-    // Implementaci髇 simple por ahora
+    console.log('Probando conexi贸n con API...');
     return { status: 'ok' };
   },
   
   async runFullDiagnostic() {
-    console.log('Ejecutando diagn髎tico...');
+    console.log('Ejecutando diagn贸stico...');
     try {
       const results = await this.testApiConnection();
-      console.log('Diagn髎tico completado:', results);
+      console.log('Diagn贸stico completado:', results);
     } catch (error) {
-      console.error('Error en diagn髎tico:', error);
+      console.error('Error en diagn贸stico:', error);
     }
   }
 };

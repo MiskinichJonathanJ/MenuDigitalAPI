@@ -1,4 +1,4 @@
-export function AllDishesButton() {
+﻿export function AllDishesButton() {
     return `
         <li class="mb-2">
           <button class="btn btn-outline-primary w-100 text-start category-btn active" data-category="all">

@@ -1,4 +1,4 @@
-import { formatPrice } from "../utils/helpers.js";
+﻿import { formatPrice } from "../utils/helpers.js";
 
 export function dishCardHTML(dish) {
     const availabilityClass = dish.isActive ? 'dish-available' : 'dish-unavailable';
@@ -9,7 +9,7 @@ export function dishCardHTML(dish) {
             <div class="card dish-card h-100" data-dish-id="${dish.id}">
               <div class="position-relative">
                 <img src="${dish.image}" class="card-img-top dish-card-img" alt="${dish.name}" loading="lazy">
-                <span class="category-badge">${dish.category?.name || 'Sin categor�a'}</span>
+                <span class="category-badge">${dish.category?.name || 'Sin categoría'}</span>
               </div>
           
               <div class="card-body dish-card-body">
