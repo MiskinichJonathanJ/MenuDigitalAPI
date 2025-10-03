@@ -1,10 +1,10 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Restaurante Digital | Menú</title>
+    <title>Restaurante Digital | MenÃº</title>
 
     <link rel="stylesheet" href="./css/styles.css">
     <link rel="stylesheet" href="./css/components.css">
@@ -23,9 +23,11 @@
                 <span class="fw-bold">Restaurante Digital</span> <!--nombre del restaurante-->
             </a>
 
-            <button class="btn btn-outline-primary position-relative" id="cart-toggle" type="button">
-                <i class="fas fa-shopping-cart"></i> <!--icono del carrito-->
-                <span id="cart-count" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">0</span>  <!--contador de items en el carrito-->
+            <button class="btn btn-outline-primary position-relative" id="cart-toggle" type="button" data-bs-toggle="offcanvas" data-bs-target="#cartOffcanvas" aria-controls="cartOffcanvas" aria-label="Abrir carrito">
+                <i class="fas fa-shopping-cart"></i>
+                <span id="cart-count"
+                      class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                      aria-live="polite">0</span>
             </button>
         </div>
     </header>
@@ -36,21 +38,21 @@
 
                     <h5 class="mb-3">
                         <i class="fas fa-list text-primary me-2"></i>
-                        Categorías
+                        Categorí­as
                     </h5>
 
                     <div class="mb-3">
                         <div class="input-group">
-                            <input type="text" class="form-control" id="search-input" placeholder="Buscar platos...">
+                            <input type="text" class="form-control" id="search-input" data-filter="search" placeholder="Buscar platos...">
                             <button class="btn  btn-outline-secondary" id="search-btn"><i class="fas fa-search"></i></button>
                         </div>
                     </div>
 
                     <ul class="list-unstyled" id="categories-list">
                         <li class="mb-2">
-                            <button class="btn btn-outline-primary w-100 text-start category-btn active" data-category="all">
-                                <i class="fas fa-th-large me-2"></i>
-                                Todas los platos
+                            <button class="btn btn-outline-primary w-100 text-start category-btn active" data-category="all" data-filter="category">
+                            <i class="fas fa-th-large me-2"></i>
+                            Todas los platos
                             </button>
                         </li>
                     </ul>
@@ -58,7 +60,7 @@
                     <div class="mt-4">
                         <h6>Filtros</h6>
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="only-available">
+                            <input class="form-check-input" type="checkbox" id="only-available" data-filter="only-available">
                             <label class="form-check-label" for="only-available">
                                 Solo disponibles
                             </label>
@@ -66,7 +68,7 @@
 
                         <div class="mt-2">
                             <label for="price-sort" class="form-label small">Ordenar por precio:</label>
-                            <select class="form-select form-select-sm" id="price-sort">
+                            <select class="form-select form-select-sm" id="price-sort" data-filter="price-sort">
                                 <option value="">Sin ordenar</option>
                                 <option value="asc">Menor a mayor</option>
                                 <option value="desc">Mayor a menor</option>
@@ -91,17 +93,40 @@
                     </button>
                     <div class="collapse" id="mobile-filters">
                         <div class="card card-body">
+
+                            <!-- BÃºsqueda (mobile) -->
                             <div class="input-group mb-2">
-                                <input type="text" class="form-control" id="search-input-mobile" placeholder="Buscar...">
-                                <button class="btn btn-outline-secondary" type="button">
+                                <input type="text" class="form-control" id="search-input-mobile" data-filter="search" placeholder="Buscar...">
+                                <button class="btn btn-outline-secondary search-btn-mobile" type="button">
                                     <i class="fas fa-search"></i>
                                 </button>
                             </div>
-                            <select class="form-select" id="category-select-mobile">
-                                <option value="all">Todas las categorías</option>
+
+                            <!-- CategorÃ­as (mobile) -->
+                            <select class="form-select mb-2" id="category-select-mobile" data-filter="category">
+                                <option value="all">Todas las categorÃ­as</option>
+                                <!-- las opciones se llenan por JS igual que desktop -->
                             </select>
+
+                            <!-- Solo disponibles (mobile) -->
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="only-available-mobile" data-filter="only-available">
+                                <label class="form-check-label" for="only-available-mobile">
+                                    Solo disponibles
+                                </label>
+                            </div>
+
+                            <!-- Ordenar por precio (mobile) -->
+                            <label for="price-sort-mobile" class="form-label small">Ordenar por precio:</label>
+                            <select class="form-select form-select-sm" id="price-sort-mobile" data-filter="price-sort">
+                                <option value="">Sin ordenar</option>
+                                <option value="asc">Menor a mayor</option>
+                                <option value="desc">Mayor a menor</option>
+                            </select>
+
                         </div>
                     </div>
+
                 </div>
 
                 <div class="row" id="dishes-container">
@@ -109,52 +134,16 @@
                         <div class="spinner-border text-primary" role="status">
                             <span class="visually-hidden">Cargando platos...</span>
                         </div>
-                        <p class="mt-2 text-muted">Cargando menú...</p>
+                        <p class="mt-2 text-muted">Cargando menÃº...</p>
                     </div>
                 </div>
 
                 <div class="col-12 text-center py-5 d-none" id="no-dishes">
                     <i class="fas fa-search text-muted" style="font-size: 3rem;"></i>
                     <h4 class="mt-3 text-muted">No se encontraron platos</h4>
-                    <p class="text-muted">Intenta con otros filtros o términos de búsqueda</p>
+                    <p class="text-muted">Intenta con otros filtros o tÃ©rminos de bÃºsqueda</p>
                 </div>
             </section>
-
-            <aside class="col-lg-3 d-none d-lg-block p-3">
-                <div class="sticky-top" style="top: 100px;">
-                    <div class="card">
-
-                        <div class="card-header">
-                            <h5 class="mb-0">
-                                <i class="fas fa-shopping-cart text-primary me-2"></i>
-                                Tu Pedido
-                            </h5>
-                        </div>
-
-                        <div class="card-body" id="cart-content">
-
-                            <div class="text-center text-muted py-4" id="empty-cart">
-                                <i class="fas fa-shopping-cart" style="font-size: 2rem;"></i>
-                                <p class="mt-2 mb-0">Tu carrito está vacío</p>
-                                <small>Agrega platos para comenzar</small>
-                            </div>
-
-                            <div id="cart-items" class="d-none"></div>
-                        </div>
-
-                        <div class="card-footer d-none" id="cart-footer">
-                            <div class="d-flex justify-content-between mb-2">
-                                <strong>Total: $<span id="cart-total">0</span></strong>
-                            </div>
-                            <button class="btn btn-primary w-100" id="checkout-btn">
-                                <i class="fas fa-credit-card me-2"></i>
-                                Realizar Pedido
-                            </button>
-                        </div>
-
-                    </div>
-                </div>
-            </aside>
         </div>
     </main>
 
@@ -182,6 +171,24 @@
             </div>
         </div>
     </div>
+    <div class="offcanvas offcanvas-end" tabindex="-1" id="cartOffcanvas" aria-labelledby="cartOffcanvasLabel">
+        <div class="offcanvas-header">
+            <h5 id="cartOffcanvasLabel">Tu pedido</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Cerrar"></button>
+        </div>
+        <div class="offcanvas-body">
+            <ul id="cart-items" class="list-unstyled"></ul>
+            <div id="empty-cart" class="text-muted">Carrito vacÃ­o</div>
+            <div class="mt-3 d-flex justify-content-between align-items-center d-none" id="cart-footer">
+                <strong>Total: $<span id="cart-total">0</span></strong>
+                <button class="btn btn-primary" id="checkout-btn">
+                    <i class="fas fa-credit-card me-2"></i>
+                    Realizar Pedido
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <script src="./js/main.js" type="module"></script>

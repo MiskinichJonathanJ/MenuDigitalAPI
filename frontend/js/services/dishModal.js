@@ -19,13 +19,32 @@ const DishModal = {
             modalTitle.textContent = dish.name;
             modalContent.innerHTML = modalDishHTML(dish);
 
-            modalContent.querySelector('.add-to-cart-modal-btn').addEventListener('click', (e) => {
-                const id = e.target.dataset.dishId;
-                CartService.addToCart(id);
+            const addBtn = modalContent.querySelector('.add-to-cart-modal-btn');
+            if (addBtn) {
+                addBtn.addEventListener('click', (e) => {
+                    const id = e.currentTarget.dataset.dishId;
+                    const qtyInput = modalContent.querySelector('.dish-quantity-input');
+                    const notesInput = modalContent.querySelector('.dish-notes-input');
 
-                const modal = bootstrap.Modal.getInstance(document.getElementById('dishModal'));
-                modal.hide();
-            });
+                    const quantity = qtyInput ? parseInt(qtyInput.value, 10) : 1;
+                    const notes = notesInput ? String(notesInput.value || '').trim() : '';
+
+                    if (!Number.isInteger(quantity) || quantity < 1) {
+                        showError('La cantidad debe ser un número entero mayor o igual a 1');
+                        return;
+                    }
+
+                    if (!dish.isActive) {
+                        showError('No se puede agregar un plato que no está disponible');
+                        return;
+                    }
+
+                    CartService.addToCart({ id, quantity, notes });
+
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('dishModal'));
+                    if (modal) modal.hide();
+                });
+            }
 
             new bootstrap.Modal(document.getElementById('dishModal')).show();
         } catch (err) {

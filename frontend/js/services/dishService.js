@@ -1,10 +1,9 @@
-import { buildApiUrl, apiRequest, API_CONFIG } from '../config/api.js';
-import { showError } from '../utils/helpers.js';
+﻿import { buildApiUrl, apiRequest, API_CONFIG } from '../config/api.js';
+import { showError, showSuccess } from '../utils/helpers.js';
 import { appState } from '../store.js';
+import { modalDishHTML } from '../components/modal.js';
 import { dishLoader, errorDishLoader } from '../components/loader.js';
 import { dishCardHTML } from '../components/dishCard.js';
-import { DishModal } from "./dishModal.js";
-import { CartService } from "./cartService.js";
 
 const DishService = {
     async getAllDishes(filters = {}) {
@@ -66,20 +65,105 @@ const DishService = {
     },
 
     setupDishEventListeners() {
-        document.querySelectorAll('.view-dish-btn').forEach(button => {
-            button.addEventListener('click', (e) => {
+        const viewButtons = document.querySelectorAll('.view-dish-btn');
+        viewButtons.forEach(button => {
+            button.addEventListener('click', async (e) => {
                 const dishId = e.currentTarget.dataset.dishId;
-                console.log(dishId);
-                if (DishModal) DishModal.show(dishId);
+                await this.showDishDetails(dishId);
             });
         });
-        document.querySelectorAll('.add-to-cart-btn').forEach(button => {
+
+        const addButtons = document.querySelectorAll('.add-to-cart-btn');
+        addButtons.forEach(button => {
             button.addEventListener('click', (e) => {
                 const dishId = e.currentTarget.dataset.dishId;
-                if (CartService) CartService.addToCart(dishId);
+                this.addToCart(dishId);
             });
         });
     },
+
+    async showDishDetails(dishId) {
+        try {
+            let dish = appState.dishes.find(d => d.id.toString() === dishId.toString());
+I
+            if (!dish) {
+                dish = await this.getDishById(dishId);
+            }
+
+            const modalContent = document.getElementById('dish-modal-content');
+            const modalTitle = document.getElementById('dishModalLabel');
+
+            if (!modalContent || !modalTitle) {
+                return;
+            }
+
+            modalTitle.textContent = dish.name;
+            modalContent.innerHTML = modalDishHTML(dish);
+
+            const addToCartModalBtn = modalContent.querySelector('.add-to-cart-modal-btn');
+            if (addToCartModalBtn) {
+                addToCartModalBtn.addEventListener('click', (e) => {
+                    const dishId = e.currentTarget.dataset.dishId;
+                    this.addToCart(dishId);
+
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('dishModal'));
+                    if (modal) modal.hide();
+                });
+            }
+
+            const modal = new bootstrap.Modal(document.getElementById('dishModal'));
+            modal.show();
+
+        } catch (error) {
+            if (showError) {
+                showError('Error al cargar detalles del plato');
+            }
+        }
+    },
+
+    addToCart(dishId, quantity = 1) {
+        try {
+            const dish = appState.dishes.find(d => d.id.toString() === dishId.toString());
+
+            if (!dish) {
+                throw new Error('Plato no encontrado');
+            }
+
+            if (!dish.isActive) {
+                if (showError) {
+                    showError('Este plato no está disponible');
+                }
+                return;
+            }
+
+            const existingItem = appState.cart.find(item => item.dish.id.toString() === dishId.toString());
+
+            if (existingItem) {
+                existingItem.quantity += quantity;
+            } else {
+                appState.cart.push({
+                    id: generateId ? generateId() : Date.now().toString(),
+                    dish: dish,
+                    quantity: quantity,
+                    notes: ''
+                });
+            }
+
+            if (window.CartService && window.CartService.updateCartUI) {
+                window.CartService.updateCartUI();
+            }
+
+            if (showSuccess) {
+                showSuccess(`${dish.name} agregado al carrito`);
+            }
+
+        } catch (error) {
+            if (showError) {
+                showError('Error al agregar plato al carrito');
+            }
+        }
+    },
+
     async filterAndRenderDishes() {
         try {
             const loadingDishes = document.getElementById('loading-dishes');
@@ -97,6 +181,7 @@ const DishService = {
             };
 
             const dishes = await this.getAllDishes(filters);
+
             appState.dishes = dishes;
 
             this.renderDishes(dishes);

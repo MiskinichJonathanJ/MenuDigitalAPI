@@ -1,4 +1,4 @@
-import { showError, showSuccess, debounce } from './utils/helpers.js';
+ï»¿import { showError, showSuccess, debounce } from './utils/helpers.js';
 import { appState } from './store.js';
 import { renderLoader } from './components/loader.js';
 import { CategoryService } from './services/categoryService.js';
@@ -20,10 +20,10 @@ async function initApp() {
         }
         CartService.updateCartUI();
 
-        showSuccess('Aplicación cargada correctamente!');
+        showSuccess('AplicaciÃ³n cargada correctamente!');
     } catch (error) {
         const errorMessage = error.message || 'Error desconocido';
-        showError(`Error al cargar la aplicación: ${errorMessage}`);
+        showError(`Error al cargar la aplicaciÃ³n: ${errorMessage}`);
     }
 }
 

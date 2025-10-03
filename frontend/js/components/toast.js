@@ -1,4 +1,4 @@
-export function toastHTML(message) {
+﻿export function toastHTML(message) {
     return `
     <div class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="polite">
       <div class="d-flex">

@@ -1,4 +1,4 @@
-import { appState } from '../store.js';
+ï»¿import { appState } from '../store.js';
 import { DishService } from './dishService.js';
 import { showError } from '../utils/helpers.js';
 import { buildApiUrl, apiRequest, API_CONFIG } from '../config/api.js';
@@ -11,7 +11,7 @@ const CategoryService = {
             const response = await apiRequest(url);
             return response;
         } catch (error) {
-            throw new Error(`Error al cargar categorías: ${error.message}`);
+            throw new Error(`Error al cargar categorÃ­as: ${error.message}`);
         }
     },
 
@@ -36,22 +36,22 @@ const CategoryService = {
             const categoryItem = document.createElement('li');
             categoryItem.className = 'mb-2';
             categoryItem.innerHTML = categoryItemHTML(category);
-
             categoriesList.appendChild(categoryItem);
         });
 
         if (categorySelectMobile) {
-            categorySelectMobile.innerHTML = '<option value="all">Todas las categorías</option>';
+            categorySelectMobile.innerHTML = '<option value="all">Todas las categorÃ­as</option>';
             categories.forEach(category => {
                 const option = document.createElement('option');
                 option.value = category.id;
-                option.textContent = category.name;
+                option.textContent = category.name; 
                 categorySelectMobile.appendChild(option);
             });
         }
 
         this.setupCategoryEventListeners();
-    },
+        document.dispatchEvent(new Event('categories:loaded'));
+    }, 
 
     setupCategoryEventListeners() {
         const categoryButtons = document.querySelectorAll('.category-btn');
@@ -119,7 +119,7 @@ const CategoryService = {
 
         } catch (error) {
             if (showError) {
-                showError('Error al cargar categorías. Verifique la conexión.');
+                showError('Error al cargar categorÃ­as. Verifique la conexiÃ³n.');
             }
             this.renderCategories([]);
             throw error;
