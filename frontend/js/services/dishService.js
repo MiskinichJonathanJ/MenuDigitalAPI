@@ -1,10 +1,5 @@
-<<<<<<< Updated upstream
 import { buildApiUrl, apiRequest, API_CONFIG } from '../config/api.js';
 import { showError, showSuccess } from '../utils/helpers.js';
-=======
-﻿import { buildApiUrl, apiRequest, API_CONFIG } from '../config/api.js';
-import { showError } from '../utils/helpers.js';
->>>>>>> Stashed changes
 import { appState } from '../store.js';
 import { modalDishHTML } from '../components/modal.js';
 import { dishLoader, errorDishLoader } from '../components/loader.js';
@@ -81,11 +76,8 @@ const DishService = {
         addButtons.forEach(button => {
             button.addEventListener('click', (e) => {
                 const dishId = e.currentTarget.dataset.dishId;
-<<<<<<< Updated upstream
                 this.addToCart(dishId);
-=======
                 if (CartService) CartService.addToCart({ id: dishId, quantity: 1, notes: '' });
->>>>>>> Stashed changes
             });
         });
     },
