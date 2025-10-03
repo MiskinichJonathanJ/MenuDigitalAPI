@@ -1,4 +1,4 @@
-import { showSuccess, showError, generateId } from '../utils/helpers.js';
+Ôªøimport { showSuccess, showError, generateId } from '../utils/helpers.js';
 import { appState } from '../store.js';
 
 const CartService = {
@@ -21,12 +21,12 @@ const CartService = {
             ? { id: String(payload), quantity: 1, notes: '' }
             : { id: String(payload.id), quantity: parseInt(payload.quantity || 1, 10), notes: String(payload.notes || '') };
 
-        if (!normalized.id) { showError('ID de plato inv·lido'); return; }
-        if (!Number.isInteger(normalized.quantity) || normalized.quantity < 1) { showError('Cantidad inv·lida'); return; }
+        if (!normalized.id) { showError('ID de plato inv√°lido'); return; }
+        if (!Number.isInteger(normalized.quantity) || normalized.quantity < 1) { showError('Cantidad inv√°lida'); return; }
 
         const dish = (appState.dishes || []).find(d => String(d.id) === String(normalized.id));
         if (!dish) { showError('Plato no encontrado'); return; }
-        if (!dish.isActive) { showError('El plato no est· disponible'); return; }
+        if (!dish.isActive) { showError('El plato no est√° disponible'); return; }
 
         appState.cart = appState.cart || [];
 

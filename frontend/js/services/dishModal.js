@@ -1,4 +1,4 @@
-import { DishService } from '../services/dishService.js';
+ï»¿import { DishService } from '../services/dishService.js';
 import { showError } from '../utils/helpers.js';
 import { appState } from '../store.js';
 import { CartService } from './cartService.js';
@@ -30,12 +30,12 @@ const DishModal = {
                     const notes = notesInput ? String(notesInput.value || '').trim() : '';
 
                     if (!Number.isInteger(quantity) || quantity < 1) {
-                        showError('La cantidad debe ser un número entero mayor o igual a 1');
+                        showError('La cantidad debe ser un nÃºmero entero mayor o igual a 1');
                         return;
                     }
 
                     if (!dish.isActive) {
-                        showError('No se puede agregar un plato que no está disponible');
+                        showError('No se puede agregar un plato que no estÃ¡ disponible');
                         return;
                     }
 
