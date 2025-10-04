@@ -4,6 +4,8 @@ import { renderLoader } from './components/loader.js';
 import { CategoryService } from './services/categoryService.js';
 import { DishService } from './services/dishService.js';
 import { CartService } from './services/cartService.js';
+import { CheckoutController } from './services/checkoutService.js';
+import { CheckoutModal } from './components/checkoutModal.js';
 
 async function initApp() {
     try {
@@ -12,13 +14,23 @@ async function initApp() {
             loadingDishes.innerHTML = renderLoader();
         }
 
+        // Inyectar modal de checkout en el body (solo una vez)
+        if (!document.getElementById('checkoutModal')) {
+            document.body.insertAdjacentHTML('beforeend', CheckoutModal());
+        }
+
         if (CategoryService) {
             await CategoryService.init();
         }
         if (DishService) {
             await DishService.init();
         }
+
         CartService.updateCartUI();
+
+        if (CheckoutController) {
+            await CheckoutController.init();
+        }
 
         showSuccess('Aplicación cargada correctamente!');
     } catch (error) {

@@ -85,7 +85,6 @@ const DishService = {
     async showDishDetails(dishId) {
         try {
             let dish = appState.dishes.find(d => d.id.toString() === dishId.toString());
-I
             if (!dish) {
                 dish = await this.getDishById(dishId);
             }

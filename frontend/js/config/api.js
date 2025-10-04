@@ -5,7 +5,7 @@
     CATEGORIES: '/Category',
     ORDERS: '/Order',
     STATUS: '/Status',
-    DELIVERY_TYPES: '/Deliverytype'
+    DELIVERY_TYPES: '/DeliveryType'
   },
   HEADERS: {
       'Content-Type': 'application/json; charset=utf-8',
