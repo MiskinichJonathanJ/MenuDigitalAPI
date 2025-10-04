@@ -1,34 +1,56 @@
 ﻿import { toastHTML } from "../components/toast.js";
-export function showError(message) {
-    let toastContainer = document.getElementById('toast-container');
-    if (!toastContainer) {
-        toastContainer = document.createElement('div');
-        toastContainer.id = 'toast-container';
-        toastContainer.className = 'toast-container position-fixed top-0 end-0 p-3';
-        document.body.appendChild(toastContainer);
+function getOrCreateToastContainer() {
+    let container = document.getElementById('toast-container');
+    if (!container) {
+        container = document.createElement('div');
+        container.id = 'toast-container';
+        container.className = 'toast-container position-fixed top-0 end-0 p-3';
+        document.body.appendChild(container);
+    }
+    return container;
+}
+function showToast(message, type) {
+    const container = getOrCreateToastContainer();
+    const toastHtmlContent = toastHTML(message, type);
+
+    container.insertAdjacentHTML('beforeend', toastHtmlContent);
+
+    const toastElement = container.lastElementChild;
+    const bsToast = new bootstrap.Toast(toastElement, {
+        autohide: true,
+        delay: type === 'error' ? 5000 : 3000 
+    });
+
+    bsToast.show();
+
+    toastElement.addEventListener('hidden.bs.toast', () => {
+        toastElement.remove();
+    });
+}
+
+export function showMessage(message, type = 'info') {
+    if (!message || typeof message !== 'string') {
+        console.warn('showMessage: mensaje inválido', message);
+        return;
     }
 
-    toastContainer.insertAdjacentHTML('beforeend', toastHTML(message));
-    const toastElement = toastContainer.lastElementChild;
-    const toast = new bootstrap.Toast(toastElement);
-    toast.show();
-    toastElement.addEventListener('hidden.bs.toast', () => toastElement.remove());
+    const cleanMessage = message.trim();
+    if (cleanMessage === '') {
+        console.warn('showMessage: mensaje vacío');
+        return;
+    }
+
+    const validTypes = ['success', 'error', 'warning', 'info'];
+    const normalizedType = validTypes.includes(type) ? type : 'info';
+
+    showToast(cleanMessage, normalizedType);
+}
+export function showError(message) {
+    showMessage(message, 'error')
 }
 
 export function showSuccess(message) {
-    let toastContainer = document.getElementById('toast-container');
-    if (!toastContainer) {
-        toastContainer = document.createElement('div');
-        toastContainer.id = 'toast-container';
-        toastContainer.className = 'toast-container position-fixed top-0 end-0 p-3';
-        document.body.appendChild(toastContainer);
-    }
-
-    toastContainer.insertAdjacentHTML('beforeend', toastHTML(message));
-    const toastElement = toastContainer.lastElementChild;
-    const toast = new bootstrap.Toast(toastElement);
-    toast.show();
-    toastElement.addEventListener('hidden.bs.toast', () => toastElement.remove());
+    showMessage(message, 'success')
 }
 
 export function formatPrice(price) {
@@ -53,4 +75,18 @@ export function debounce(func, wait) {
         clearTimeout(timeout);
         timeout = setTimeout(later, wait);
     };
+}
+export function escapeHtml(str) {
+    return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+}
+export function truncate(text, maxLength) {
+    if (typeof text !== 'string') return '';
+    return text.length > maxLength
+        ? text.slice(0, maxLength) + '…'
+        : text;
 }

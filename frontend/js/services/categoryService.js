@@ -8,6 +8,7 @@ const CategoryService = {
     async getAllCategories() {
         try {
             const url = buildApiUrl(API_CONFIG.ENDPOINTS.CATEGORIES);
+            console.log('Fetching categories from URL:', url);
             const response = await apiRequest(url);
             return response;
         } catch (error) {

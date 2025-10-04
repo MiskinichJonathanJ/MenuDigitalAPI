@@ -14,7 +14,6 @@ async function initApp() {
             loadingDishes.innerHTML = renderLoader();
         }
 
-        // Inyectar modal de checkout en el body (solo una vez)
         if (!document.getElementById('checkoutModal')) {
             document.body.insertAdjacentHTML('beforeend', CheckoutModal());
         }

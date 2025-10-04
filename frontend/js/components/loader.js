@@ -1,32 +1,70 @@
-﻿export function renderLoader(message = "Conectando con la API...") {
+﻿const LOADER_CONFIG = {
+    default: {
+        icon: 'spinner-border',
+        title: 'Cargando...',
+        message: 'Por favor espere',
+        variant: 'primary'
+    },
+    dishes: {
+        icon: 'spinner-border',
+        title: 'Cargando platos...',
+        message: 'Obteniendo el menú',
+        variant: 'primary'
+    },
+    categories: {
+        icon: 'spinner-border',
+        title: 'Cargando categorías...',
+        message: 'Obteniendo categorías',
+        variant: 'primary'
+    },
+    api: {
+        icon: 'spinner-border',
+        title: 'Conectando con el servidor...',
+        message: 'Estableciendo conexión',
+        variant: 'primary'
+    }
+};
+
+export function renderLoader(options = {}) {
+    const {
+        type = 'default',
+        title = null,
+        message = null,
+        variant = 'primary',
+        size = 'md'
+    } = options;
+
+    const config = LOADER_CONFIG[type] || LOADER_CONFIG.default;
+
+    const finalTitle = title || config.title;
+    const finalMessage = message || config.message;
+    const finalVariant = variant || config.variant;
+
+    const sizeClass = {
+        sm: 'spinner-border-sm',
+        md: '',
+        lg: 'spinner-border-lg'
+    }[size] || '';
+
     return `
-    <div class="col-12 text-center py-5">
-      <h4 class="text-muted">${message}</h4>
-      <p class="text-muted mb-4">Cargando datos del restaurante</p>
-      <div class="spinner-border text-primary" role="status">
-        <span class="visually-hidden">Conectando...</span>
-      </div>
-    </div>
-  `;
-}
+        <div class="col-12 text-center py-5" role="status" aria-live="polite">
+            <div class="${config.icon} text-${finalVariant} ${sizeClass}" role="status">
+                <span class="visually-hidden">${finalTitle}</span>
+            </div>
+            <h4 class="mt-3 text-muted">${finalTitle}</h4>
+            <p class="text-muted">${finalMessage}</p>
+        </div>
+    `;
+}   
 
 export function dishLoader() {
-    return `
-    <div class="col-12 text-center py-5">
-        <div class="spinner-border text-primary" role="status">
-            <span class="visually-hidden">Cargando platos...</span>
-        </div>
-        <p class="mt-2 text-muted">Filtrando platos...</p>
-    </div>`;
+    return renderLoader({ type: 'dishes' });
 }
 
 export function errorDishLoader() {
-    return `<div class="col-12 text-center py-5">
-                <i class="fas fa-exclamation-triangle text-warning mb-3" style="font-size: 3rem;"></i>
-                <h4 class="text-muted">Error al cargar platos</h4>
-                <p class="text-muted">Verifique la conexión con la API</p>
-                <button class="btn btn-primary" onclick="window.DishService.filterAndRenderDishes()">
-                  <i class="fas fa-redo me-2"></i>Reintentar
-                </button>
-            </div> `;
+    return renderErrorState({
+        title: 'Error al cargar platos',
+        message: 'Verifique la conexión con la API',
+        retryAction: 'window.DishService.filterAndRenderDishes'
+    });
 }
