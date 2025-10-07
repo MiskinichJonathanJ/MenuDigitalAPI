@@ -1,155 +1,216 @@
-﻿import { showSuccess, showError, generateId, formatPrice } from '../utils/helpers.js';
-import { appState } from '../store.js';
+﻿import { showSuccess, showError, generateId, showMessage } from '../utils/helpers.js';
+import { isValidQuantity } from '../utils/validation.js';
+import { appStore } from '../appStore.js';
+import { updateCartUI } from '../components/cartUI.js';
+
+let cartMemoryStorage = [];
 
 const CartService = {
-    save() {
-        try { localStorage.setItem('cart', JSON.stringify(appState.cart || [])); }
-        catch (e) { /* noop */ }
+    load() {
+        try {
+            const cart = cartMemoryStorage || [];
+            appStore.setState('cart', cart);
+        } catch (error) {
+            appStore.setState('cart', []);
+        }
     },
 
-    load() {
-        try { appState.cart = JSON.parse(localStorage.getItem('cart')) || appState.cart || []; }
-        catch (e) { appState.cart = appState.cart || []; }
+    save() {
+        try {
+            const cart = appStore.getState('cart');
+            cartMemoryStorage = [...cart];
+        } catch (error) {
+        }
     },
 
     findIndexByDishId(dishId) {
-        return (appState.cart || []).findIndex(i => String(i.dish?.id) === String(dishId));
+        const cart = appStore.getState('cart');
+        return cart.findIndex(item => String(item.dish?.id) === String(dishId));
+    },
+
+    findIndexByCartId(cartItemId) {
+        const cart = appStore.getState('cart');
+        return cart.findIndex(item => item.id === cartItemId);
     },
 
     addToCart(payload) {
-        const normalized = (typeof payload === 'string' || typeof payload === 'number')
-            ? { id: String(payload), quantity: 1, notes: '' }
-            : { id: String(payload.id), quantity: parseInt(payload.quantity || 1, 10), notes: String(payload.notes || '') };
+        let normalized;
 
-        if (!normalized.id) { showError('ID de plato inválido'); return; }
-        if (!Number.isInteger(normalized.quantity) || normalized.quantity < 1) { showError('Cantidad inválida'); return; }
+        if (typeof payload === 'string' || typeof payload === 'number') {
+            normalized = {
+                dishId: String(payload),
+                quantity: 1,
+                notes: ''
+            };
+        } else if (payload && typeof payload === 'object') {
+            normalized = {
+                dishId: String(payload.id || payload.dishId),
+                quantity: parseInt(payload.quantity, 10) || 1,
+                notes: String(payload.notes || '').trim()
+            };
+        } else {
+            showError('Datos inválidos para agregar al carrito');
+            return false;
+        }
 
-        const dish = (appState.dishes || []).find(d => String(d.id) === String(normalized.id));
-        if (!dish) { showError('Plato no encontrado'); return; }
-        if (!dish.isActive) { showError('El plato no está disponible'); return; }
+        if (!isValidQuantity(normalized.quantity)) {
+            showError('La cantidad debe ser un número entero mayor a 0');
+            return false;
+        }
 
-        appState.cart = appState.cart || [];
+        const dishes = appStore.getState('dishes');
+        const dish = dishes.find(d => String(d.id) === normalized.dishId);
 
-        const idx = this.findIndexByDishId(dish.id);
-        if (idx >= 0) {
-            appState.cart[idx].quantity += normalized.quantity;
+        if (!dish) {
+            showError('Plato no encontrado');
+            return false;
+        }
+
+        if (!dish.isActive) {
+            showError('Este plato no está disponible en este momento');
+            return false;
+        }
+
+        const cart = [...appStore.getState('cart')];
+        const existingIndex = this.findIndexByDishId(dish.id);
+
+        if (existingIndex >= 0) {
+            cart[existingIndex].quantity += normalized.quantity;
+
             if (normalized.notes) {
-                appState.cart[idx].notes = [appState.cart[idx].notes, normalized.notes].filter(Boolean).join(' | ');
+                const existingNotes = cart[existingIndex].notes || '';
+                cart[existingIndex].notes = existingNotes
+                    ? `${existingNotes} | ${normalized.notes}`
+                    : normalized.notes;
             }
         } else {
-            appState.cart.push({
+            cart.push({
                 id: generateId(),
-                dish,
+                dish: { ...dish },
                 quantity: normalized.quantity,
-                notes: normalized.notes || ''
+                notes: normalized.notes
             });
         }
 
-        this.save();
-        this.updateCartUI();
-        document.dispatchEvent(new CustomEvent('cart:updated', { detail: appState.cart }));
+        appStore.setState('cart', cart);
         showSuccess(`${dish.name} agregado al carrito`);
+        return true;
     },
 
-    updateItemQuantity(cartId, newQty) {
-        if (!Number.isInteger(newQty) || newQty < 1) return;
-        const idx = (appState.cart || []).findIndex(i => i.id === cartId);
-        if (idx < 0) return;
-        appState.cart[idx].quantity = newQty;
-        this.save();
-        this.updateCartUI();
-        document.dispatchEvent(new CustomEvent('cart:updated', { detail: appState.cart }));
-    },
-
-    updateItemNotes(cartId, notes) {
-        const idx = (appState.cart || []).findIndex(i => i.id === cartId);
-        if (idx < 0) return;
-        appState.cart[idx].notes = String(notes || '');
-        this.save();
-        this.updateCartUI();
-        document.dispatchEvent(new CustomEvent('cart:updated', { detail: appState.cart }));
-    },
-
-    removeItem(cartId) {
-        const idx = (appState.cart || []).findIndex(i => i.id === cartId);
-        if (idx < 0) return;
-        appState.cart.splice(idx, 1);
-        this.save();
-        this.updateCartUI();
-        document.dispatchEvent(new CustomEvent('cart:updated', { detail: appState.cart }));
-    },
-
-    updateCartUI() {
-        const itemsContainer = document.getElementById('cart-items');
-        const emptyMsg = document.getElementById('empty-cart');
-        const footer = document.getElementById('cart-footer');
-
-        if (!itemsContainer || !emptyMsg || !footer) return;
-
-        if (appState.cart.length === 0) {
-            itemsContainer.innerHTML = '';
-            emptyMsg.style.display = 'block';
-            footer.classList.add('d-none');
-        } else {
-            emptyMsg.style.display = 'none';
-            footer.classList.remove('d-none');
-
-            // Renderizar items del carrito con mejor diseño
-            itemsContainer.innerHTML = appState.cart.map(item => `
-                <li class="cart-item mb-3 pb-3 border-bottom">
-                    <div class="d-flex justify-content-between align-items-start mb-2">
-                        <div class="flex-grow-1">
-                            <h6 class="mb-1">${item.dish.name}</h6>
-                            <small class="text-muted">${formatPrice(item.dish.price)} c/u</small>
-                            ${item.notes ? `<br><small class="text-muted fst-italic"><i class="fas fa-sticky-note me-1"></i>${item.notes}</small>` : ''}
-                        </div>
-                        <button class="btn btn-sm btn-outline-danger" onclick="window.CartService.removeItem('${item.id}')">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </div>
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div class="btn-group btn-group-sm" role="group">
-                            <button class="btn btn-outline-secondary" onclick="window.CartService.updateItemQuantity('${item.id}', ${item.quantity - 1})">
-                                <i class="fas fa-minus"></i>
-                            </button>
-                            <button class="btn btn-outline-secondary" disabled>
-                                ${item.quantity}
-                            </button>
-                            <button class="btn btn-outline-secondary" onclick="window.CartService.updateItemQuantity('${item.id}', ${item.quantity + 1})">
-                                <i class="fas fa-plus"></i>
-                            </button>
-                        </div>
-                        <strong>${formatPrice(item.dish.price * item.quantity)}</strong>
-                    </div>
-                </li>
-            `).join('');
-
-            const total = appState.cart.reduce((sum, i) => sum + i.dish.price * i.quantity, 0);
-            document.getElementById('cart-total').textContent = total.toFixed(2);
+    updateItemQuantity(cartItemId, newQuantity) {
+        if (!isValidQuantity(newQuantity)) {
+            showMessage('La cantidad debe ser un número entero mayor a 0', 'warning');
+            return false;
         }
 
-        this.updateBadge();
+        const cart = [...appStore.getState('cart')];
+        const index = this.findIndexByCartId(cartItemId);
+
+        if (index < 0) {
+            showError('Item no encontrado en el carrito');
+            return false;
+        }
+
+        cart[index].quantity = newQuantity;
+        appStore.setState('cart', cart);
+        return true;
+    },
+
+    updateItemNotes(cartItemId, notes) {
+        const cart = [...appStore.getState('cart')];
+        const index = this.findIndexByCartId(cartItemId);
+
+        if (index < 0) {
+            showError('Item no encontrado en el carrito');
+            return false;
+        }
+
+        cart[index].notes = String(notes || '').trim();
+        appStore.setState('cart', cart);
+        return true;
+    },
+
+    removeItem(cartItemId) {
+        const cart = [...appStore.getState('cart')];
+        const index = this.findIndexByCartId(cartItemId);
+
+        if (index < 0) {
+            showError('Item no encontrado en el carrito');
+            return false;
+        }
+
+        const itemName = cart[index].dish.name;
+        cart.splice(index, 1);
+
+        appStore.setState('cart', cart);
+        showSuccess(`${itemName} eliminado del carrito`);
+        return true;
+    },
+
+    clearCart() {
+        appStore.setState('cart', []);
+        showSuccess('Carrito vaciado');
+    },
+
+    getTotal() {
+        const cart = appStore.getState('cart');
+        return cart.reduce((sum, item) => sum + (item.dish.price * item.quantity), 0);
     },
 
     getTotalItems() {
-        return (appState.cart || []).reduce((sum, it) => sum + (Number(it.quantity) || 0), 0);
+        const cart = appStore.getState('cart');
+        return cart.reduce((sum, item) => sum + item.quantity, 0);
     },
 
-    updateBadge() {
-        const badge = document.getElementById('cart-count');
-        if (!badge) return;
-        const total = this.getTotalItems();
-        badge.textContent = String(total);
-        badge.classList.toggle('d-none', total === 0);
+    getCartData() {
+        return {
+            items: appStore.getState('cart'),
+            total: this.getTotal(),
+            totalItems: this.getTotalItems()
+        };
+    },
+
+    setupEventListeners() {
+        document.addEventListener('click', (e) => {
+            const target = e.target.closest('button');
+            if (!target) return;
+
+            const cartId = target.dataset.cartId;
+            if (!cartId) return;
+
+            if (target.classList.contains('cart-remove-btn')) {
+                this.removeItem(cartId);
+            }
+            else if (target.classList.contains('cart-decrease-btn')) {
+                const cart = appStore.getState('cart');
+                const item = cart.find(i => i.id === cartId);
+                if (item && item.quantity > 1) {
+                    this.updateItemQuantity(cartId, item.quantity - 1);
+                } else {
+                    this.removeItem(cartId);
+                }
+            }
+            else if (target.classList.contains('cart-increase-btn')) {
+                const cart = appStore.getState('cart');
+                const item = cart.find(i => i.id === cartId);
+                if (item) {
+                    this.updateItemQuantity(cartId, item.quantity + 1);
+                }
+            }
+        });
+    },
+
+    init() {
+        this.load();
+
+        appStore.subscribe('cart', () => {
+            this.save();
+            updateCartUI(this.getCartData());
+        });
+
+        this.setupEventListeners();
+        updateCartUI(this.getCartData());
     },
 };
-
-// Exponer CartService globalmente para los onclick en el HTML
-window.CartService = CartService;
-
-// Inicializar carga
-CartService.load();
-CartService.updateCartUI();
-CartService.updateBadge();
 
 export { CartService };
