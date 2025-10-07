@@ -1,128 +1,70 @@
-﻿import { appState } from '../store.js';
-import { DishService } from './dishService.js';
+﻿import { appStore } from '../appStore.js';
 import { showError } from '../utils/helpers.js';
 import { buildApiUrl, apiRequest, API_CONFIG } from '../config/api.js';
-import { AllDishesButton, categoryItemHTML } from "../components/category.js";
+import { updateCategoryUI, syncCategoryUI } from '../components/categoryUI.js';
 
 const CategoryService = {
     async getAllCategories() {
         try {
             const url = buildApiUrl(API_CONFIG.ENDPOINTS.CATEGORIES);
-            console.log('Fetching categories from URL:', url);
-            const response = await apiRequest(url);
-            return response;
+            const categories = await apiRequest(url);
+
+            if (!Array.isArray(categories)) {
+                throw new Error('Respuesta inválida del servidor');
+            }
+
+            return categories;
         } catch (error) {
             throw new Error(`Error al cargar categorías: ${error.message}`);
         }
     },
 
-    renderCategories(categories) {
-        const categoriesList = document.getElementById('categories-list');
-        const categorySelectMobile = document.getElementById('category-select-mobile');
-
-        if (!categoriesList) {
-            return;
-        }
-
-        const allButton = categoriesList.querySelector('[data-category="all"]')?.parentElement;
-        categoriesList.innerHTML = '';
-
-        if (allButton) {
-            categoriesList.appendChild(allButton);
-        } else {
-            categoriesList.innerHTML = AllDishesButton();
-        }
-
-        categories.forEach(category => {
-            const categoryItem = document.createElement('li');
-            categoryItem.className = 'mb-2';
-            categoryItem.innerHTML = categoryItemHTML(category);
-            categoriesList.appendChild(categoryItem);
-        });
-
-        if (categorySelectMobile) {
-            categorySelectMobile.innerHTML = '<option value="all">Todas las categorías</option>';
-            categories.forEach(category => {
-                const option = document.createElement('option');
-                option.value = category.id;
-                option.textContent = category.name; 
-                categorySelectMobile.appendChild(option);
-            });
-        }
-
-        this.setupCategoryEventListeners();
-        document.dispatchEvent(new Event('categories:loaded'));
-    }, 
-
-    setupCategoryEventListeners() {
-        const categoryButtons = document.querySelectorAll('.category-btn');
-        const categorySelectMobile = document.getElementById('category-select-mobile');
-
-        categoryButtons.forEach(button => {
-            button.addEventListener('click', (e) => {
-                categoryButtons.forEach(btn => btn.classList.remove('active'));
-
-                e.currentTarget.classList.add('active');
-
-                const categoryId = e.currentTarget.dataset.category;
-                appState.currentCategory = categoryId;
-
-                this.updateBreadcrumb(categoryId, e.currentTarget.textContent.trim());
-
-                if (DishService && DishService.filterAndRenderDishes) {
-                    DishService.filterAndRenderDishes();
-                }
-            });
-        });
-
-        if (categorySelectMobile) {
-            categorySelectMobile.addEventListener('change', (e) => {
-                const categoryId = e.target.value;
-
-                appState.currentCategory = categoryId;
-
-                categoryButtons.forEach(btn => {
-                    btn.classList.remove('active');
-                    if (btn.dataset.category === categoryId) {
-                        btn.classList.add('active');
-                    }
-                });
-
-                const selectedOption = e.target.options[e.target.selectedIndex];
-                this.updateBreadcrumb(categoryId, selectedOption.textContent);
-
-                if (DishService && DishService.filterAndRenderDishes) {
-                    DishService.filterAndRenderDishes();
-                }
-            });
-        }
-    },
-
-    updateBreadcrumb(categoryId, categoryName) {
-        const breadcrumb = document.getElementById('current-category');
-        if (breadcrumb) {
-            breadcrumb.textContent = categoryName;
-        }
-    },
     getCategoryById(categoryId) {
-        return appState.categories.find(cat => cat.id.toString() === categoryId.toString());
+        const categories = appStore.getState('categories');
+        return categories.find(cat => String(cat.id) === String(categoryId)) || null;
+    },
+
+    setCurrentCategory(categoryId) {
+        const normalizedId = categoryId === 'all' ? 'all' : String(categoryId);
+        appStore.setState('currentCategory', normalizedId);
+    },
+
+    setupEventListeners() {
+        document.addEventListener('click', (e) => {
+            const categoryBtn = e.target.closest('.category-btn[data-category]');
+            if (!categoryBtn) return;
+
+            e.preventDefault();
+            this.setCurrentCategory(categoryBtn.dataset.category);
+        });
+
+        const mobileSelect = document.getElementById('category-select-mobile');
+        if (mobileSelect) {
+            mobileSelect.addEventListener('change', (e) => {
+                this.setCurrentCategory(e.target.value);
+            });
+        }
+
+        appStore.subscribe('currentCategory', (newCategory) => {
+            syncCategoryUI(newCategory, this.getCategoryById(newCategory));
+        });
     },
 
     async init() {
         try {
             const categories = await this.getAllCategories();
+            appStore.setState('categories', categories);
 
-            appState.categories = categories;
+            const currentCategory = appStore.getState('currentCategory');
+            updateCategoryUI(categories, currentCategory);
 
-            this.renderCategories(categories);
+            this.setupEventListeners();
 
             return categories;
-
         } catch (error) {
-            if (showError) {
-                showError('Error al cargar categorías. Verifique la conexión.');
-            }
-            this.renderCategories([]);
+            showError('Error al cargar categorías. Verifique la conexión.');
+            updateCategoryUI([], 'all');
+            this.setupEventListeners();
             throw error;
         }
     }

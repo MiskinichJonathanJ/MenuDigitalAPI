@@ -1,5 +1,6 @@
 ﻿import { escapeHtml } from '../utils/helpers.js'; 
 import { isValidCategory } from '../utils/validation.js';
+
 export function AllDishesButton(options = {}) {
     const {
         active = true,
