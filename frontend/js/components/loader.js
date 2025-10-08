@@ -23,48 +23,24 @@
         message: 'Estableciendo conexión',
         variant: 'primary'
     }
-};
+};   
+export function showErrorState(container, { title, message, retryAction = null }) {
+    if (!container) return;
 
-export function renderLoader(options = {}) {
-    const {
-        type = 'default',
-        title = null,
-        message = null,
-        variant = 'primary',
-        size = 'md'
-    } = options;
+    const retryButton = retryAction
+        ? `<button class="btn btn-outline-primary mt-3" onclick="${retryAction}()">Reintentar</button>`
+        : '';
 
-    const config = LOADER_CONFIG[type] || LOADER_CONFIG.default;
-
-    const finalTitle = title || config.title;
-    const finalMessage = message || config.message;
-    const finalVariant = variant || config.variant;
-
-    const sizeClass = {
-        sm: 'spinner-border-sm',
-        md: '',
-        lg: 'spinner-border-lg'
-    }[size] || '';
-
-    return `
-        <div class="col-12 text-center py-5" role="status" aria-live="polite">
-            <div class="${config.icon} text-${finalVariant} ${sizeClass}" role="status">
-                <span class="visually-hidden">${finalTitle}</span>
+    const errorHTML = `
+        <div class="col-12 text-center py-5">
+            <div class="text-danger">
+                <i class="bi bi-exclamation-triangle fs-1"></i>
             </div>
-            <h4 class="mt-3 text-muted">${finalTitle}</h4>
-            <p class="text-muted">${finalMessage}</p>
+            <h4 class="mt-3 text-danger">${title || 'Error'}</h4>
+            <p class="text-muted">${message || 'Ha ocurrido un error inesperado'}</p>
+            ${retryButton}
         </div>
     `;
-}   
 
-export function dishLoader() {
-    return renderLoader({ type: 'dishes' });
-}
-
-export function errorDishLoader() {
-    return renderErrorState({
-        title: 'Error al cargar platos',
-        message: 'Verifique la conexión con la API',
-        retryAction: 'window.DishService.filterAndRenderDishes'
-    });
+    container.innerHTML = errorHTML;
 }

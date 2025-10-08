@@ -1,209 +1,141 @@
 ﻿import { buildApiUrl, apiRequest, API_CONFIG } from '../config/api.js';
-import { showError, showSuccess } from '../utils/helpers.js';
-import { appState } from '../store.js';
-import { modalDishHTML } from '../components/modal.js';
-import { dishLoader, errorDishLoader } from '../components/loader.js';
-import { dishCardHTML } from '../components/dishCard.js';
+import { showError } from '../utils/helpers.js';
+import { appStore } from '../appStore.js';
+import { updateDishesUI, showDishModal } from '../components/dishUI.js';
+import { CartService } from './cartService.js';
 
 const DishService = {
     async getAllDishes(filters = {}) {
         try {
             const params = new URLSearchParams();
 
-            if (filters.name) params.append('name', filters.name);
+            if (filters.name?.trim()) {
+                params.append('name', filters.name.trim());
+            }
 
             if (filters.category && filters.category !== 'all') {
                 params.append('category', filters.category);
             }
 
-            if (filters.onlyActive !== undefined) params.append('onlyActive', filters.onlyActive);
-            if (filters.sortByPrice) params.append('sortByPrice', filters.sortByPrice);
+            if (filters.onlyActive !== undefined) {
+                params.append('onlyActive', filters.onlyActive);
+            }
 
-            const url = buildApiUrl(API_CONFIG.ENDPOINTS.DISHES, params.toString() ? `?${params.toString()}` : '');
+            if (filters.sortByPrice) {
+                params.append('sortByPrice', filters.sortByPrice);
+            }
 
-            const response = await apiRequest(url);
-            return response;
+            const queryString = params.toString();
+            const url = buildApiUrl(
+                API_CONFIG.ENDPOINTS.DISHES,
+                queryString ? `?${queryString}` : ''
+            );
+
+            const dishes = await apiRequest(url);
+
+            if (!Array.isArray(dishes)) {
+                throw new Error('Respuesta inválida del servidor');
+            }
+
+            return dishes;
         } catch (error) {
-            showError(`Error al cargar platos: ${error.message}`);
-            return [];
+            throw new Error(`Error al cargar platos: ${error.message}`);
         }
     },
 
     async getDishById(dishId) {
         try {
             const url = buildApiUrl(API_CONFIG.ENDPOINTS.DISHES, `/${dishId}`);
-            const response = await apiRequest(url);
-            return response;
-        } catch (error) {
-            showError(error.message);
-            return null;
-        }
-    },
+            const dish = await apiRequest(url);
 
-    renderDishes(dishes) {
-        const dishesContainer = document.getElementById('dishes-container');
-        const loadingDishes = document.getElementById('loading-dishes');
-        const noDishes = document.getElementById('no-dishes');
-
-        if (!dishesContainer) {
-            return;
-        }
-
-        if (loadingDishes) loadingDishes.style.display = 'none';
-        if (noDishes) noDishes.classList.add('d-none');
-
-        if (!dishes || dishes.length === 0) {
-            dishesContainer.innerHTML = '';
-            if (noDishes) noDishes.classList.remove('d-none');
-            return;
-        }
-
-        const dishesHTML = dishes.map(dish => dishCardHTML(dish)).join('');
-        dishesContainer.innerHTML = dishesHTML;
-
-        this.setupDishEventListeners();
-    },
-
-    setupDishEventListeners() {
-        const viewButtons = document.querySelectorAll('.view-dish-btn');
-        viewButtons.forEach(button => {
-            button.addEventListener('click', async (e) => {
-                const dishId = e.currentTarget.dataset.dishId;
-                await this.showDishDetails(dishId);
-            });
-        });
-
-        const addButtons = document.querySelectorAll('.add-to-cart-btn');
-        addButtons.forEach(button => {
-            button.addEventListener('click', (e) => {
-                const dishId = e.currentTarget.dataset.dishId;
-                this.addToCart(dishId);
-            });
-        });
-    },
-
-    async showDishDetails(dishId) {
-        try {
-            let dish = appState.dishes.find(d => d.id.toString() === dishId.toString());
-            if (!dish) {
-                dish = await this.getDishById(dishId);
-            }
-
-            const modalContent = document.getElementById('dish-modal-content');
-            const modalTitle = document.getElementById('dishModalLabel');
-
-            if (!modalContent || !modalTitle) {
-                return;
-            }
-
-            modalTitle.textContent = dish.name;
-            modalContent.innerHTML = modalDishHTML(dish);
-
-            const addToCartModalBtn = modalContent.querySelector('.add-to-cart-modal-btn');
-            if (addToCartModalBtn) {
-                addToCartModalBtn.addEventListener('click', (e) => {
-                    const dishId = e.currentTarget.dataset.dishId;
-                    this.addToCart(dishId);
-
-                    const modal = bootstrap.Modal.getInstance(document.getElementById('dishModal'));
-                    if (modal) modal.hide();
-                });
-            }
-
-            const modal = new bootstrap.Modal(document.getElementById('dishModal'));
-            modal.show();
-
-        } catch (error) {
-            if (showError) {
-                showError('Error al cargar detalles del plato');
-            }
-        }
-    },
-
-    addToCart(dishId, quantity = 1) {
-        try {
-            const dish = appState.dishes.find(d => d.id.toString() === dishId.toString());
-
-            if (!dish) {
+            if (!dish || typeof dish !== 'object') {
                 throw new Error('Plato no encontrado');
             }
 
-            if (!dish.isActive) {
-                if (showError) {
-                    showError('Este plato no está disponible');
-                }
-                return;
-            }
-
-            const existingItem = appState.cart.find(item => item.dish.id.toString() === dishId.toString());
-
-            if (existingItem) {
-                existingItem.quantity += quantity;
-            } else {
-                appState.cart.push({
-                    id: generateId ? generateId() : Date.now().toString(),
-                    dish: dish,
-                    quantity: quantity,
-                    notes: ''
-                });
-            }
-
-            if (window.CartService && window.CartService.updateCartUI) {
-                window.CartService.updateCartUI();
-            }
-
-            if (showSuccess) {
-                showSuccess(`${dish.name} agregado al carrito`);
-            }
-
+            return dish;
         } catch (error) {
-            if (showError) {
-                showError('Error al agregar plato al carrito');
-            }
+            showError(`Error al cargar plato: ${error.message}`);
+            throw error;
         }
+    },
+
+    async findDish(dishId) {
+        const dishes = appStore.getState('dishes');
+        let dish = dishes.find(d => String(d.id) === String(dishId));
+
+        if (!dish) {
+            dish = await this.getDishById(dishId);
+        }
+
+        return dish;
+    },
+
+    getCurrentFilters() {
+        return {
+            name: appStore.getState('searchTerm') || '',
+            category: appStore.getState('currentCategory') || 'all',
+            onlyActive: appStore.getState('filters')?.onlyAvailable || false,
+            sortByPrice: appStore.getState('filters')?.sortByPrice || ''
+        };
     },
 
     async filterAndRenderDishes() {
         try {
-            const loadingDishes = document.getElementById('loading-dishes');
-
-            if (loadingDishes) {
-                loadingDishes.style.display = 'block';
-                loadingDishes.innerHTML = dishLoader();
-            }
-
-            const filters = {
-                name: appState.searchTerm,
-                category: appState.currentCategory,
-                onlyActive: appState.filters.onlyAvailable,
-                sortByPrice: appState.filters.sortByPrice
-            };
-
+            const filters = this.getCurrentFilters();
             const dishes = await this.getAllDishes(filters);
 
-            appState.dishes = dishes;
-
-            this.renderDishes(dishes);
-
+            appStore.setState('dishes', dishes);
+            updateDishesUI(dishes);
         } catch (error) {
-            if (showError) {
-                showError('Error al cargar platos');
+            updateDishesUI([], true);
+        }
+    },
+
+    async showDetails(dishId) {
+        try {
+            const dish = await this.findDish(dishId);
+            showDishModal(dish, (payload) => {
+                CartService.addToCart(payload);
+            });
+        } catch (error) {
+            showError('Error al cargar detalles del plato');
+        }
+    },
+
+    setupEventListeners() {
+        document.addEventListener('click', async (e) => {
+            const viewBtn = e.target.closest('.view-dish-btn');
+            if (viewBtn) {
+                const dishId = viewBtn.dataset.dishId;
+                if (dishId) await this.showDetails(dishId);
+                return;
             }
 
-            const dishesContainer = document.getElementById('dishes-container');
-            if (dishesContainer) {
-                dishesContainer.innerHTML = errorDishLoader();
+            const addBtn = e.target.closest('.add-to-cart-btn');
+            if (addBtn && !addBtn.closest('.modal')) {
+                const dishId = addBtn.dataset.dishId;
+                if (dishId) CartService.addToCart(dishId);
+                return;
             }
-        }
+        });
+    },
+
+    setupStoreListeners() {
+        appStore.subscribe('searchTerm', () => this.filterAndRenderDishes());
+        appStore.subscribe('currentCategory', () => this.filterAndRenderDishes());
+        appStore.subscribe('filters', () => this.filterAndRenderDishes());
     },
 
     async init() {
         try {
+            this.setupStoreListeners();
+            this.setupEventListeners();
             await this.filterAndRenderDishes();
         } catch (error) {
             throw error;
         }
     }
 };
+
 
 export { DishService };

@@ -1,4 +1,4 @@
-﻿import { formatPrice, showMessage, escapeHtml, truncate } from "../utils/helpers.js";
+﻿import { formatPrice, escapeHtml, truncate } from "../utils/helpers.js";
 import { isValidDish } from "../utils/validation.js";
 
 const AVAILABILITY_CONFIG = {
@@ -15,6 +15,7 @@ const AVAILABILITY_CONFIG = {
 };
 
 const DEFAULT_DISH_IMAGE = 'https://cdni.iconscout.com/illustration/premium/thumb/no-result-found-illustration-svg-download-png-11838290.png';
+
 function renderCategoryBadge(category) {
     const categoryName = category?.name || 'Sin categoría';
     return `<span class="category-badge">${escapeHtml(categoryName)}</span>`;
@@ -130,7 +131,6 @@ export function dishCardHTML(dish, options = {}) {
 
 export function renderDishCards(dishes, options = {}) {
     if (!Array.isArray(dishes)) {
-        console.warn('renderDishCards: dishes debe ser un array', dishes);
         return '';
     }
 

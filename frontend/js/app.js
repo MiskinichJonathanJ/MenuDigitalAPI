@@ -1,81 +1,150 @@
-﻿import { showError, showSuccess, debounce } from './utils/helpers.js';
-import { appState } from './store.js';
-import { renderLoader } from './components/loader.js';
+﻿import { showError, showSuccess, showMessage, debounce } from './utils/helpers.js';
 import { CategoryService } from './services/categoryService.js';
 import { DishService } from './services/dishService.js';
 import { CartService } from './services/cartService.js';
-import { CheckoutController } from './services/checkoutService.js';
 import { CheckoutModal } from './components/checkoutModal.js';
+import { showCheckoutModal } from './components/checkoutUI.js';
+import { appStore } from './appStore.js';
+import { updateCartUI } from './components/cartUI.js';
 
 async function initApp() {
     try {
-        const loadingDishes = document.getElementById('loading-dishes');
-        if (loadingDishes) {
-            loadingDishes.innerHTML = renderLoader();
-        }
+        showMessage('Cargando aplicación...', 'info');
 
         if (!document.getElementById('checkoutModal')) {
             document.body.insertAdjacentHTML('beforeend', CheckoutModal());
         }
 
-        if (CategoryService) {
-            await CategoryService.init();
-        }
-        if (DishService) {
-            await DishService.init();
-        }
+        CartService.init();
+        await CategoryService.init();
+        await DishService.init();
 
-        CartService.updateCartUI();
-
-        if (CheckoutController) {
-            await CheckoutController.init();
-        }
-
-        showSuccess('Aplicación cargada correctamente!');
+        showSuccess('¡Aplicación lista!');
     } catch (error) {
-        const errorMessage = error.message || 'Error desconocido';
-        showError(`Error al cargar la aplicación: ${errorMessage}`);
+        showError(`Error al cargar la aplicación: ${error.message}`);
+        throw error;
     }
 }
 
 function setupEventListeners() {
-    const searchInput = document.getElementById('search-input');
-    const searchBtn = document.getElementById('search-btn');
-
-    if (searchInput && searchBtn) {
-        searchInput.addEventListener('input', debounce((e) => {
-            appState.searchTerm = e.target.value;
-            if (DishService?.filterAndRenderDishes) {
-                DishService.filterAndRenderDishes();
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            const openModal = document.querySelector('.modal.show');
+            if (openModal) {
+                const bsModal = bootstrap.Modal.getInstance(openModal);
+                if (bsModal) bsModal.hide();
             }
-        }, 300));
+        }
+    });
 
-        searchBtn.addEventListener('click', () => {
-            if (DishService?.filterAndRenderDishes) {
-                DishService.filterAndRenderDishes();
-            }
+    const cartOffcanvas = document.getElementById('cartOffcanvas');
+    if (cartOffcanvas) {
+        cartOffcanvas.addEventListener('show.bs.offcanvas', () => {
+            updateCartUI(CartService.getCartData());
         });
     }
 
-    const onlyAvailableCheckbox = document.getElementById('only-available');
-    if (onlyAvailableCheckbox) {
-        onlyAvailableCheckbox.addEventListener('change', (e) => {
-            appState.filters.onlyAvailable = e.target.checked;
-            if (DishService?.filterAndRenderDishes) {
-                DishService.filterAndRenderDishes();
-            }
+    const checkoutBtn = document.getElementById('checkout-btn');
+    if (checkoutBtn) {
+        checkoutBtn.addEventListener('click', async () => {
+            await showCheckoutModal();
         });
     }
 
-    const priceSortSelect = document.getElementById('price-sort');
-    if (priceSortSelect) {
-        priceSortSelect.addEventListener('change', (e) => {
-            appState.filters.sortByPrice = e.target.value;
-            if (DishService?.filterAndRenderDishes) {
-                DishService.filterAndRenderDishes();
-            }
+    setupFilterListeners();
+}
+
+function setupFilterListeners() {
+    const searchInputDesktop = document.getElementById('search-input');
+    const searchInputMobile = document.getElementById('search-input-mobile');
+
+    const onlyAvailableDesktop = document.getElementById('only-available');
+    const onlyAvailableMobile = document.getElementById('only-available-mobile');
+
+    const priceSortDesktop = document.getElementById('price-sort');
+    const priceSortMobile = document.getElementById('price-sort-mobile');
+
+    const debouncedSearch = debounce((value) => {
+        appStore.setState('searchTerm', value);
+    }, 300);
+
+    if (searchInputDesktop) {
+        searchInputDesktop.addEventListener('input', (e) => {
+            const value = e.target.value;
+            if (searchInputMobile) searchInputMobile.value = value;
+            debouncedSearch(value);
+        });
+    }
+
+    if (searchInputMobile) {
+        searchInputMobile.addEventListener('input', (e) => {
+            const value = e.target.value;
+            if (searchInputDesktop) searchInputDesktop.value = value;
+            debouncedSearch(value);
+        });
+    }
+
+    if (onlyAvailableDesktop) {
+        onlyAvailableDesktop.addEventListener('change', (e) => {
+            const checked = e.target.checked;
+            if (onlyAvailableMobile) onlyAvailableMobile.checked = checked;
+
+            const currentFilters = appStore.getState('filters');
+            appStore.setState('filters', {
+                ...currentFilters,
+                onlyAvailable: checked
+            });
+        });
+    }
+
+    if (onlyAvailableMobile) {
+        onlyAvailableMobile.addEventListener('change', (e) => {
+            const checked = e.target.checked;
+            if (onlyAvailableDesktop) onlyAvailableDesktop.checked = checked;
+
+            const currentFilters = appStore.getState('filters');
+            appStore.setState('filters', {
+                ...currentFilters,
+                onlyAvailable: checked
+            });
+        });
+    }
+
+    if (priceSortDesktop) {
+        priceSortDesktop.addEventListener('change', (e) => {
+            const value = e.target.value;
+            if (priceSortMobile) priceSortMobile.value = value;
+
+            const currentFilters = appStore.getState('filters');
+            appStore.setState('filters', {
+                ...currentFilters,
+                sortByPrice: value
+            });
+        });
+    }
+
+    if (priceSortMobile) {
+        priceSortMobile.addEventListener('change', (e) => {
+            const value = e.target.value;
+            if (priceSortDesktop) priceSortDesktop.value = value;
+
+            const currentFilters = appStore.getState('filters');
+            appStore.setState('filters', {
+                ...currentFilters,
+                sortByPrice: value
+            });
         });
     }
 }
 
-export { initApp, setupEventListeners };
+function setupErrorHandling() {
+    window.addEventListener('error', (event) => {
+        showError('Ocurrió un error inesperado');
+    });
+
+    window.addEventListener('unhandledrejection', (event) => {
+        showError('Error en operación asíncrona');
+    });
+}
+
+export { initApp, setupEventListeners, setupErrorHandling };

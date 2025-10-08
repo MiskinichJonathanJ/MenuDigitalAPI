@@ -30,13 +30,11 @@ function showToast(message, type) {
 
 export function showMessage(message, type = 'info') {
     if (!message || typeof message !== 'string') {
-        console.warn('showMessage: mensaje inválido', message);
         return;
     }
 
     const cleanMessage = message.trim();
     if (cleanMessage === '') {
-        console.warn('showMessage: mensaje vacío');
         return;
     }
 
