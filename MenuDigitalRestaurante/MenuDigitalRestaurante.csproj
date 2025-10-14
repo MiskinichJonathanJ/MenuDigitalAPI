@@ -20,7 +20,5 @@
   <ItemGroup>
     <ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
   </ItemGroup>
-    <PropertyGroup>
-		<CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	</PropertyGroup>
+    
 </Project>
