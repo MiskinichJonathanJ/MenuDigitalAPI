@@ -5,17 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Menú digital del restaurante - Ordena tus platos favoritos online">
     <meta name="theme-color" content="#0d6efd">
-
     <title>Restaurante Digital | Menú</title>
 
+    <!-- Librerías externas -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Estilos locales -->
     <link rel="stylesheet" href="./css/styles.css">
-    <link rel="stylesheet" href="./css/components.css">
 
 </head>
 
 <body>
+    <!-- ===== Header ===== -->
     <header class="navbar navbar-expand-lg navbar-light bg-white shadow-sm" role="banner">
         <div class="container-fluid">
             <a class="navbar-brand d-flex align-items-center" href="/" aria-label="Inicio">
@@ -37,69 +39,51 @@
         </div>
     </header>
 
-    <main class="container-fluid" role="main">
-        <div class="row">
-            <aside class="col-lg-3 col-md-4 d-none d-md-block bg-light p-3"
-                   role="complementary"
-                   aria-label="Filtros y categorías">
-                <div class="sticky-top">
-                    <h2 class="h5 mb-3">
-                        <i class="fas fa-list text-primary me-2" aria-hidden="true"></i>
-                        Categorías
-                    </h2>
+    <!-- ===== Branding Screen ===== -->
+    <section id="branding-screen" role="region" aria-label="Pantalla principal">
+        <h1>No es solo comida</h1>
+        <p>Es una experiencia gastronómica digital</p>
+        <div>
+            <button class="branding-btn" id="show-menu-btn">Ver menú</button>
+            <button class="branding-btn" id="show-orders-btn">Ver órdenes</button>
+        </div>
+    </section>
 
-                    <form role="search" class="mb-3" onsubmit="return false;">
+    <!-- ===== Menú Principal ===== -->
+    <main id="menu-section" class="container-fluid d-none" role="main" aria-label="Menú del restaurante">
+        <div class="row">
+            <!-- ===== Sidebar de Categorías y Filtros ===== -->
+            <aside class="col-lg-3 col-md-4 d-none d-md-block bg-dark text-light p-3" role="complementary" aria-label="Filtros y categorías">
+                <div class="sticky-top">
+                    <!-- Búsqueda -->
+                    <form role="search" class="mb-4" onsubmit="return false;">
                         <label for="search-input" class="visually-hidden">Buscar platos</label>
                         <div class="input-group">
-                            <input type="search"
-                                   class="form-control"
-                                   id="search-input"
-                                   placeholder="Buscar platos..."
-                                   aria-label="Buscar platos">
-                            <button class="btn btn-outline-secondary"
-                                    type="button"
-                                    aria-label="Buscar">
-                                <i class="fas fa-search" aria-hidden="true"></i>
+                            <input type="search" class="form-control bg-secondary text-light border-0" id="search-input" placeholder="Buscar platos..." aria-label="Buscar platos">
+                            <button class="btn btn-outline-light" type="button" aria-label="Buscar">
+                                <i class="fas fa-search"></i>
                             </button>
                         </div>
                     </form>
 
+                    <!-- Categorías -->
+                    <h2 class="h5 mb-3 text-light">Categorías</h2>
                     <nav aria-label="Categorías de platos">
                         <ul class="list-unstyled" id="categories-list" role="list">
                             <li class="mb-2">
-                                <button class="btn btn-outline-primary w-100 text-start category-btn active"
-                                        data-category="all"
-                                        aria-pressed="true">
-                                    <i class="fas fa-th-large me-2" aria-hidden="true"></i>
-                                    Todos los platos
+                                <button class="btn btn-category w-100 text-start category-btn active" data-category="all" aria-pressed="true">
+                                    <i class="fas fa-th-large me-2"></i> Todos los platos
                                 </button>
                             </li>
                         </ul>
                     </nav>
 
+                    <!-- Filtros adicionales -->
                     <section class="mt-4" aria-labelledby="filters-heading">
-                        <h3 class="h6" id="filters-heading">Filtros adicionales</h3>
-
-                        <div class="form-check mb-3">
-                            <input class="form-check-input"
-                                   type="checkbox"
-                                   id="only-available"
-                                   aria-describedby="only-available-help">
-                            <label class="form-check-label" for="only-available">
-                                Solo disponibles
-                            </label>
-                            <small id="only-available-help" class="visually-hidden">
-                                Mostrar únicamente platos disponibles
-                            </small>
-                        </div>
 
                         <div class="mb-3">
-                            <label for="price-sort" class="form-label small">
-                                Ordenar por precio
-                            </label>
-                            <select class="form-select form-select-sm"
-                                    id="price-sort"
-                                    aria-label="Ordenar platos por precio">
+                            <h2 for="price-sort" class="h5 mb-3 text-light">Ordenar por precio</h2>
+                            <select class="form-select form-select-sm bg-secondary text-light border-0" id="price-sort" aria-label="Ordenar platos por precio">
                                 <option value="">Sin ordenar</option>
                                 <option value="asc">Menor a mayor</option>
                                 <option value="desc">Mayor a menor</option>
@@ -109,99 +93,47 @@
                 </div>
             </aside>
 
-            <section class="col-lg-6 col-md-8 col-12 p-3"
-                     aria-labelledby="dishes-heading">
+
+            <!-- ===== Contenido principal de platos ===== -->
+            <section class="col-lg-6 col-md-8 col-12 p-3" aria-labelledby="dishes-heading">
                 <nav aria-label="Navegación de ruta">
                     <ol class="breadcrumb">
-                        <li class="breadcrumb-item active"
-                            id="current-category"
-                            aria-current="page">
-                            Todos los platos
-                        </li>
+                        <li class="breadcrumb-item active" id="current-category" aria-current="page">Todos los platos</li>
                     </ol>
                 </nav>
 
+                <!-- Filtros móviles -->
                 <div class="d-md-none mb-3">
-                    <button class="btn btn-outline-primary w-100 mb-2"
-                            type="button"
-                            data-bs-toggle="collapse"
-                            data-bs-target="#mobile-filters"
-                            aria-expanded="false"
-                            aria-controls="mobile-filters">
-                        <i class="fas fa-filter me-2" aria-hidden="true"></i>
-                        Filtros
+                    <button class="btn btn-outline-light w-100 mb-2" type="button" data-bs-toggle="collapse" data-bs-target="#mobile-filters" aria-expanded="false" aria-controls="mobile-filters">
+                        <i class="fas fa-filter me-2"></i> Filtros
                     </button>
 
                     <div class="collapse" id="mobile-filters">
-                        <div class="card card-body">
-                            <form role="search" onsubmit="return false;">
-                                <label for="search-input-mobile" class="visually-hidden">
-                                    Buscar platos
-                                </label>
-                                <div class="input-group mb-3">
-                                    <input type="search"
-                                           class="form-control"
-                                           id="search-input-mobile"
-                                           placeholder="Buscar..."
-                                           aria-label="Buscar platos">
-                                    <button class="btn btn-outline-secondary"
-                                            type="button"
-                                            aria-label="Buscar">
-                                        <i class="fas fa-search" aria-hidden="true"></i>
-                                    </button>
-                                </div>
-                            </form>
-
-                            <label for="category-select-mobile" class="visually-hidden">
-                                Seleccionar categoría
-                            </label>
-                            <select class="form-select mb-3"
-                                    id="category-select-mobile"
-                                    aria-label="Filtrar por categoría">
-                                <option value="all">Todas las categorías</option>
-                            </select>
-
-                            <div class="form-check mb-3">
-                                <input class="form-check-input"
-                                       type="checkbox"
-                                       id="only-available-mobile">
-                                <label class="form-check-label" for="only-available-mobile">
-                                    Solo disponibles
-                                </label>
-                            </div>
-
-                            <label for="price-sort-mobile" class="form-label small">
-                                Ordenar por precio
-                            </label>
-                            <select class="form-select form-select-sm mb-2"
-                                    id="price-sort-mobile"
-                                    aria-label="Ordenar platos por precio">
-                                <option value="">Sin ordenar</option>
-                                <option value="asc">Menor a mayor</option>
-                                <option value="desc">Mayor a menor</option>
-                            </select>
+                        <div class="card card-body bg-dark text-light">
                         </div>
                     </div>
                 </div>
+
 
                 <h1 class="visually-hidden" id="dishes-heading">Menú de platos</h1>
 
                 <div class="row" id="dishes-container" role="region" aria-live="polite">
-                    <div class="col-12 text-center py-5" id="loading-dishes">
-                        <div class="spinner-border text-primary" role="status">
-                            <span class="visually-hidden">Cargando platos...</span>
+                    <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="card bg-secondary text-light h-100">
+                            <img src="https://img.icons8.com/?size=1200&id=0uYcfoG9OUaw&format=jpg" class="card-img-top" alt="Nombre del plato">
+                            <div class="card-body d-flex flex-column">
+                                <h5 class="card-title">Nombre del plato</h5>
+                                <p class="card-text flex-grow-1">Descripción del plato</p>
+                                <strong class="mb-2">$Precio</strong>
+                                <button class="btn btn-outline-light mt-auto">Agregar al carrito</button>
+                            </div>
                         </div>
-                        <p class="mt-2 text-muted">Cargando menú...</p>
                     </div>
                 </div>
 
-                <div class="col-12 text-center py-5 d-none"
-                     id="no-dishes"
-                     role="status"
-                     aria-live="polite">
-                    <i class="fas fa-search text-muted"
-                       style="font-size: 3rem;"
-                       aria-hidden="true"></i>
+
+                <div class="col-12 text-center py-5 d-none" id="no-dishes" role="status" aria-live="polite">
+                    <i class="fas fa-search text-muted" style="font-size: 3rem;" aria-hidden="true"></i>
                     <h2 class="h4 mt-3 text-muted">No se encontraron platos</h2>
                     <p class="text-muted">Intenta con otros filtros o términos de búsqueda</p>
                 </div>
@@ -209,63 +141,46 @@
         </div>
     </main>
 
-    <div class="modal fade"
-         id="dishModal"
-         tabindex="-1"
-         aria-labelledby="dishModalLabel"
-         aria-hidden="true"
-         role="dialog">
+    <!-- ===== Órdenes ===== -->
+    <section class="container py-4 d-none" id="orders-section">
+        <h3 class="mb-4 text-light">Órdenes registradas</h3>
+        <div id="orders-container"></div>
+    </section>
+
+    <!-- ===== Modal Detalles Plato ===== -->
+    <div class="modal fade" id="dishModal" tabindex="-1" aria-labelledby="dishModalLabel" aria-hidden="true" role="dialog">
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <h2 class="modal-title h5" id="dishModalLabel">Detalles del Plato</h2>
-                    <button type="button"
-                            class="btn-close"
-                            data-bs-dismiss="modal"
-                            aria-label="Cerrar"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                 </div>
                 <div class="modal-body" id="dish-modal-content"></div>
             </div>
         </div>
     </div>
 
-    <aside class="offcanvas offcanvas-end"
-           tabindex="-1"
-           id="cartOffcanvas"
-           aria-labelledby="cartOffcanvasLabel"
-           role="complementary">
+    <!-- ===== Carrito ===== -->
+    <aside class="offcanvas offcanvas-end" tabindex="-1" id="cartOffcanvas" aria-labelledby="cartOffcanvasLabel" role="complementary">
         <div class="offcanvas-header">
             <h2 class="offcanvas-title h5" id="cartOffcanvasLabel">Tu pedido</h2>
-            <button type="button"
-                    class="btn-close"
-                    data-bs-dismiss="offcanvas"
-                    aria-label="Cerrar carrito"></button>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Cerrar carrito"></button>
         </div>
+
         <div class="offcanvas-body">
-            <ul id="cart-items"
-                class="list-unstyled"
-                role="list"
-                aria-label="Items en el carrito"></ul>
+            <ul id="cart-items" class="list-unstyled" role="list" aria-label="Items en el carrito"></ul>
+            <p id="empty-cart" class="text-muted text-center" role="status">Carrito vacío</p>
 
-            <p id="empty-cart"
-               class="text-muted text-center"
-               role="status">
-                Carrito vacío
-            </p>
-
-            <footer class="mt-3 d-flex justify-content-between align-items-center d-none"
-                    id="cart-footer">
+            <footer class="mt-3 d-flex justify-content-between align-items-center d-none" id="cart-footer">
                 <strong>Total: $<span id="cart-total">0</span></strong>
-                <button class="btn btn-primary"
-                        id="checkout-btn"
-                        type="button">
-                    <i class="fas fa-credit-card me-2" aria-hidden="true"></i>
-                    Realizar Pedido
+                <button class="btn btn-primary" id="checkout-btn" type="button">
+                    <i class="fas fa-credit-card me-2" aria-hidden="true"></i> Realizar Pedido
                 </button>
             </footer>
         </div>
     </aside>
 
+    <!-- ===== Scripts ===== -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="./js/main.js" type="module"></script>
 </body>

@@ -15,7 +15,10 @@ services:
     api:
         build: .
         volumes:
-            - ./:/app
+            - ./MenuDigitalRestaurante:/app/MenuDigitalRestaurante
+            - ./Application:/app/Application
+            - ./Infrastructure:/app/Infrastructure
+            - ./Domain:/app/Domain
         working_dir: /app
         command: dotnet watch --project ./MenuDigitalRestaurante/MenuDigitalRestaurante.csproj run --urls http://+:80
         depends_on:

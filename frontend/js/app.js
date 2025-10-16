@@ -6,11 +6,10 @@ import { CheckoutModal } from './components/checkoutModal.js';
 import { showCheckoutModal } from './components/checkoutUI.js';
 import { appStore } from './appStore.js';
 import { updateCartUI } from './components/cartUI.js';
+import { renderMobileFilters } from './components/mobileFilters.js';
 
 async function initApp() {
     try {
-        showMessage('Cargando aplicación...', 'info');
-
         if (!document.getElementById('checkoutModal')) {
             document.body.insertAdjacentHTML('beforeend', CheckoutModal());
         }
@@ -18,8 +17,6 @@ async function initApp() {
         CartService.init();
         await CategoryService.init();
         await DishService.init();
-
-        showSuccess('¡Aplicación lista!');
     } catch (error) {
         showError(`Error al cargar la aplicación: ${error.message}`);
         throw error;
@@ -58,9 +55,6 @@ function setupFilterListeners() {
     const searchInputDesktop = document.getElementById('search-input');
     const searchInputMobile = document.getElementById('search-input-mobile');
 
-    const onlyAvailableDesktop = document.getElementById('only-available');
-    const onlyAvailableMobile = document.getElementById('only-available-mobile');
-
     const priceSortDesktop = document.getElementById('price-sort');
     const priceSortMobile = document.getElementById('price-sort-mobile');
 
@@ -81,32 +75,6 @@ function setupFilterListeners() {
             const value = e.target.value;
             if (searchInputDesktop) searchInputDesktop.value = value;
             debouncedSearch(value);
-        });
-    }
-
-    if (onlyAvailableDesktop) {
-        onlyAvailableDesktop.addEventListener('change', (e) => {
-            const checked = e.target.checked;
-            if (onlyAvailableMobile) onlyAvailableMobile.checked = checked;
-
-            const currentFilters = appStore.getState('filters');
-            appStore.setState('filters', {
-                ...currentFilters,
-                onlyAvailable: checked
-            });
-        });
-    }
-
-    if (onlyAvailableMobile) {
-        onlyAvailableMobile.addEventListener('change', (e) => {
-            const checked = e.target.checked;
-            if (onlyAvailableDesktop) onlyAvailableDesktop.checked = checked;
-
-            const currentFilters = appStore.getState('filters');
-            appStore.setState('filters', {
-                ...currentFilters,
-                onlyAvailable: checked
-            });
         });
     }
 
@@ -134,6 +102,11 @@ function setupFilterListeners() {
                 sortByPrice: value
             });
         });
+    }
+    const mobileFiltersContainer = document.querySelector('#mobile-filters .card-body');
+    if (mobileFiltersContainer && !document.getElementById('search-input-mobile')) {
+        mobileFiltersContainer.innerHTML = renderMobileFilters();
+        setupFilterListeners();
     }
 }
 

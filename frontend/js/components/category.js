@@ -12,7 +12,7 @@ export function AllDishesButton(options = {}) {
 
     return `
         <li class="mb-2">
-            <button class="btn btn-outline-primary w-100 text-start category-btn ${activeClass}" 
+            <button class="btn btn-category w-100 text-start ${activeClass}" 
                     data-category="all"
                     data-filter="category"
                     aria-label="Mostrar todas las categorías"

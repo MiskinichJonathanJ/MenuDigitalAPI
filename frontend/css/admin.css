@@ -1,0 +1,121 @@
+﻿body {
+    background-color: #121212;
+    color: #fff;
+    min-height: 100vh;
+}
+
+header {
+    background-color: #0d6efd;
+    color: #fff;
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+main {
+    padding: 2rem;
+}
+
+.order-card {
+    background-color: #1e1e1e;
+    border: 1px solid #2d2d2d;
+    border-radius: 10px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+    .order-card h5 {
+        color: #0d6efd;
+        margin-bottom: 1rem;
+    }
+
+.order-info p {
+    margin: 0.2rem 0;
+    font-size: 0.95rem;
+}
+
+.order-status {
+    margin-top: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.form-select {
+    width: auto;
+    background-color: #2b2b2b;
+    color: #fff;
+    border: 1px solid #3d3d3d;
+}
+
+.btn-primary {
+    background-color: #0d6efd;
+    border: none;
+}
+
+    .btn-primary:hover {
+        background-color: #0b5ed7;
+    }
+
+#reload-orders {
+    color: #fff;
+    border: 1px solid #fff;
+}
+
+    #reload-orders:hover {
+        background-color: #fff;
+        color: #0d6efd;
+    }
+
+.empty-msg {
+    text-align: center;
+    color: #bbb;
+    font-style: italic;
+    margin-top: 2rem;
+}
+/* Colores por estado de los platos */
+.dish-status-pending {
+    background-color: #3a3a3a; /* gris oscuro */
+}
+
+.dish-status-in-progress {
+    background-color: #0d6efd; /* azul */
+}
+
+.dish-status-ready {
+    background-color: #198754; /* verde */
+}
+
+.dish-status-delivery {
+    background-color: #ffc107; /* amarillo */
+    color: #000; /* mejor contraste */
+}
+
+.dish-status-closed {
+    background-color: #6c757d; /* gris medio */
+}
+
+/* Opcional: suavizar transición */
+.dish-item {
+    transition: background-color 0.3s ease;
+}
+#filters-container {
+    background-color: #f8f9fa;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    align-items: flex-end;
+}
+
+    #filters-container .filter-item label {
+        font-size: 0.9rem;
+    }
+
+    #filters-container .filter-item input,
+    #filters-container .filter-item select {
+        min-width: 150px;
+    }
