@@ -4,42 +4,114 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Panel de Administración | Restaurante Digital</title>
+
+    <!-- Bootstrap 5 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- CSS Unificado (NO admin.css - todo está en styles.css) -->
     <link rel="stylesheet" href="./css/styles.css">
-    <link rel="stylesheet" href="./css/admin.css">
+
+    <style>
+        /* Asegura que Bootstrap no pise nuestros estilos admin */
+        .admin-page input.form-control,
+        .admin-page select.form-select,
+        .admin-page textarea.form-control {
+            background-color: #1f1f1f !important;
+            color: #e0e0e0 !important;
+            border: 1px solid #404040 !important;
+        }
+
+            .admin-page input.form-control:focus,
+            .admin-page select.form-select:focus,
+            .admin-page textarea.form-control:focus {
+                background-color: #252525 !important;
+                border-color: #0d6efd !important;
+                color: #e0e0e0 !important;
+                box-shadow: 0 0 8px rgba(13, 110, 253, 0.2) !important;
+            }
+    </style>
 </head>
-<body>
-    <header>
-        <h1 class="h4 m-0">Panel de Administración</h1>
+
+<body class="admin-page">
+    <!-- ===== HEADER ===== -->
+    <header role="banner">
+        <h1>
+            <i class="fas fa-utensils me-2" aria-hidden="true"></i>
+            Panel de Administración
+        </h1>
     </header>
 
-    <main>
-        <h2 class="h5 mb-4">Órdenes registradas</h2>
+    <!-- ===== CONTENIDO PRINCIPAL ===== -->
+    <main class="admin-container" role="main">
+        <!-- Título de sección -->
+        <div class="mb-4">
+            <h2 style="color: #e0e0e0;" class="mb-2">Gestión de Órdenes</h2>
+            <p style="color: #999999;">Visualiza, filtra y actualiza el estado de las órdenes en tiempo real</p>
+        </div>
 
-        <div id="filters-container" class="mb-4 p-3 bg-light rounded shadow-sm d-flex flex-wrap align-items-end gap-3">
+        <!-- ===== FILTROS ===== -->
+        <div id="filters-container" role="search" aria-label="Filtros de órdenes">
             <div class="filter-item">
-                <label for="filter-from" class="form-label fw-bold">Desde</label>
-                <input type="date" id="filter-from" class="form-control" />
+                <label for="filter-from" class="form-label" style="color: #e0e0e0; font-weight: 600; margin-bottom: 0.5rem;">
+                    <i class="fas fa-calendar me-2" aria-hidden="true"></i>Desde
+                </label>
+                <input type="date"
+                       id="filter-from"
+                       class="form-control"
+                       aria-label="Fecha de inicio para filtrar órdenes" />
             </div>
+
             <div class="filter-item">
-                <label for="filter-to" class="form-label fw-bold">Hasta</label>
-                <input type="date" id="filter-to" class="form-control" />
+                <label for="filter-to" class="form-label" style="color: #e0e0e0; font-weight: 600; margin-bottom: 0.5rem;">
+                    <i class="fas fa-calendar me-2" aria-hidden="true"></i>Hasta
+                </label>
+                <input type="date"
+                       id="filter-to"
+                       class="form-control"
+                       aria-label="Fecha de fin para filtrar órdenes" />
             </div>
+
             <div class="filter-item">
-                <label for="filter-status" class="form-label fw-bold">Estado</label>
-                <select id="filter-status" class="form-select">
-                    <option value="">Todos</option>
+                <label for="filter-status" class="form-label" style="color: #e0e0e0; font-weight: 600; margin-bottom: 0.5rem;">
+                    <i class="fas fa-filter me-2" aria-hidden="true"></i>Estado
+                </label>
+                <select id="filter-status"
+                        class="form-select"
+                        aria-label="Filtrar órdenes por estado">
+                    <option value="">Todos los estados</option>
                 </select>
             </div>
-            <div class="filter-item align-self-end">
-                <button id="filter-orders-btn" class="btn btn-primary">Aplicar filtros</button>
+
+            <div class="filter-item">
+                <button id="filter-orders-btn"
+                        class="btn btn-primary"
+                        type="button"
+                        style="width: 100%;"
+                        aria-label="Aplicar filtros a las órdenes">
+                    <i class="fas fa-search me-2" aria-hidden="true"></i>
+                    Aplicar Filtros
+                </button>
             </div>
         </div>
 
-        <div id="orders-container"></div>
+        <!-- ===== CONTENEDOR DE ÓRDENES ===== -->
+        <div id="orders-container" role="region" aria-live="polite" aria-label="Lista de órdenes">
+            <!-- Las órdenes se renderizan aquí dinámicamente -->
+            <div class="text-center py-5">
+                <div class="spinner-border text-info" role="status">
+                    <span class="visually-hidden">Cargando...</span>
+                </div>
+                <p style="color: #999999; margin-top: 1rem;">Cargando órdenes...</p>
+            </div>
+        </div>
     </main>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- ===== SCRIPTS ===== -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script type="module" src="./js/mainAdmin.js"></script>
 </body>
+
 </html>
