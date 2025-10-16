@@ -74,7 +74,7 @@ const DishService = {
         return {
             name: appStore.getState('searchTerm') || '',
             category: appStore.getState('currentCategory') || 'all',
-            onlyActive: appStore.getState('filters')?.onlyAvailable || false,
+            onlyActive: true,
             sortByPrice: appStore.getState('filters')?.sortByPrice || ''
         };
     },

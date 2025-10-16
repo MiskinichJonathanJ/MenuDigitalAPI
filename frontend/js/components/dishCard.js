@@ -83,51 +83,48 @@ export function dishCardHTML(dish, options = {}) {
     const dishImage = dish.image || DEFAULT_DISH_IMAGE;
     const dishPrice = formatPrice(dish.price);
     const isActive = dish.isActive !== false;
-
     const availabilityClass = isActive ? 'dish-available' : 'dish-unavailable';
 
     return `
         <div class="${columnClass} mb-4">
-            <article class="card dish-card h-100" 
+            <article class="card bg-secondary text-light h-100 shadow-sm border-0 ${availabilityClass}"
                      data-dish-id="${dishId}"
-                     itemscope 
-                     itemtype="https://schema.org/MenuItem">
+                     itemscope itemtype="https://schema.org/MenuItem">
                 
-                <div class="position-relative">
-                    <img src="${dishImage}" 
-                         class="card-img-top dish-card-img" 
-                         alt="${dishName}"
-                         itemprop="image"
-                         loading="lazy"
-                         onerror="this.src='${DEFAULT_DISH_IMAGE}'">
-                    ${renderCategoryBadge(dish.category)}
-                </div>
-                
-                <div class="card-body dish-card-body">
-                    <h5 class="dish-card-title" itemprop="name">
+                <img src="${dishImage}"
+                     class="card-img-top rounded-top dish-card-img"
+                     alt="${dishName}"
+                     itemprop="image"
+                     loading="lazy"
+                     onerror="this.src='${DEFAULT_DISH_IMAGE}'">
+
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title fw-semibold mb-2" itemprop="name">
                         ${dishName}
                     </h5>
-                    
-                    <p class="dish-card-description" itemprop="description">
+
+                    <p class="card-text text-light flex-grow-1 small mb-3" itemprop="description">
                         ${dishDescription}
                     </p>
-                    
-                    <div class="dish-card-footer">
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <span class="dish-card-price" itemprop="offers" itemscope itemtype="https://schema.org/Offer">
-                                <meta itemprop="priceCurrency" content="ARS">
-                                <span itemprop="price">${dishPrice}</span>
-                            </span>
-                            ${renderAvailabilityBadge(isActive)}
-                        </div>
-                        
-                        ${renderActionButtons(dish)}
+
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <strong class="fs-5 dish-card-price" itemprop="offers" itemscope itemtype="https://schema.org/Offer">
+                            <meta itemprop="priceCurrency" content="ARS">
+                            <span itemprop="price">${dishPrice}</span>
+                        </strong>
+                        ${isActive
+            ? '<span class="badge bg-success">Disponible</span>'
+            : '<span class="badge bg-danger">No disponible</span>'
+        }
                     </div>
+
+                    ${renderActionButtons(dish)}
                 </div>
             </article>
         </div>
     `;
 }
+
 
 export function renderDishCards(dishes, options = {}) {
     if (!Array.isArray(dishes)) {

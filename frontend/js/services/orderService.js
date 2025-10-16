@@ -32,6 +32,11 @@ const OrderService = {
         }
     },
 
+    async getAllOrders() {
+        const url = buildApiUrl(API_CONFIG.ENDPOINTS.ORDERS);
+        return await apiRequest(url, { method: 'GET' });
+    },
+
     async getOrderById(orderId) {
         try {
             const url = buildApiUrl(`${API_CONFIG.ENDPOINTS.ORDERS}/${orderId}`);
@@ -39,6 +44,21 @@ const OrderService = {
             return response;
         } catch (error) {
             showError('Error al obtener la orden');
+            throw error;
+        }
+    },
+
+    async updateOrder(orderNumber, updateData) {
+        try {
+            const url = buildApiUrl(`${API_CONFIG.ENDPOINTS.ORDERS}/${orderNumber}`);
+            const response = await apiRequest(url, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(updateData)
+            });
+            return response;
+        } catch (error) {
+            showError('Error al actualizar la orden.');
             throw error;
         }
     },
@@ -56,6 +76,33 @@ const OrderService = {
             },
             notes: notes
         };
+    },
+
+    async getOrders(filters = {}) {
+        const queryParams = [];
+        if (filters.from) queryParams.push(`from=${encodeURIComponent(filters.from)}`);
+        if (filters.to) queryParams.push(`to=${encodeURIComponent(filters.to)}`);
+        if (filters.status) queryParams.push(`status=${encodeURIComponent(filters.status)}`);
+
+        const queryString = queryParams.length ? `?${queryParams.join('&')}` : '';
+        const url = buildApiUrl(API_CONFIG.ENDPOINTS.ORDERS, queryString);
+
+        return await apiRequest(url, { method: 'GET' });
+    },
+
+    async updateOrderItemStatus(orderNumber, itemId, newStatus) {
+        try {
+            const url = buildApiUrl(`${API_CONFIG.ENDPOINTS.ORDERS}/${orderNumber}/item/${itemId}`);
+            const response = await apiRequest(url, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ status: newStatus })
+            });
+            return response;
+        } catch (error) {
+            showError('Error al actualizar el estado del plato');
+            throw error;
+        }
     }
 };
 

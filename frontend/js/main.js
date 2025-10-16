@@ -1,5 +1,6 @@
 ﻿import { initApp, setupEventListeners, setupErrorHandling } from './app.js';
-
+import { setupBrandingNavigation } from './services/pageService.js';
+import { renderOrders } from './components/orderUI.js';
 function hideLoader() {
     const loader = document.getElementById('loader');
     if (!loader) return;
@@ -15,8 +16,15 @@ async function main() {
     try {
         setupErrorHandling();
         setupEventListeners();
+        setupBrandingNavigation();
         await initApp();
         hideLoader();
+        document.getElementById('show-orders-btn')?.addEventListener('click', () => {
+            document.getElementById('branding-screen').classList.add('d-none');
+            document.getElementById('menu-section').classList.add('d-none');
+            document.getElementById('orders-section').classList.remove('d-none');
+            renderOrders();
+        });
     } catch (error) {
         const container = document.getElementById('dishes-container');
         if (container) {

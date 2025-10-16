@@ -2,6 +2,7 @@ import { renderDishCards } from './dishCard.js';
 import { showErrorState } from './loader.js';
 import { modalDishHTML } from './modal.js';
 import { showError } from '../utils/helpers.js';
+import { initModalControls } from './modalController.js';
 
 export function updateDishesUI(dishes, hasError = false) {
     const container = document.getElementById('dishes-container');
@@ -41,6 +42,7 @@ export function updateDishesUI(dishes, hasError = false) {
 }
 
 export function showDishModal(dish, onAddToCart) {
+    initModalControls();
     const modalElement = document.getElementById('dishModal');
     const modalContent = document.getElementById('dish-modal-content');
     const modalTitle = document.getElementById('dishModalLabel');
@@ -49,7 +51,7 @@ export function showDishModal(dish, onAddToCart) {
         showError('Error al mostrar el modal');
         return;
     }
-
+    
     modalTitle.textContent = dish.name;
     modalContent.innerHTML = modalDishHTML(dish);
 

@@ -3,52 +3,6 @@ import { isValidDish } from '../utils/validation.js';
 
 const DEFAULT_DISH_IMAGE = 'https://cdni.iconscout.com/illustration/premium/thumb/no-result-found-illustration-svg-download-png-11838290.png';
 
-function renderModalImage(dish) {
-    const imageUrl = dish.image || DEFAULT_DISH_IMAGE;
-    const altText = escapeHtml(dish.name);
-
-    return `
-        <img src="${imageUrl}" 
-             class="dish-modal-img img-fluid rounded" 
-             alt="${altText}"
-             onerror="this.src='${DEFAULT_DISH_IMAGE}'">
-    `;
-}
-
-function renderModalInfo(dish) {
-    const price = formatPrice(dish.price);
-    const description = dish.description
-        ? escapeHtml(dish.description)
-        : '<em class="text-muted">Sin descripción disponible</em>';
-    const categoryName = dish.category?.name || 'Sin categoría';
-    const isActive = dish.isActive !== false;
-
-    const statusBadge = isActive
-        ? '<span class="badge bg-success">Disponible</span>'
-        : '<span class="badge bg-danger">No disponible</span>';
-
-    return `
-        <p class="dish-modal-price fs-4 fw-bold text-primary mb-3">
-            ${price}
-        </p>
-        
-        <div class="mb-3">
-            <h6 class="text-muted mb-2">Descripción</h6>
-            <p class="mb-0">${description}</p>
-        </div>
-
-        <div class="mb-2">
-            <strong>Categoría:</strong> 
-            <span class="text-muted">${escapeHtml(categoryName)}</span>
-        </div>
-        
-        <div class="mb-3">
-            <strong>Estado:</strong> 
-            ${statusBadge}
-        </div>
-    `;
-}
-
 function renderModalForm(dish) {
     const dishId = escapeHtml(String(dish.id));
 
@@ -57,14 +11,18 @@ function renderModalForm(dish) {
             <label for="dish-quantity" class="form-label fw-bold">
                 Cantidad
             </label>
-            <input id="dish-quantity" 
-                   class="form-control dish-quantity-input" 
-                   type="number" 
-                   min="1" 
-                   max="99"
-                   value="1"
-                   aria-label="Cantidad de porciones"
-                   required />
+            <div class="input-group">
+                <button type="button" class="btn btn-outline-secondary" data-action="decrease">-</button>
+                <input id="dish-quantity"
+                       class="form-control dish-quantity-input text-center" 
+                       type="number" 
+                       min="1" 
+                       max="99"
+                       value="1"
+                       aria-label="Cantidad de porciones"
+                       required />
+                <button type="button" class="btn btn-outline-secondary" data-action="increase">+</button>
+            </div>
             <div class="form-text">Mínimo: 1, Máximo: 99</div>
         </div>
 
@@ -93,6 +51,7 @@ function renderModalForm(dish) {
     `;
 }
 
+
 function renderUnavailableMessage() {
     return `
         <div class="alert alert-warning" role="alert">
@@ -109,31 +68,41 @@ function renderUnavailableMessage() {
 
 export function modalDishHTML(dish) {
     if (!isValidDish(dish)) {
-        return `
-            <div class="alert alert-danger" role="alert">
-                <i class="fas fa-exclamation-circle me-2" aria-hidden="true"></i>
-                <strong>Error</strong>
-                <p class="mb-0 mt-2">No se pudo cargar la información del plato.</p>
-            </div>
-        `;
+        return renderUnavailableMessage();
     }
 
     const isActive = dish.isActive !== false;
+    const price = formatPrice(dish.price);
+    const image = dish.image || DEFAULT_DISH_IMAGE;
+    const description = dish.description
+        ? escapeHtml(dish.description)
+        : '<em class="text-muted">Sin descripción disponible</em>';
+    const categoryName = dish.category?.name || 'Sin categoría';
 
     return `
-        <div class="row">
-            <div class="col-md-6 mb-3 mb-md-0">
-                ${renderModalImage(dish)}
+        <div class="dish-modal-content">
+            <div class="dish-modal-left">
+                <img src="${image}" 
+                     class="dish-modal-img"
+                     alt="${escapeHtml(dish.name)}"
+                     loading="lazy"
+                     onerror="this.src='${DEFAULT_DISH_IMAGE}'">
             </div>
-            
-            <div class="col-md-6">
-                ${renderModalInfo(dish)}
-                
-                ${isActive
-            ? renderModalForm(dish)
-            : renderUnavailableMessage()
-        }
+
+            <div class="dish-modal-right">
+                <h3>${escapeHtml(dish.name)}</h3>
+                <div class="category"><strong>Categoría:</strong> ${escapeHtml(categoryName)}</div>
+                <div class="price">${price}</div>
+                <div class="description">${description}</div>
+
+                ${isActive ? renderModalForm(dish) : `
+                    <div class="alert bg-dark">
+                        <i class="fas fa-ban me-2"></i>
+                        Este plato no está disponible actualmente.
+                    </div>
+                `}
             </div>
         </div>
     `;
 }
+

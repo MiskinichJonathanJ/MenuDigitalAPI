@@ -1,4 +1,4 @@
-import { formatPrice, escapeHtml } from '../utils/helpers.js';
+ï»¿import { formatPrice, escapeHtml } from '../utils/helpers.js';
 
 export function CheckoutModal() {
     return `
@@ -11,7 +11,7 @@ export function CheckoutModal() {
                     </div>
                     <div class="modal-body" id="checkout-modal-content">
                         <div class="text-center py-5">
-                            <div class="spinner-border text-primary" role="status">
+                            <div class="spinner-border text-light" role="status">
                                 <span class="visually-hidden">Cargando...</span>
                             </div>
                         </div>
@@ -21,7 +21,7 @@ export function CheckoutModal() {
         </div>
     `;
 }
-
+    
 export function renderCheckoutForm(cartData, deliveryTypes = []) {
     const itemsHTML = cartData.items.map(item => `
         <tr>
@@ -41,7 +41,7 @@ export function renderCheckoutForm(cartData, deliveryTypes = []) {
             <h6 class="mb-3">Resumen del Pedido</h6>
             
             <div class="table-responsive mb-4">
-                <table class="table table-sm">
+                <table class="table table-sm table-dark">
                     <thead>
                         <tr>
                             <th>Plato</th>
@@ -72,23 +72,21 @@ export function renderCheckoutForm(cartData, deliveryTypes = []) {
                 </div>
 
                 <div class="mb-3" id="address-container" style="display: none;">
-                    <label for="delivery-address" class="form-label">Dirección de Entrega</label>
-                    <input type="text" class="form-control" id="delivery-address" 
-                           placeholder="Ej: Calle 123, Piso 4, Depto B">
+                    <label for="delivery-address" class="form-label">DirecciÃ³n de Entrega</label>
+                    <input type="text" class="form-control" id="delivery-address" placeholder="Ej: Calle 123, Piso 4, Depto B">
                 </div>
 
                 <div class="mb-3">
                     <label for="order-notes" class="form-label">Notas adicionales (opcional)</label>
-                    <textarea class="form-control" id="order-notes" rows="3"
-                              placeholder="Ej: Sin timbre, llamar al llegar..."></textarea>
+                    <textarea class="form-control" id="order-notes" rows="3" placeholder="Ej: Sin timbre, llamar al llegar..."></textarea>
                 </div>
 
                 <div class="d-grid gap-2">
-                    <button type="submit" class="btn btn-primary btn-lg">
+                    <button type="submit" class="btn btn-lg">
                         <i class="fas fa-check me-2"></i>
                         Confirmar Pedido
                     </button>
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <button type="button" class="btn" data-bs-dismiss="modal">
                         Cancelar
                     </button>
                 </div>
@@ -101,10 +99,10 @@ export function renderCheckoutSuccess(orderNumber) {
     return `
         <div class="text-center py-5">
             <i class="fas fa-check-circle text-success mb-3" style="font-size: 4rem;"></i>
-            <h4 class="mb-3">¡Pedido realizado con éxito!</h4>
-            <p class="lead mb-4">Número de orden: <strong>#${orderNumber}</strong></p>
-            <p class="text-muted">Recibirás una confirmación pronto.</p>
-            <button class="btn btn-primary" data-bs-dismiss="modal">
+            <h4 class="mb-3">Â¡Pedido realizado con Ã©xito!</h4>
+            <p class="lead mb-4">NÃºmero de orden: <strong>#${orderNumber}</strong></p>
+            <p class="text-muted">RecibirÃ¡s una confirmaciÃ³n pronto.</p>
+            <button class="btn" data-bs-dismiss="modal">
                 Cerrar
             </button>
         </div>

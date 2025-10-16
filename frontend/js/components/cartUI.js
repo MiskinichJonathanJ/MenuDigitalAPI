@@ -15,6 +15,15 @@ export function renderCartItem(item) {
 
     return `
         <li class="cart-item mb-3 pb-3 border-bottom" data-cart-id="${item.id}">
+            <div class="d-flex align-items-start mb-2">
+                <img src="${item.dish.image || DEFAULT_DISH_IMAGE}" alt="${escapeHtml(item.dish.name)}" class="me-2 rounded">
+                <div class="flex-grow-1">
+                    <h6 class="mb-1">${escapeHtml(item.dish.name)}</h6>
+                    <small class="text-muted">${formatPrice(item.dish.price)} c/u</small>
+                    ${notesHTML}
+                </div>
+            </div>
+
             <div class="d-flex justify-content-between align-items-start mb-2">
                 <div class="flex-grow-1">
                     <h6 class="mb-1">${escapeHtml(item.dish.name)}</h6>
