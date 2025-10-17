@@ -71,7 +71,7 @@ namespace Infrastructure.Command
             if (!OrderItemStatusFlow.CanTransition((OrderItemStatusFlow.OrderItemStatus)orderItem.Status, newStatus))
                 throw new InvalidOrderStatusTransitionException();
             orderItem.Status = (int)newStatus;
-
+            await _context.SaveChangesAsync();
             await UpdateOrderOverallStatus(order);
 
             order.UpdateDate = DateTime.UtcNow;
@@ -83,6 +83,10 @@ namespace Infrastructure.Command
         public async Task<Order> UpdateOrder(ICollection<OrderItem> request, long id, decimal newPrice)
         {
             var order = await GetOrderWithItemsNotClosedAsync(id);
+
+            if ((OrderItemStatusFlow.OrderItemStatus)order.OverallStatus == OrderItemStatusFlow.OrderItemStatus.Closed)
+                throw new OrderAlreadyClosedException();
+
 
             var requestDishes = request.Select(r => r.Dish).ToList();
 

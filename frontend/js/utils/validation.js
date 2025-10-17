@@ -1,4 +1,6 @@
-﻿export function isValidId(id) {
+﻿import { MESSAGES } from '../config/constants.js';
+import { showMessage } from './helpers.js';
+export function isValidId(id) {
     return id !== null && id !== undefined && String(id).trim() !== '';
 }
 
@@ -28,12 +30,12 @@ export function isValidCartItem(item) {
 }
 export  function isValidCategory(category) {
     if (!category || typeof category !== 'object') {
-        showMessage('Categoría inválida', 'error');
+        showMessage(MESSAGES.CATEGORY_INVALID, 'error');
         return false;
     }
 
     if (!category.id || !category.name) {
-        showMessage('categoryItemHTML: categoría sin id o name', 'error');
+        showMessage(MESSAGES.CATEGORY_INVALID, 'error');
         return false;
     }
 

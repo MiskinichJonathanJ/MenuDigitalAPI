@@ -1,4 +1,4 @@
-class AppStore {
+﻿class AppStore {
     #state = {
         dishes: [],
         categories: [],
@@ -121,23 +121,3 @@ class AppStore {
 }
 
 export const appStore = new AppStore();
-
-export const appState = {
-    get dishes() { return appStore.getState('dishes'); },
-    set dishes(value) { appStore.setState('dishes', value); },
-
-    get categories() { return appStore.getState('categories'); },
-    set categories(value) { appStore.setState('categories', value); },
-
-    get cart() { return appStore.getState('cart'); },
-    set cart(value) { appStore.setState('cart', value); },
-
-    get currentCategory() { return appStore.getState('currentCategory'); },
-    set currentCategory(value) { appStore.setState('currentCategory', value); },
-
-    get searchTerm() { return appStore.getState('searchTerm'); },
-    set searchTerm(value) { appStore.setState('searchTerm', value); },
-
-    get filters() { return appStore.getState('filters'); },
-    set filters(value) { appStore.setState('filters', value); }
-};

@@ -1,7 +1,6 @@
 ﻿import { formatPrice, escapeHtml } from '../utils/helpers.js';
 import { isValidDish } from '../utils/validation.js';
-
-const DEFAULT_DISH_IMAGE = 'https://cdni.iconscout.com/illustration/premium/thumb/no-result-found-illustration-svg-download-png-11838290.png';
+import { DEFAULT_DISH_IMAGE } from "../config/constants.js";
 
 function renderModalForm(dish) {
     const dishId = escapeHtml(String(dish.id));

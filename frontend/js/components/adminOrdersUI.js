@@ -1,16 +1,17 @@
-﻿import { OrderService } from '../services/orderService.js';
+﻿import { MESSAGES, SELECTORS } from '../config/constants.js';
+import { OrderService } from '../services/orderService.js';
 import { StatusService } from '../services/statusService.js';
 import { showSuccess, showError } from '../utils/helpers.js';
 
 let statusMap = {}; 
 
-async function initAdminOrders(containerId = 'orders-container') {
+async function initAdminOrders(containerId = SELECTORS.ORDERS_CONTAINER) {
     try {
         statusMap = await StatusService.getStatusMap();
         await loadOrders(containerId);
         setupFilters(containerId);
     } catch (error) {
-        showError('Error al inicializar las órdenes');
+        showError(MESSAGES.LOAD_ORDERS_ERROR);
     }
 }
 
@@ -23,7 +24,7 @@ async function loadOrders(containerId, filters = {}) {
         renderOrders(containerId, orders);
     } catch (error) {
         console.error(error);
-        showError('Error al cargar las órdenes');
+        showError(MESSAGES.LOAD_ORDERS_ERROR);
     }
 }
 
@@ -84,17 +85,16 @@ export function renderOrders(containerId, orders) {
 
             try {
                 await OrderService.updateOrderItemStatus(orderId, itemId, newStatus);
-                showSuccess('Estado actualizado correctamente');
+                showSuccess(MESSAGES.STATE_UPDATED);
                 await loadOrders(containerId);
             } catch (error) {
                 console.error(error);
-                showError('Error al actualizar el estado del item');
+                showError(MESSAGES.UPDATE_STATE_ERROR);
             }
         });
     });
 }
 
-// Función para generar las opciones del select según el estado
 function renderStatusOptions(currentId) {
     return Object.entries(statusMap)
         .map(([id, name]) => `<option value="${id}" ${id == currentId ? 'selected' : ''}>${name}</option>`)
@@ -114,8 +114,8 @@ function setupFilters(containerId) {
     }
 
     filterBtn?.addEventListener('click', async () => {
-        const fromInput = document.getElementById('filter-from').value;
-        const toInput = document.getElementById('filter-to').value;
+        const fromInput = document.getElementById(SELECTORS.FILTER_FROM).value;
+        const toInput = document.getElementById(SELECTORS.FILTER_TO).value;
 
         const fromDate = fromInput ? new Date(fromInput) : null;
         const toDate = toInput ? new Date(toInput) : null;
@@ -123,7 +123,7 @@ function setupFilters(containerId) {
         const filters = {
             from: fromDate ? fromDate.toISOString() : undefined,
             to: toDate ? toDate.toISOString() : undefined,
-            status: document.getElementById('filter-status').value
+            status: document.getElementById(SELECTORS.FILTER_STATUS).value
         };
 
         await loadOrders(containerId, filters);

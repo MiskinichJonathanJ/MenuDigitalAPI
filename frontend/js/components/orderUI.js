@@ -2,6 +2,12 @@
 import { DishService } from '../services/dishService.js';
 import { showError, showSuccess } from '../utils/helpers.js';
 
+function isOrderClosed(orderStatus) {
+    if (!orderStatus) return false;
+    const statusName = orderStatus.name || orderStatus;
+    return statusName === 'Closed';
+}
+
 export async function renderOrders() {
     const container = document.getElementById('orders-container');
     if (!container) return;
@@ -66,6 +72,8 @@ export async function renderOrderDetails(orderNumber) {
         const activeDishes = await DishService.getAllDishes({ onlyActive: true });
         const order = await OrderService.getOrderById(orderNumber);
 
+        const orderIsClosed = isOrderClosed(order.status);
+
         container.innerHTML = `
             <button class="btn btn-outline-light mb-3" id="back-to-orders-btn">
                 <i class="fas fa-arrow-left me-2"></i> Volver a órdenes
@@ -85,87 +93,96 @@ export async function renderOrderDetails(orderNumber) {
                         <div class="d-flex align-items-center mb-2" data-item-id="${i.dish.id}">
                             <img src="${i.dish.image}" alt="${i.dish.name}" class="me-2 rounded" style="width:40px; height:40px; object-fit:cover;">
                             <span class="me-2">${i.dish.name}</span>
-                            <input type="number" min="1" value="${i.quantity}" class="form-control form-control-sm me-2" style="width:70px;" data-type="quantity">
-                            <input type="text" value="${i.notes || ''}" class="form-control form-control-sm me-2" placeholder="Notas" data-type="notes">
+                            <input type="number" min="1" value="${i.quantity}" class="form-control form-control-sm me-2" style="width:70px;" data-type="quantity" ${orderIsClosed ? 'disabled' : ''}>
+                            <input type="text" value="${i.notes || ''}" class="form-control form-control-sm me-2" placeholder="Notas" data-type="notes" ${orderIsClosed ? 'disabled' : ''}>
                         </div>
                     `).join('')}
                 </div>
                 <div id="order-items-container" class="d-flex align-items-center mb-3 mt-3"></div>
-                <button class="btn btn-success mt-3" id="save-order-btn">Guardar cambios</button>
+                ${!orderIsClosed ? `
+                    ${(() => {
+                    const availableDishes = activeDishes.filter(d =>
+                        !order.items.some(item => item.dish.id === d.id)
+                    );
+                    return `
+                            <div id="add-dish-container" class="add-dish-container d-flex flex-wrap align-items-center gap-2 mt-3">
+                                <select id="new-dish-select" class="form-select form-select-sm flex-grow-1">
+                                    <option value="">Seleccionar plato...</option>
+                                    ${availableDishes.map(d => `<option value="${d.id}">${d.name}</option>`).join('')}
+                                </select>
+                                <input type="number" min="1" value="1"
+                                       class="form-control form-control-sm qty-input"
+                                       id="new-dish-qty" placeholder="Cant.">
+                                <input type="text"
+                                       class="form-control form-control-sm notes-input"
+                                       id="new-dish-notes" placeholder="Notas (opcional)">
+                                <button class="btn btn-sm btn-secondary flex-shrink-0" id="add-dish-btn">
+                                    Agregar
+                                </button>
+                            </div>
+                        `;
+                })()}
+                    <button class="btn btn-success mt-3" id="save-order-btn">Guardar cambios</button>
+                ` : `
+                    <div class="alert alert-warning mt-3 mb-0">
+                        <i class="fas fa-lock me-2"></i>
+                        <strong>Orden Cerrada</strong> - No se puede modificar
+                    </div>
+                `}
             </div>
         `;
 
-        // Filtrar platos activos que no estén en la orden
         const availableDishes = activeDishes.filter(d =>
             !order.items.some(item => item.dish.id === d.id)
         );
 
-        const selectHTML = `
-          <div id="add-dish-container" class="add-dish-container d-flex flex-wrap align-items-center gap-2 mt-3">
-              <select id="new-dish-select" class="form-select form-select-sm flex-grow-1">
-                  <option value="">Seleccionar plato...</option>
-                  ${availableDishes.map(d => `<option value="${d.id}">${d.name}</option>`).join('')}
-              </select>
-              <input type="number" min="1" value="1"
-                     class="form-control form-control-sm qty-input"
-                     id="new-dish-qty" placeholder="Cant.">
-              <input type="text"
-                     class="form-control form-control-sm notes-input"
-                     id="new-dish-notes" placeholder="Notas (opcional)">
-              <button class="btn btn-sm btn-secondary flex-shrink-0" id="add-dish-btn">
-                  Agregar
-              </button>
-          </div>
-        `;
+        if (!orderIsClosed) {
+            document.getElementById('add-dish-btn').addEventListener('click', () => {
+                const select = document.getElementById('new-dish-select');
+                const qty = parseInt(document.getElementById('new-dish-qty').value);
+                const notes = document.getElementById('new-dish-notes').value;
 
-        document.getElementById('order-items-container').insertAdjacentHTML('beforeend', selectHTML);
+                if (!select.value) return;
 
-        // Evento para agregar plato
-        document.getElementById('add-dish-btn').addEventListener('click', () => {
-            const select = document.getElementById('new-dish-select');
-            const qty = parseInt(document.getElementById('new-dish-qty').value);
-            const notes = document.getElementById('new-dish-notes').value;
+                const dish = availableDishes.find(d => d.id === select.value);
 
-            if (!select.value) return;
+                const div = document.createElement('div');
+                div.className = 'd-flex align-items-center mb-2';
+                div.setAttribute('data-item-id', dish.id);
+                div.innerHTML = `
+                    <img src="${dish.image}" alt="${dish.name}" class="me-2 rounded" style="width:40px; height:40px; object-fit:cover;">
+                    <span class="me-2">${dish.name}</span>
+                    <input type="number" min="1" value="${qty}" class="form-control form-control-sm me-2" style="width:70px;" data-type="quantity">
+                    <input type="text" value="${notes}" class="form-control form-control-sm me-2" placeholder="Notas" data-type="notes">
+                `;
+                document.getElementById('order-items').appendChild(div);
 
-            const dish = availableDishes.find(d => d.id === select.value);
+                const newAvailable = availableDishes.filter(d => d.id !== dish.id);
+                const newOptions = newAvailable.map(d => `<option value="${d.id}">${d.name}</option>`).join('');
+                select.innerHTML = `<option value="">Seleccionar plato...</option>${newOptions}`;
+                document.getElementById('new-dish-qty').value = 1;
+                document.getElementById('new-dish-notes').value = '';
+            });
 
-            const div = document.createElement('div');
-            div.className = 'd-flex align-items-center mb-2';
-            div.setAttribute('data-item-id', dish.id);
-            div.innerHTML = `
-                <img src="${dish.image}" alt="${dish.name}" class="me-2 rounded" style="width:40px; height:40px; object-fit:cover;">
-                <span class="me-2">${dish.name}</span>
-                <input type="number" min="1" value="${qty}" class="form-control form-control-sm me-2" style="width:70px;" data-type="quantity">
-                <input type="text" value="${notes}" class="form-control form-control-sm me-2" placeholder="Notas" data-type="notes">
-            `;
-            document.getElementById('order-items').appendChild(div);
+            document.getElementById('save-order-btn').addEventListener('click', async () => {
+                const updatedItems = Array.from(container.querySelectorAll('#order-items [data-item-id]')).map(div => ({
+                    id: div.getAttribute('data-item-id'),
+                    quantity: parseInt(div.querySelector('[data-type="quantity"]').value),
+                    notes: div.querySelector('[data-type="notes"]').value
+                }));
 
-            // Actualizar select para quitar plato agregado
-            const newAvailable = availableDishes.filter(d => d.id !== dish.id);
-            const newOptions = newAvailable.map(d => `<option value="${d.id}">${d.name}</option>`).join('');
-            select.innerHTML = `<option value="">Seleccionar plato...</option>${newOptions}`;
-            document.getElementById('new-dish-qty').value = 1;
-            document.getElementById('new-dish-notes').value = '';
-        });
+                try {
+                    const updatedOrder = await OrderService.updateOrder(orderNumber, { items: updatedItems });
+                    showSuccess(`Orden #${updatedOrder.orderNumber} actualizada exitosamente!`);
+                    renderOrders();
+                } catch (err) {
+                    showError(err.message || 'Error al actualizar la orden.');
+                }
+            });
+        }
+
         document.getElementById('back-to-orders-btn').addEventListener('click', () => {
             renderOrders();
-        });
-        // Guardar cambios
-        document.getElementById('save-order-btn').addEventListener('click', async () => {
-            const updatedItems = Array.from(container.querySelectorAll('#order-items [data-item-id]')).map(div => ({
-                id: div.getAttribute('data-item-id'),
-                quantity: parseInt(div.querySelector('[data-type="quantity"]').value),
-                notes: div.querySelector('[data-type="notes"]').value
-            }));
-
-            try {
-                const updatedOrder = await OrderService.updateOrder(orderNumber, { items: updatedItems });
-                showSuccess(`Orden #${updatedOrder.orderNumber} actualizada exitosamente!`);
-                renderOrders();
-            } catch (err) {
-                showError(err.message || 'Error al actualizar la orden.');
-            }
         });
 
     } catch (err) {

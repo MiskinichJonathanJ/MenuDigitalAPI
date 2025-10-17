@@ -7,17 +7,14 @@
     <meta name="theme-color" content="#0d6efd">
     <title>Restaurante Digital | Menú</title>
 
-    <!-- Librerías externas -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <!-- Estilos locales -->
     <link rel="stylesheet" href="./css/styles.css">
 
 </head>
 
 <body>
-    <!-- ===== Header ===== -->
     <header class="navbar navbar-expand-lg navbar-light bg-white shadow-sm" role="banner">
         <div class="container-fluid">
             <a class="navbar-brand d-flex align-items-center" href="/" aria-label="Inicio">
@@ -39,7 +36,6 @@
         </div>
     </header>
 
-    <!-- ===== Branding Screen ===== -->
     <section id="branding-screen" role="region" aria-label="Pantalla principal">
         <h1>No es solo comida</h1>
         <p>Es una experiencia gastronómica digital</p>
@@ -49,13 +45,10 @@
         </div>
     </section>
 
-    <!-- ===== Menú Principal ===== -->
     <main id="menu-section" class="container-fluid d-none" role="main" aria-label="Menú del restaurante">
         <div class="row">
-            <!-- ===== Sidebar de Categorías y Filtros ===== -->
             <aside class="col-lg-3 col-md-4 d-md-block bg-dark text-light p-3" role="complementary" aria-label="Filtros y categorías">
                 <div class="sticky-top">
-                    <!-- Búsqueda -->
                     <form role="search" class="mb-4" onsubmit="return false;">
                         <label for="search-input" class="visually-hidden">Buscar platos</label>
                         <div class="input-group">
@@ -66,7 +59,6 @@
                         </div>
                     </form>
 
-                    <!-- Categorías -->
                     <h2 class="h5 mb-3 text-light">Categorías</h2>
                     <nav aria-label="Categorías de platos">
                         <ul class="list-unstyled" id="categories-list" role="list">
@@ -78,7 +70,6 @@
                         </ul>
                     </nav>
 
-                    <!-- Filtros adicionales -->
                     <section class="mt-4" aria-labelledby="filters-heading">
 
                         <div class="mb-3">
@@ -94,7 +85,6 @@
             </aside>
 
 
-            <!-- ===== Contenido principal de platos ===== -->
             <section class="col-lg-6 col-md-8 col-12 p-3" aria-labelledby="dishes-heading">
                 <nav aria-label="Navegación de ruta">
                     <ol class="breadcrumb">
@@ -102,7 +92,6 @@
                     </ol>
                 </nav>
 
-                <!-- Filtros móviles -->
                 <div class="d-md-none mb-3">
                     <button class="btn btn-outline-light w-100 mb-2" type="button" data-bs-toggle="collapse" data-bs-target="#mobile-filters" aria-expanded="false" aria-controls="mobile-filters">
                         <i class="fas fa-filter me-2"></i> Filtros
@@ -141,13 +130,11 @@
         </div>
     </main>
 
-    <!-- ===== Órdenes ===== -->
     <section class="container py-4 d-none" id="orders-section">
         <h3 class="mb-4 text-light">Órdenes registradas</h3>
         <div id="orders-container"></div>
     </section>
 
-    <!-- ===== Modal Detalles Plato ===== -->
     <div class="modal fade" id="dishModal" tabindex="-1" aria-labelledby="dishModalLabel" aria-hidden="true" role="dialog">
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
@@ -160,7 +147,6 @@
         </div>
     </div>
 
-    <!-- ===== Carrito ===== -->
     <aside class="offcanvas offcanvas-end" tabindex="-1" id="cartOffcanvas" aria-labelledby="cartOffcanvasLabel" role="complementary">
         <div class="offcanvas-header">
             <h2 class="offcanvas-title h5" id="cartOffcanvasLabel">Tu pedido</h2>
@@ -180,7 +166,6 @@
         </div>
     </aside>
 
-    <!-- ===== Scripts ===== -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="./js/main.js" type="module"></script>
 </body>

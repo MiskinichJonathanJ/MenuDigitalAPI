@@ -2,6 +2,7 @@
 import { isValidQuantity } from '../utils/validation.js';
 import { appStore } from '../appStore.js';
 import { updateCartUI } from '../components/cartUI.js';
+import { MESSAGES } from '../config/constants.js';
 
 let cartMemoryStorage = [];
 
@@ -49,12 +50,12 @@ const CartService = {
                 notes: String(payload.notes || '').trim()
             };
         } else {
-            showError('Datos inválidos para agregar al carrito');
+            showError(MESSAGES.INVALID_DATA);
             return false;
         }
 
         if (!isValidQuantity(normalized.quantity)) {
-            showError('La cantidad debe ser un número entero mayor a 0');
+            showError(MESSAGES.INVALID_QUANTITY);
             return false;
         }
 
@@ -62,12 +63,12 @@ const CartService = {
         const dish = dishes.find(d => String(d.id) === normalized.dishId);
 
         if (!dish) {
-            showError('Plato no encontrado');
+            showError(MESSAGES.DISH_NOT_FOUND);
             return false;
         }
 
         if (!dish.isActive) {
-            showError('Este plato no está disponible en este momento');
+            showError(MESSAGES.DISH_UNAVAILABLE);
             return false;
         }
 
@@ -93,7 +94,7 @@ const CartService = {
         }
 
         appStore.setState('cart', cart);
-        showSuccess(`${dish.name} agregado al carrito`);
+        showSuccess(MESSAGES.ADD_CART_SUCCESS(dish.name));
         return true;
     },
 
@@ -107,7 +108,7 @@ const CartService = {
         const index = this.findIndexByCartId(cartItemId);
 
         if (index < 0) {
-            showError('Item no encontrado en el carrito');
+            showError(MESSAGES.REMOVE_CART_SUCCESS(itemName));
             return false;
         }
 
@@ -121,7 +122,7 @@ const CartService = {
         const index = this.findIndexByCartId(cartItemId);
 
         if (index < 0) {
-            showError('Item no encontrado en el carrito');
+            showError(MESSAGES.CART_ITEM_NOT_FOUND);
             return false;
         }
 
@@ -135,7 +136,7 @@ const CartService = {
         const index = this.findIndexByCartId(cartItemId);
 
         if (index < 0) {
-            showError('Item no encontrado en el carrito');
+            showError(MESSAGES.CART_ITEM_NOT_FOUND);
             return false;
         }
 
@@ -143,13 +144,13 @@ const CartService = {
         cart.splice(index, 1);
 
         appStore.setState('cart', cart);
-        showSuccess(`${itemName} eliminado del carrito`);
+        showSuccess(MESSAGES.REMOVE_CART_SUCCESS(itemName));
         return true;
     },
 
     clearCart() {
         appStore.setState('cart', []);
-        showSuccess('Carrito vaciado');
+        showSuccess(MESSAGES.CART_CLEARED);
     },
 
     getTotal() {
