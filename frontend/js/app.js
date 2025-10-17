@@ -1,4 +1,4 @@
-﻿import { showError, showSuccess, showMessage, debounce } from './utils/helpers.js';
+﻿import { showError, debounce } from './utils/helpers.js';
 import { CategoryService } from './services/categoryService.js';
 import { DishService } from './services/dishService.js';
 import { CartService } from './services/cartService.js';
@@ -7,6 +7,7 @@ import { showCheckoutModal } from './components/checkoutUI.js';
 import { appStore } from './appStore.js';
 import { updateCartUI } from './components/cartUI.js';
 import { renderMobileFilters } from './components/mobileFilters.js';
+import { MESSAGES } from './config/constants.js';
 
 async function initApp() {
     try {
@@ -112,11 +113,11 @@ function setupFilterListeners() {
 
 function setupErrorHandling() {
     window.addEventListener('error', (event) => {
-        showError('Ocurrió un error inesperado');
+        showError(MESSAGES.UNEXPECTED_ERROR);
     });
 
     window.addEventListener('unhandledrejection', (event) => {
-        showError('Error en operación asíncrona');
+        showError(MESSAGES.UNEXPECTED_ERROR);
     });
 }
 

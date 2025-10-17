@@ -1,9 +1,10 @@
+﻿import { SELECTORS } from '../config/constants.js';
 export function setupBrandingNavigation() {
-    const showMenuBtn = document.getElementById('show-menu-btn');
-    const showOrdersBtn = document.getElementById('show-orders-btn');
-    const branding = document.getElementById('branding-screen');
-    const menu = document.getElementById('menu-section');
-    const orders = document.getElementById('orders-section');
+    const showMenuBtn = document.getElementById(SELECTORS.SHOW_MENU_BTN);
+    const showOrdersBtn = document.getElementById(SELECTORS.SHOW_ORDERS_BTN);
+    const branding = document.getElementById(SELECTORS.BRANDING_SCREEN);
+    const menu = document.getElementById(SELECTORS.MENU_SECTION);
+    const orders = document.getElementById(SELECTORS.ORDERS_SECTION);
 
     if (showMenuBtn) {
         showMenuBtn.addEventListener('click', () => {

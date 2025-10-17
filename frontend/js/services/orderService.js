@@ -1,4 +1,5 @@
 ﻿import { buildApiUrl, apiRequest, API_CONFIG } from '../config/api.js';
+import { MESSAGES } from '../config/constants.js';
 import { showSuccess, showError } from '../utils/helpers.js';
 
 const OrderService = {
@@ -8,7 +9,7 @@ const OrderService = {
             const response = await apiRequest(url, { method: 'GET' });
             return response;
         } catch (error) {
-            showError('Error al cargar tipos de entrega');
+            showError(MESSAGES.DELIVERY_TYPES_ERROR);
             throw error;
         }
     },
@@ -24,10 +25,10 @@ const OrderService = {
                 body: JSON.stringify(orderData)
             });
 
-            showSuccess(`Orden #${response.orderNumber} creada exitosamente!`);
+            showSuccess(MESSAGES.ORDER_CREATED(response.orderNumber));
             return response;
         } catch (error) {
-            showError('Error al crear la orden. Intente nuevamente.');
+            showError(MESSAGES.CREATE_ORDER_ERROR);
             throw error;
         }
     },
@@ -43,7 +44,7 @@ const OrderService = {
             const response = await apiRequest(url, { method: 'GET' });
             return response;
         } catch (error) {
-            showError('Error al obtener la orden');
+            showError(MESSAGES.CREATE_ORDER_ERROR);
             throw error;
         }
     },
@@ -58,7 +59,7 @@ const OrderService = {
             });
             return response;
         } catch (error) {
-            showError('Error al actualizar la orden.');
+            showError(MESSAGES.UPDATE_ORDER_ERROR);
             throw error;
         }
     },
@@ -100,7 +101,7 @@ const OrderService = {
             });
             return response;
         } catch (error) {
-            showError('Error al actualizar el estado del plato');
+            showError(MESSAGES.UPDATE_STATE_ERROR);
             throw error;
         }
     }

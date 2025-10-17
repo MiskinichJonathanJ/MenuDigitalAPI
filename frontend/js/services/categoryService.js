@@ -2,6 +2,7 @@
 import { showError } from '../utils/helpers.js';
 import { buildApiUrl, apiRequest, API_CONFIG } from '../config/api.js';
 import { updateCategoryUI, syncCategoryUI } from '../components/categoryUI.js';
+import { MESSAGES } from '../config/constants.js'; 
 
 const CategoryService = {
     async getAllCategories() {
@@ -10,12 +11,12 @@ const CategoryService = {
             const categories = await apiRequest(url);
 
             if (!Array.isArray(categories)) {
-                throw new Error('Respuesta inválida del servidor');
+                throw new Error(MESSAGES.UNEXPECTED_ERROR);
             }
 
             return categories;
         } catch (error) {
-            throw new Error(`Error al cargar categorías: ${error.message}`);
+            throw new Error(MESSAGES.LOAD_CATEGORIES_ERROR);
         }
     },
 
@@ -62,7 +63,7 @@ const CategoryService = {
 
             return categories;
         } catch (error) {
-            showError('Error al cargar categorías. Verifique la conexión.');
+            showError(MESSAGES.LOAD_CATEGORIES_ERROR);
             updateCategoryUI([], 'all');
             this.setupEventListeners();
             throw error;

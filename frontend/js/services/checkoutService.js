@@ -1,6 +1,7 @@
-import { buildApiUrl, apiRequest, API_CONFIG } from '../config/api.js';
+﻿import { buildApiUrl, apiRequest, API_CONFIG } from '../config/api.js';
 import { showSuccess, showError } from '../utils/helpers.js';
 import { appStore } from '../appStore.js';
+import { MESSAGES } from '../config/constants.js';
 
 const CheckoutService = {
     async getDeliveryTypes() {
@@ -8,7 +9,7 @@ const CheckoutService = {
             const url = buildApiUrl(API_CONFIG.ENDPOINTS.DELIVERY_TYPES);
             return await apiRequest(url);
         } catch (error) {
-            showError('Error al cargar tipos de entrega');
+            showError(MESSAGES.DELIVERY_TYPES_ERROR);
             throw error;
         }
     },
@@ -21,10 +22,10 @@ const CheckoutService = {
                 body: JSON.stringify(orderData)
             });
 
-            showSuccess(`Orden #${response.orderNumber} creada exitosamente!`);
+            showSuccess(MESSAGES.ORDER_CREATED(response.orderNumber));
             return response;
         } catch (error) {
-            showError('Error al crear la orden. Intente nuevamente.');
+            showError(MESSAGES.CREATE_ORDER_ERROR);
             throw error;
         }
     },

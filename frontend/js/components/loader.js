@@ -1,30 +1,4 @@
-﻿const LOADER_CONFIG = {
-    default: {
-        icon: 'spinner-border',
-        title: 'Cargando...',
-        message: 'Por favor espere',
-        variant: 'primary'
-    },
-    dishes: {
-        icon: 'spinner-border',
-        title: 'Cargando platos...',
-        message: 'Obteniendo el menú',
-        variant: 'primary'
-    },
-    categories: {
-        icon: 'spinner-border',
-        title: 'Cargando categorías...',
-        message: 'Obteniendo categorías',
-        variant: 'primary'
-    },
-    api: {
-        icon: 'spinner-border',
-        title: 'Conectando con el servidor...',
-        message: 'Estableciendo conexión',
-        variant: 'primary'
-    }
-};   
-export function showErrorState(container, { title, message, retryAction = null }) {
+﻿export function showErrorState(container, { title, message, retryAction = null }) {
     if (!container) return;
 
     const retryButton = retryAction

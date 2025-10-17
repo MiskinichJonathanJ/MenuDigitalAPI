@@ -14,25 +14,7 @@ const AVAILABILITY_CONFIG = {
     }
 };
 
-const DEFAULT_DISH_IMAGE = 'https://cdni.iconscout.com/illustration/premium/thumb/no-result-found-illustration-svg-download-png-11838290.png';
-
-function renderCategoryBadge(category) {
-    const categoryName = category?.name || 'Sin categoría';
-    return `<span class="category-badge">${escapeHtml(categoryName)}</span>`;
-}
-
-function renderAvailabilityBadge(isActive) {
-    const config = isActive
-        ? AVAILABILITY_CONFIG.available
-        : AVAILABILITY_CONFIG.unavailable;
-
-    return `
-        <span class="dish-availability ${config.class}">
-            ${config.text}
-        </span>
-    `;
-}
-
+import { DEFAULT_DISH_IMAGE } from "../config/constants.js";
 export function renderActionButtons(dish) {
     const viewButton = `
         <button class="btn btn-sm btn-outline-primary flex-fill view-dish-btn" 

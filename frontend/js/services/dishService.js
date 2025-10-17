@@ -3,6 +3,7 @@ import { showError } from '../utils/helpers.js';
 import { appStore } from '../appStore.js';
 import { updateDishesUI, showDishModal } from '../components/dishUI.js';
 import { CartService } from './cartService.js';
+import { MESSAGES } from '../config/constants.js';
 
 const DishService = {
     async getAllDishes(filters = {}) {
@@ -34,12 +35,12 @@ const DishService = {
             const dishes = await apiRequest(url);
 
             if (!Array.isArray(dishes)) {
-                throw new Error('Respuesta inválida del servidor');
+                throw new Error(MESSAGES.UNEXPECTED_ERROR);
             }
 
             return dishes;
         } catch (error) {
-            throw new Error(`Error al cargar platos: ${error.message}`);
+            throw new Error(MESSAGES.LOAD_DISHES_ERROR);
         }
     },
 
@@ -49,12 +50,12 @@ const DishService = {
             const dish = await apiRequest(url);
 
             if (!dish || typeof dish !== 'object') {
-                throw new Error('Plato no encontrado');
+                throw new Error(MESSAGES.DISH_NOT_FOUND);
             }
 
             return dish;
         } catch (error) {
-            showError(`Error al cargar plato: ${error.message}`);
+            showError(MESSAGES.LOAD_DISHES_ERROR);
             throw error;
         }
     },
@@ -98,7 +99,7 @@ const DishService = {
                 CartService.addToCart(payload);
             });
         } catch (error) {
-            showError('Error al cargar detalles del plato');
+            showError(MESSAGES.LOAD_DISHES_ERROR);
         }
     },
 

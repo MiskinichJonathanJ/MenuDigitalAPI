@@ -1,5 +1,6 @@
-import { formatPrice, escapeHtml } from '../utils/helpers.js';
+﻿import { formatPrice, escapeHtml } from '../utils/helpers.js';
 import { isValidCartItem } from '../utils/validation.js';
+import { DEFAULT_DISH_IMAGE, SELECTORS } from '../config/constants.js';
 
 export function renderCartItem(item) {
     if (!isValidCartItem(item)) return '';
@@ -15,20 +16,14 @@ export function renderCartItem(item) {
 
     return `
         <li class="cart-item mb-3 pb-3 border-bottom" data-cart-id="${item.id}">
-            <div class="d-flex align-items-start mb-2">
-                <img src="${item.dish.image || DEFAULT_DISH_IMAGE}" alt="${escapeHtml(item.dish.name)}" class="me-2 rounded">
-                <div class="flex-grow-1">
-                    <h6 class="mb-1">${escapeHtml(item.dish.name)}</h6>
-                    <small class="text-muted">${formatPrice(item.dish.price)} c/u</small>
-                    ${notesHTML}
-                </div>
-            </div>
-
             <div class="d-flex justify-content-between align-items-start mb-2">
-                <div class="flex-grow-1">
-                    <h6 class="mb-1">${escapeHtml(item.dish.name)}</h6>
-                    <small class="text-muted">${formatPrice(item.dish.price)} c/u</small>
-                    ${notesHTML}
+                <div class="flex-grow-1 d-flex align-items-start">
+                    <img src="${item.dish.image || DEFAULT_DISH_IMAGE}" alt="${escapeHtml(item.dish.name)}" class="me-2 rounded" style="width: 60px; height: 60px; object-fit: cover;">
+                    <div>
+                        <h6 class="mb-1">${escapeHtml(item.dish.name)}</h6>
+                        <small class="text-muted">${formatPrice(item.dish.price)} c/u</small>
+                        ${notesHTML}
+                    </div>
                 </div>
                 <button class="btn btn-sm btn-outline-danger cart-remove-btn" 
                         data-cart-id="${item.id}"
@@ -66,10 +61,10 @@ export function renderCartItems(items) {
 export function updateCartUI(cartData) {
     const { items, total, totalItems } = cartData;
 
-    const itemsContainer = document.getElementById('cart-items');
-    const emptyMsg = document.getElementById('empty-cart');
-    const footer = document.getElementById('cart-footer');
-    const badge = document.getElementById('cart-count');
+    const itemsContainer = document.getElementById(SELECTORS.CART_FOOTER);
+    const emptyMsg = document.getElementById(SELECTORS.EMPTY_CART);
+    const footer = document.getElementById(SELECTORS.CART_FOOTER);
+    const badge = document.getElementById(SELECTORS.CART_COUNT);
 
     if (!itemsContainer) return;
 
@@ -83,7 +78,7 @@ export function updateCartUI(cartData) {
 
         itemsContainer.innerHTML = renderCartItems(items);
 
-        const totalElement = document.getElementById('cart-total');
+        const totalElement = document.getElementById(SELECTORS.CART_TOTAL);
         if (totalElement) {
             totalElement.textContent = total.toFixed(2);
         }
