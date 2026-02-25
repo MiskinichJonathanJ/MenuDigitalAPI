@@ -61,12 +61,15 @@ export function renderCartItems(items) {
 export function updateCartUI(cartData) {
     const { items, total, totalItems } = cartData;
 
-    const itemsContainer = document.getElementById(SELECTORS.CART_FOOTER);
+    const itemsContainer = document.getElementById(SELECTORS.CART_ITEMS);
     const emptyMsg = document.getElementById(SELECTORS.EMPTY_CART);
     const footer = document.getElementById(SELECTORS.CART_FOOTER);
     const badge = document.getElementById(SELECTORS.CART_COUNT);
 
-    if (!itemsContainer) return;
+    if (!itemsContainer) {
+        console.warn('Items container no encontrado');
+        return;
+    }
 
     if (items.length === 0) {
         itemsContainer.innerHTML = '';

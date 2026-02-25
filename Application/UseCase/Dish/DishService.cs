@@ -1,14 +1,10 @@
 ﻿using Application.DataTransfers.Request.Dish;
 using Application.DataTransfers.Response.Dish;
-using Application.Exceptions;
 using Application.Exceptions.DishException;
 using Application.Interfaces.IDish;
 using Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using FluentValidation;
+
 
 namespace Application.UseCase.DishUse
 {
@@ -17,9 +13,9 @@ namespace Application.UseCase.DishUse
         private readonly IDishCommand _command;
         private readonly IDishQuery _query;
         private readonly IDishMapper _mapper;
-        private readonly IDishValidator _validator;
+        private readonly IValidator<DishBaseRequest> _validator;
 
-        public DishService(IDishCommand command, IDishQuery query, IDishMapper mapper, IDishValidator validator)
+        public DishService(IDishCommand command, IDishQuery query, IDishMapper mapper, IValidator<DishBaseRequest> validator)
         {
             _command = command;
             _query = query;
@@ -29,7 +25,9 @@ namespace Application.UseCase.DishUse
 
         public async Task<DishResponse> CreateDish(DishRequest request)
         {
-            await _validator.ValidateCreate(request);
+            var validationResult = await _validator.ValidateAsync(request);
+            if (!validationResult.IsValid)
+                throw new ValidationException(validationResult.Errors);
 
             var dish = _mapper.ToEntity(request);
 
@@ -63,7 +61,9 @@ namespace Application.UseCase.DishUse
 
         public async Task<DishResponse> UpdateDish(Guid id, DishUpdateRequest request)
         {
-            await _validator.ValidateUpdate(id, request);
+            var validationResult = await _validator.ValidateAsync(request);
+            if (!validationResult.IsValid)
+                throw new ValidationException(validationResult.Errors);
 
             var dish = await _command.UpdateDish(id, request);
             

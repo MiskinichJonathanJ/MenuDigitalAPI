@@ -1,72 +1,123 @@
-# Menu Digital Restaurante
+﻿# Menu Digital Restaurante
 
-Este proyecto es parte de la práctica de la materia Proyecto de Software, cuyo objetivo es desarrollar un sistema de menú digital para un restaurante.
-El sistema reemplaza la carta física tradicional y permite gestionar de forma digital tanto los platos del menú como las órdenes de los clientes.
+Sistema para gestión de menú digital en restaurante. Consta de API backend, frontend estático y base de datos PostgreSQL orquestadas con Docker Compose.
 
-## Tecnologías utilizadas
+---
 
-- Lenguaje: C# (.NET 8)
-- Framework: ASP.NET Core Web API
-- ORM: Entity Framework Core (Code-First)
-- Base de Datos: PostgreSQL
-- Arquitectura: Hexagonal (Domain-Centric)
-- Capas: Domain, Application, Infrastructure, API
-- Patrón CQRS aplicado
-- Inyección de dependencias en toda la aplicación
+## 🧩 Tecnologías usadas
 
-## Funcionalidades (Parte 1 completada)
+- C# / .NET  
+- ASP.NET Core Web API  
+- Entity Framework Core (Code‑First)  
+- PostgreSQL  
+- Docker + Docker Compose  
+- Frontend estático servido por Nginx  
 
-- ✔️ Crear platos (endpoint POST /api/v1/dish)
-- ✔️ Listar platos (con filtros por nombre, categoría y orden por precio ASC/DESC)
-- ✔️ Actualizar información de un plato (PUT /api/v1/dish/{id})
+---
 
-## Modelo de datos
+## 📁 Estructura
 
-### El sistema se basa en el siguiente modelo:
-
-- Category: Agrupa platos del menú (Ej: Pastas, Pizzas, Bebidas, etc.)
-- Dish: Representa cada plato con su nombre, descripción, precio, imagen y disponibilidad
-- DeliveryType: Define si la orden es Delivery, Take Away o Dine In
-- Order & OrderItem: Manejo de comandas con relación a platos, notas y cantidades
-- Status: Estados de órdenes e ítems (Pending, In Progress, Ready, Delivered, Closed)
-
-## Instalación y ejecución
-
-1. Clonar el repositorio
-```bash
-git clone https://github.com/tuusuario/MenuDigitalRestaurante.git
-cd MenuDigitalRestaurante
 ```
-2. Configurar la cadena de conexión en appsettings.json
-```bash
-"ConnectionStrings": {
-  "DefaultConnection": "Host=localhost;Database=menu_db;Username=postgres;Password=tu_password"
-}
+.
+├── Application/
+├── Domain/
+├── Infrastructure/
+├── MenuDigitalRestaurante/      ← proyecto API
+├── frontend/                     ← archivos estáticos del front
+├── Dockerfile                    ← para la API
+├── docker-compose.yml
+└── README.md
 ```
-3. Aplicar migraciones y crear la base de datos:
-```bash
-dotnet ef migrations add [NombreMigracion]   
-dotnet ef database update
+
+---
+
+## 🚀 Cómo levantar el sistema
+
+1. Clonar el repositorio  
+   ```bash
+   git clone https://github.com/MiskinichJonathanJ/MenuDigitalAPI.git
+   cd MenuDigitalAPI
+   ```
+
+2. Levantar con Docker Compose  
+   ```bash
+   docker-compose up --build
+   ```
+
+   Esto crea tres servicios:
+   - **db**: PostgreSQL  
+   - **api**: backend .NET  
+   - **frontend**: cliente estático servido por Nginx  
+
+---
+
+## 🌐 URLs de acceso
+
+| Componente | URL local                      |
+|------------|--------------------------------|
+| API        | http://localhost:5000          |
+| Frontend   | http://localhost:3000          |
+| Base datos (externa) | localhost:5434            |
+
+---
+
+## 🔌 Conexiones de base de datos
+
+### En el contenedor de la API (interno Docker)
+```text
+Host = db  
+Port = 5432  
+Database = testDb  
+Username = postgres  
+Password = Admin#1234
 ```
-4. Ejecutar el proyecto:
-```bash
-dotnet run
+
+### Desde tu máquina local (para herramientas como DBeaver, psql, etc.)
+```text
+Host = localhost  
+Port = 5434  
+Database = testDb  
+Username = postgres  
+Password = Admin#1234
 ```
-5. Acceder a la documentación de la API con Swagger:
-```bash
-http://localhost:5000/swagger
-``` 
 
-## Endpoints principales (Parte 1)
+---
 
-- GET /api/v1/dishes → Lista todos los platos (con filtros opcionales y ordenamiento).
-- POST /api/v1/dishes → Crea un nuevo plato.
-- PUT /api/v1/dishes/{id} → Actualiza la información de un plato.
+## ⚙ Variables de entorno para la API
 
-## ✅ Buenas prácticas aplicadas
+```text
+ConnectionStrings__MenuDigitalConnection = "Host=db;Port=5432;Database=testDb;Username=postgres;Password=Admin#1234"
+ASPNETCORE_ENVIRONMENT = Development
+ASPNETCORE_URLS = http://+:80
+```
 
-- Clean Code & Clean Architecture: separación clara de responsabilidades.
-- Principios SOLID: servicios desacoplados y fácilmente testeables.
-- CQRS: separación de queries (lectura) y commands (escritura).
-- Migrations con EF Core para mantener la base versionada.
-  
+---
+
+## 🛑 Detener el sistema
+
+- Para detener contenedores sin borrar datos:
+  ```bash
+  docker-compose down
+  ```
+- Para detener y borrar volúmenes (incluye borrar datos de DB):
+  ```bash
+  docker-compose down -v
+  ```
+
+---
+
+## 🔍 Endpoints disponibles (ejemplos)
+
+- `GET /api/v1/dishes` — listar platos (con filtros y orden)  
+- `POST /api/v1/dishes` — crear nuevo plato  
+- `PUT /api/v1/dishes/{id}` — actualizar plato  
+
+---
+
+## 🧠 Consejos y notas
+
+- Frontend estático es servido por Nginx dentro del contenedor `frontend`.  
+- API usa `dotnet watch` para recargar automáticamente en desarrollo.  
+- Datos de la base de datos se persisten en el volumen `db_data`.  
+- Si cambias modelos, asegurate de generar migraciones con EF Core y aplicarlas.  
+- Si algo falla, correr `docker ps` para revisar qué contenedor no arrancó.  
