@@ -11,7 +11,8 @@ namespace Infrastructure.Persistence
         public DbSet<Order> Order { get; set; }
         public DbSet<OrderItem> OrderItem { get; set; }
         public DbSet<Status> Status  { get; set; }
-        
+        public DbSet<User> Users { get; set; }
+
         public AppDbContext(DbContextOptions<AppDbContext> options)
         : base(options) 
         {
@@ -102,6 +103,15 @@ namespace Infrastructure.Persistence
                 entity.HasKey(s => s.Id);
                 entity.Property(s => s.Id).ValueGeneratedOnAdd();
                 entity.Property(s => s.Name).HasColumnType("varchar(25)");
+            });
+
+            modelBuilder.Entity<User>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.HasIndex(e => e.Email).IsUnique();
+                entity.Property(e => e.Email).HasMaxLength(150).IsRequired();
+                entity.Property(e => e.PasswordHash).IsRequired();
+                entity.Property(e => e.Role).HasMaxLength(20).IsRequired();
             });
         }
     }

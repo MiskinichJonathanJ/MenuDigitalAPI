@@ -1,59 +1,34 @@
-﻿using Application.DataTransfers.Request.Dish;
-using Application.Exceptions;
-using Application.Exceptions.CategoryException;
-using Application.Exceptions.DishException;
+﻿using FluentValidation;
+using Application.DataTransfers.Request.Dish;
 using Application.Interfaces.IDish;
 
 namespace Application.Validations
 {
-    public class DishValidator : IDishValidator
+    public class DishValidator : AbstractValidator<DishBaseRequest>
     {
         private readonly IDishQuery _query;
 
         public DishValidator(IDishQuery query)
         {
             _query = query;
+
+            RuleFor(x => x.Name)
+                .NotEmpty().WithMessage("El nombre no puede estar vacío.")
+                .MaximumLength(255).WithMessage("El nombre excede los 255 caracteres.");
+
+            RuleFor(x => x.Price)
+                .GreaterThan(0).WithMessage("El precio debe ser mayor a 0.");
+
+            RuleFor(x => x.Category)
+                .MustAsync(CategoryExists).WithMessage("La categoría no existe.");
+
+            // Nota: La validación de unicidad de nombre requiere el ID, es mejor manejarla
+            // en un validador específico para Update/Create heredando de este o en la lógica de negocio.
         }
 
-        public async Task ValidateCreate(DishBaseRequest request)
+        private async Task<bool> CategoryExists(int categoryId, CancellationToken cancellationToken)
         {
-            ValidateCommon(request);
-            await ValidateCategoryExists(request.Category);
-            await ValidateDishNameUnique(request.Name);
-        }
-
-        public async Task ValidateUpdate(Guid idDish, DishUpdateRequest request)
-        {
-            ValidateCommon(request);
-            await ValidateCategoryExists(request.Category);
-            await ValidateDishNameUnique(request.Name, idDish);
-        }
-
-        public void ValidateCommon(DishBaseRequest request)
-        {
-            if (request == null)
-                throw new RequestNullException();
-            if (string.IsNullOrWhiteSpace(request.Name))
-                throw new DishNameIsNullException();
-
-            if (request.Name.Length > 255)
-                throw new DishNameTooLongException();
-
-            if (request.Price <= 0)
-                throw new InvalidDishPriceException();
-        }
-
-        public async Task ValidateCategoryExists(int categoryId)
-        {
-           if (await _query.GetCategoryById(categoryId) == null)
-            throw new CategoryNotFoundException();
-        }
-
-        public async Task ValidateDishNameUnique(string name, Guid? id = null)
-        {
-            var dishes = await _query.GetAllDish(name: name);
-            if (dishes.Any(d => id == null  || d.DishId != id))
-                throw new DishNameAlreadyExistsException();
+            return await _query.GetCategoryById(categoryId) != null;
         }
     }
 }

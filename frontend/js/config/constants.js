@@ -1,39 +1,39 @@
 ﻿export const DEFAULT_DISH_IMAGE = 'https://cdni.iconscout.com/illustration/premium/thumb/no-result-found-illustration-svg-download-png-11838290.png';
 
 export const SELECTORS = {
-    BRANDING_SCREEN: '#branding-screen',
-    MENU_SECTION: '#menu-section',
-    ORDERS_SECTION: '#orders-section',
-    SHOW_MENU_BTN: '#show-menu-btn',
-    SHOW_ORDERS_BTN: '#show-orders-btn',
+    BRANDING_SCREEN: 'branding-screen',
+    MENU_SECTION: 'menu-section',
+    ORDERS_SECTION: 'orders-section',
+    SHOW_MENU_BTN: 'show-menu-btn',
+    SHOW_ORDERS_BTN: 'show-orders-btn',
     
-    SEARCH_INPUT: '#search-input',
-    SEARCH_INPUT_MOBILE: '#search-input-mobile',
+    SEARCH_INPUT: 'search-input',
+    SEARCH_INPUT_MOBILE: 'search-input-mobile',
     CATEGORY_BUTTONS: '.category-btn',
-    CATEGORY_SELECT_MOBILE: '#category-select-mobile',
-    PRICE_SORT: '#price-sort',
-    PRICE_SORT_MOBILE: '#price-sort-mobile',
+    CATEGORY_SELECT_MOBILE: 'category-select-mobile',
+    PRICE_SORT: 'price-sort',
+    PRICE_SORT_MOBILE: 'price-sort-mobile',
     
-    DISHES_CONTAINER: '#dishes-container',
-    NO_DISHES_MSG: '#no-dishes',
-    DISH_MODAL: '#dishModal',
-    DISH_MODAL_CONTENT: '#dish-modal-content',
-    CATEGORIES_LIST: '#categories-list',
-    CURRENT_CATEGORY: '#current-category',
+    DISHES_CONTAINER: 'dishes-container',
+    NO_DISHES_MSG: 'no-dishes',
+    DISH_MODAL: 'dishModal',
+    DISH_MODAL_CONTENT: 'dish-modal-content',
+    CATEGORIES_LIST: 'categories-list',
+    CURRENT_CATEGORY: 'current-category',
     
-    CART_OFFCANVAS: '#cartOffcanvas',
-    CART_ITEMS: '#cart-items',
-    CART_TOTAL: '#cart-total',
-    CART_COUNT: '#cart-count',
-    CART_FOOTER: '#cart-footer',
-    CHECKOUT_BTN: '#checkout-btn',
-    EMPTY_CART: '#empty-cart',
+    CART_OFFCANVAS: 'cartOffcanvas',
+    CART_ITEMS: 'cart-items',
+    CART_TOTAL: 'cart-total',
+    CART_COUNT: 'cart-count',
+    CART_FOOTER: 'cart-footer',
+    CHECKOUT_BTN: 'checkout-btn',
+    EMPTY_CART: 'empty-cart',
     
     ORDERS_CONTAINER: '#orders-container',
     
-    FILTER_FROM: '#filter-from',
-    FILTER_TO: '#filter-to',
-    FILTER_STATUS: '#filter-status'
+    FILTER_FROM: 'filter-from',
+    FILTER_TO: 'filter-to',
+    FILTER_STATUS: 'filter-status'
 };
 
 export const MESSAGES = {

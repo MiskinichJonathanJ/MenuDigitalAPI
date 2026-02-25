@@ -219,7 +219,7 @@ namespace UnitTest.Unit.UseCase.OrderTest
                 .Returns((Order o) => new OrderUpdateResponse
                 {
                     OrderNumber = orderId,
-                    UpdatedAt = DateTime.Now
+                    UpdateAt = DateTime.Now
                 });
 
             // ACT
