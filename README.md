@@ -59,7 +59,10 @@ git clone [https://github.com/tu-usuario/MenuDigitalAPI.git](https://github.com/
 ```
 
 # Levantar los servicios
+
+```bash
 docker-compose up --build
+```
 
 ## 🧪 Pruebas Unitarias
 La calidad del software es una prioridad. Se han implementado pruebas para cubrir los flujos críticos de la aplicación:
