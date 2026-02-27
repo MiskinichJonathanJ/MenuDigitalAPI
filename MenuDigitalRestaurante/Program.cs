@@ -21,137 +21,198 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using System.Threading.RateLimiting;
 using FluentValidation;
-using FluentValidation.AspNetCore;
+using Serilog;
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Trace;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using System.Text.Json;
 
-var builder = WebApplication.CreateBuilder(args);
-
-var jwtSettings = builder.Configuration.GetSection("Jwt");
-var key = Encoding.ASCII.GetBytes(jwtSettings["Key"] ?? throw new InvalidOperationException("JWT Key missing"));
-
-builder.Services.AddAuthentication(options =>
+try
 {
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-})
-.AddJwtBearer(options =>
-{
-    options.RequireHttpsMetadata = false;
-    options.SaveToken = true;
-    options.TokenValidationParameters = new TokenValidationParameters
+    Log.Information("Iniciando MenuDigital API...");
+    var builder = WebApplication.CreateBuilder(args);
+
+    builder.Host.UseSerilog((context, services, configuration) => configuration
+        .ReadFrom.Configuration(context.Configuration)
+        .ReadFrom.Services(services)
+        .Enrich.FromLogContext());
+
+    var jwtSettings = builder.Configuration.GetSection("Jwt");
+    var key = Encoding.ASCII.GetBytes(jwtSettings["Key"] ?? throw new InvalidOperationException("JWT Key missing"));
+
+    builder.Services.AddAuthentication(options =>
     {
-        ValidateIssuerSigningKey = true,
-        IssuerSigningKey = new SymmetricSecurityKey(key),
-        ValidateIssuer = true,
-        ValidIssuer = jwtSettings["Issuer"],
-        ValidateAudience = true,
-        ValidAudience = jwtSettings["Audience"],
-        ValidateLifetime = true,
-        ClockSkew = TimeSpan.Zero
-    };
-});
+        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    })
+    .AddJwtBearer(options =>
+    {
+        options.RequireHttpsMetadata = false;
+        options.SaveToken = true;
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(key),
+            ValidateIssuer = true,
+            ValidIssuer = jwtSettings["Issuer"],
+            ValidateAudience = true,
+            ValidAudience = jwtSettings["Audience"],
+            ValidateLifetime = true,
+            ClockSkew = TimeSpan.Zero
+        };
+    });
 
-builder.Services.AddAuthorization(options =>
-{
-    options.AddPolicy("RequireAdminRole", policy => policy.RequireRole("Admin"));
-});
+    builder.Services.AddAuthorization(options =>
+    {
+        options.AddPolicy("RequireAdminRole", policy => policy.RequireRole("Admin"));
+    });
 
 
-builder.Services.AddRateLimiter(options =>
-{
-    options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(httpContext =>
-        RateLimitPartition.GetFixedWindowLimiter(
-            partitionKey: httpContext.User.Identity?.Name ?? httpContext.Request.Headers.Host.ToString(),
-            factory: partition => new FixedWindowRateLimiterOptions
+    builder.Services.AddRateLimiter(options =>
+    {
+        options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(httpContext =>
+            RateLimitPartition.GetFixedWindowLimiter(
+                partitionKey: httpContext.User.Identity?.Name ?? httpContext.Request.Headers.Host.ToString(),
+                factory: partition => new FixedWindowRateLimiterOptions
+                {
+                    AutoReplenishment = true,
+                    PermitLimit = 100,
+                    Window = TimeSpan.FromMinutes(1)
+                }));
+        options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+    });
+
+    builder.Services.AddValidatorsFromAssemblyContaining<DishValidator>();
+    builder.Services.AddControllers();
+    builder.Services.AddEndpointsApiExplorer();
+    builder.Services.AddSwaggerGen();
+
+    builder.Services.AddDbContext<AppDbContext>(options =>
+        options.UseNpgsql(builder.Configuration.GetConnectionString("MenuDigitalConnection")));
+
+    builder.Services.AddHealthChecks()
+    .AddDbContextCheck<AppDbContext>(
+        name: "Database (EF Core)",
+        tags: new[] { "db", "ready" }
+    );
+
+    builder.Services.AddOpenTelemetry()
+        .WithMetrics(metrics =>
+        {
+            metrics.AddAspNetCoreInstrumentation(); 
+            metrics.AddRuntimeInstrumentation();
+                                                   
+        })
+        .WithTracing(tracing =>
+        {
+            tracing.AddAspNetCoreInstrumentation();
+        });
+
+    builder.Services.AddScoped<IDishServices, DishService>();
+    builder.Services.AddScoped<IDishCommand, DishCommand>();
+    builder.Services.AddScoped<IDishQuery, DishQuery>();
+    builder.Services.AddScoped<IDishMapper, DishMapper>();
+
+    builder.Services.AddScoped<ICategoryQuery, CategoryQuery>();
+    builder.Services.AddScoped<ICategoryMapper, CategoryMapper>();
+    builder.Services.AddScoped<ICategoryService, CategoryService>();
+
+    builder.Services.AddScoped<IDeliveryTypeMapper, DeliveryTypeMapper>();
+    builder.Services.AddScoped<IDeliveryTypeQuery, DeliveryTypeQuery>();
+    builder.Services.AddScoped<IDeliveryTypeService, DeliveryTypeService>();
+
+    builder.Services.AddScoped<IStatusMapper, StatusMapper>();
+    builder.Services.AddScoped<IStatusQuery, StatusQuery>();
+    builder.Services.AddScoped<IStatusService, StatusService>();
+
+    builder.Services.AddScoped<IOrderValidator, OrderValidator>();
+    builder.Services.AddScoped<IOrderCommand, OrderCommand>();
+    builder.Services.AddScoped<IOrderMapper, OrderMapper>();
+    builder.Services.AddScoped<IOrderQuery, OrderQuery>();
+    builder.Services.AddScoped<IOrderService, OrderService>();
+
+
+    builder.Services.AddSwaggerGen(options =>
+    {
+        options.SwaggerDoc("v1", new OpenApiInfo
+        {
+            Version = "v1",
+            Title = "Restaurante API",
+            Description = "API para la gestión de platos en un restaurante"
+        });
+        var xmlFile = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
+        var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+        options.IncludeXmlComments(xmlPath);
+    });
+
+    builder.Services.AddCors(options =>
+    {
+        options.AddPolicy("AllowFrontend", policy =>
+        {
+            policy.WithOrigins("http://localhost:3000")
+                .AllowAnyHeader()
+                .AllowAnyMethod();
+        });
+    });
+    var app = builder.Build();
+
+    // Configure the HTTP request pipeline.
+    if (app.Environment.IsDevelopment())
+    {
+        app.UseSwagger();
+        app.UseSwaggerUI();
+    }
+    app.UseSerilogRequestLogging(options =>
+    {
+        options.MessageTemplate = "HTTP {RequestMethod} {RequestPath} respondió {StatusCode} en {Elapsed:0.0000} ms";
+    });
+    using (var scope = app.Services.CreateScope())
+    {
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        await db.Database.MigrateAsync();
+        await AppDbContextSeed.SeedAsync(db);
+    }
+
+    app.UseCors("AllowFrontend");
+
+    app.UseHttpsRedirection();
+
+    app.UseRateLimiter();
+
+    app.UseAuthentication();
+    app.UseAuthorization();
+
+    app.UseMiddleware<Infrastructure.Middleware.ExceptionHandlingMiddleware>();
+
+    app.MapHealthChecks("/health", new HealthCheckOptions
+    {
+        ResponseWriter = async (context, report) =>
+        {
+            context.Response.ContentType = "application/json";
+            var response = new
             {
-                AutoReplenishment = true,
-                PermitLimit = 100,
-                Window = TimeSpan.FromMinutes(1)
-            }));
-    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
-});
-
-builder.Services.AddValidatorsFromAssemblyContaining<DishValidator>();
-builder.Services.AddControllers();
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("MenuDigitalConnection")));
-
-
-builder.Services.AddScoped<IDishServices, DishService>();
-builder.Services.AddScoped<IDishCommand, DishCommand>();
-builder.Services.AddScoped<IDishQuery, DishQuery>();
-builder.Services.AddScoped<IDishMapper, DishMapper>();
-
-builder.Services.AddScoped<ICategoryQuery, CategoryQuery>();
-builder.Services.AddScoped<ICategoryMapper, CategoryMapper>();
-builder.Services.AddScoped<ICategoryService, CategoryService>();
-
-builder.Services.AddScoped<IDeliveryTypeMapper, DeliveryTypeMapper>();
-builder.Services.AddScoped<IDeliveryTypeQuery, DeliveryTypeQuery>();
-builder.Services.AddScoped<IDeliveryTypeService, DeliveryTypeService>();
-
-builder.Services.AddScoped<IStatusMapper, StatusMapper>();
-builder.Services.AddScoped<IStatusQuery, StatusQuery>();
-builder.Services.AddScoped<IStatusService, StatusService>();
-
-builder.Services.AddScoped<IOrderValidator, OrderValidator>();
-builder.Services.AddScoped<IOrderCommand, OrderCommand>();
-builder.Services.AddScoped<IOrderMapper, OrderMapper>();
-builder.Services.AddScoped<IOrderQuery, OrderQuery>();
-builder.Services.AddScoped<IOrderService, OrderService>();
-
-
-builder.Services.AddSwaggerGen(options =>
-{
-    options.SwaggerDoc("v1", new OpenApiInfo
-    {
-        Version = "v1",
-        Title = "Restaurante API",
-        Description = "API para la gestión de platos en un restaurante"
+                Status = report.Status.ToString(),
+                Checks = report.Entries.Select(e => new
+                {
+                    Component = e.Key,
+                    Status = e.Value.Status.ToString(),
+                    Description = e.Value.Description,
+                    DurationMs = e.Value.Duration.TotalMilliseconds
+                }),
+                TotalDurationMs = report.TotalDuration.TotalMilliseconds
+            };
+            await context.Response.WriteAsync(JsonSerializer.Serialize(response));
+        }
     });
-    var xmlFile = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
-    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
-    options.IncludeXmlComments(xmlPath);
-});
+    app.MapControllers();
 
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowFrontend", policy =>
-    {
-        policy.WithOrigins("http://localhost:3000")
-            .AllowAnyHeader()
-            .AllowAnyMethod();
-    });
-});
-var app = builder.Build();
-
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    await app.RunAsync();
 }
-
-using (var scope = app.Services.CreateScope())
+catch (Exception ex)
 {
-    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    await db.Database.MigrateAsync();
-    await AppDbContextSeed.SeedAsync(db);
+    Log.Fatal(ex, "La aplicación falló al iniciar de manera catastrófica");
 }
-
-app.UseCors("AllowFrontend");
-
-app.UseHttpsRedirection();
-
-app.UseRateLimiter();
-
-app.UseAuthentication();
-app.UseAuthorization();
-
-app.UseMiddleware<Infrastructure.Middleware.ExceptionHandlingMiddleware>();
-
-app.MapControllers();
-
-await app.RunAsync();
+finally
+{
+    Log.CloseAndFlush();
+}
