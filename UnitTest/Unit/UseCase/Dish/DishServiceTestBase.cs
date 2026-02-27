@@ -3,6 +3,7 @@ using Application.DataTransfers.Response;
 using Application.DataTransfers.Response.Dish;
 using Application.Interfaces.IDish;
 using Application.UseCase.DishUse;
+using FluentValidation;
 using Moq;
 
 namespace UnitTest.Unit.UseCase.Dish
@@ -13,7 +14,7 @@ namespace UnitTest.Unit.UseCase.Dish
         protected Mock<IDishCommand> mockCommand = new();
         protected Mock<IDishQuery> mockQuery = new();
         protected Mock<IDishMapper> mockMapper = new();
-        protected Mock<IDishValidator> mockValidator = new();
+        protected Mock<IValidator<DishBaseRequest>> mockValidator = new();
         protected DishService service;
 
         protected DishServiceTestBase()
@@ -21,7 +22,7 @@ namespace UnitTest.Unit.UseCase.Dish
             mockCommand = new Mock<IDishCommand>(MockBehavior.Strict);
             mockQuery = new Mock<IDishQuery>(MockBehavior.Strict);
             mockMapper = new Mock<IDishMapper>(MockBehavior.Strict);
-            mockValidator = new Mock<IDishValidator>(MockBehavior.Strict);
+            mockValidator = new Mock<IValidator<DishBaseRequest>>(MockBehavior.Strict);
 
             service = new DishService(
                 mockCommand.Object,
