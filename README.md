@@ -1,123 +1,82 @@
-﻿# Menu Digital Restaurante
+# MenuDigital API - Sistema de Gestión Gastronómica
 
-Sistema para gestión de menú digital en restaurante. Consta de API backend, frontend estático y base de datos PostgreSQL orquestadas con Docker Compose.
+![.NET](https://img.shields.io/badge/.NET-8.0-512bd4)
+![EF Core](https://img.shields.io/badge/EF%20Core-Latest-blue)
+![Docker](https://img.shields.io/badge/Docker-Container-2496ed)
+![Architecture](https://img.shields.io/badge/Architecture-DDD%20/%20Clean%20Arch-green)
+![Tests](https://img.shields.io/badge/Tests-xUnit-brightgreen)
 
----
-
-## 🧩 Tecnologías usadas
-
-- C# / .NET  
-- ASP.NET Core Web API  
-- Entity Framework Core (Code‑First)  
-- PostgreSQL  
-- Docker + Docker Compose  
-- Frontend estático servido por Nginx  
+**MenuDigital API** es una solución backend robusta diseñada para la digitalización de menús y la gestión de pedidos en tiempo real para restaurantes. Este proyecto demuestra la implementación de prácticas modernas de desarrollo de software, enfocándose en la escalabilidad, el mantenimiento y la separación de responsabilidades.
 
 ---
 
-## 📁 Estructura
+## 🚀 Características Principales
 
-```
-.
-├── Application/
-├── Domain/
-├── Infrastructure/
-├── MenuDigitalRestaurante/      ← proyecto API
-├── frontend/                     ← archivos estáticos del front
-├── Dockerfile                    ← para la API
-├── docker-compose.yml
-└── README.md
-```
+- **Gestión de Menú:** CRUD completo de platos (Dishes) y categorías.
+- **Sistema de Pedidos:** Flujo completo desde la creación del pedido hasta la transición de estados (Pendiente, En Preparación, Entregado, etc.).
+- **Validaciones Avanzadas:** Lógica de negocio protegida mediante validadores específicos para pedidos y precios.
+- **Persistencia de Datos:** Uso de Entity Framework Core con migraciones automatizadas.
+- **Sembrado de Datos (Seeding):** Base de datos pre-cargada para pruebas rápidas.
+- **Frontend Incluido:** Interfaz administrativa y de cliente funcional para interactuar con la API.
 
 ---
 
-## 🚀 Cómo levantar el sistema
+## 🏗️ Arquitectura y Buenas Prácticas
 
-1. Clonar el repositorio  
-   ```bash
-   git clone https://github.com/MiskinichJonathanJ/MenuDigitalAPI.git
-   cd MenuDigitalAPI
-   ```
+El proyecto sigue los principios de **Clean Architecture** y **Domain-Driven Design (DDD)**, organizado en las siguientes capas:
 
-2. Levantar con Docker Compose  
-   ```bash
-   docker-compose up --build
-   ```
-
-   Esto crea tres servicios:
-   - **db**: PostgreSQL  
-   - **api**: backend .NET  
-   - **frontend**: cliente estático servido por Nginx  
+- **Domain:** Entidades principales y lógica central del negocio (Dish, Order, Category).
+- **Application:** Interfaces, DTOs (Data Transfer Objects), Mappers y Casos de Uso (Servicios).
+- **Infrastructure:** Implementación de persistencia (SQL Server), Contexto de BD y Migraciones.
+- **API (Web):** Controladores RESTful y configuración de middlewares para el manejo global de excepciones.
+- **UnitTests:** Suite de pruebas para asegurar la calidad del código en comandos y validaciones.
 
 ---
 
-## 🌐 URLs de acceso
+## 🛠️ Stack Tecnológico
 
-| Componente | URL local                      |
-|------------|--------------------------------|
-| API        | http://localhost:5000          |
-| Frontend   | http://localhost:3000          |
-| Base datos (externa) | localhost:5434            |
+- **Lenguaje:** C# / .NET 8
+- **Base de Datos:** SQL Server
+- **ORM:** Entity Framework Core (Code First)
+- **Contenedores:** Docker & Docker Compose
+- **Testing:** xUnit / Moq
+- **Frontend:** HTML5, CSS3, JavaScript (Vanilla)
 
 ---
 
-## 🔌 Conexiones de base de datos
+## ⚙️ Configuración y Ejecución
 
-### En el contenedor de la API (interno Docker)
-```text
-Host = db  
-Port = 5432  
-Database = testDb  
-Username = postgres  
-Password = Admin#1234
+### Requisitos Previos
+- [.NET 8 SDK](https://dotnet.microsoft.com/download)
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/)
+
+### Ejecución con Docker (Recomendado)
+El proyecto incluye un archivo `compose.yml` que levanta la API y la base de datos automáticamente:
+
+```bash
+# Clonar el repositorio
+git clone [https://github.com/tu-usuario/MenuDigitalAPI.git](https://github.com/tu-usuario/MenuDigitalAPI.git)
 ```
 
-### Desde tu máquina local (para herramientas como DBeaver, psql, etc.)
-```text
-Host = localhost  
-Port = 5434  
-Database = testDb  
-Username = postgres  
-Password = Admin#1234
+# Levantar los servicios
+docker-compose up --build
+
+## 🧪 Pruebas Unitarias
+La calidad del software es una prioridad. Se han implementado pruebas para cubrir los flujos críticos de la aplicación:
+```bash
+# Ejecutar las pruebas
+dotnet test
 ```
+Enfoque de pruebas: Validadores de pedidos, lógica de transición de estados y comandos de platos.
 
----
+## Roadmap / Próximas Mejoras
+- [ ] Implementación de Autenticación con JWT (Identity).
 
-## ⚙ Variables de entorno para la API
+- [ ] Integración de Swagger/OpenAPI mejorada para documentación de endpoints.
 
-```text
-ConnectionStrings__MenuDigitalConnection = "Host=db;Port=5432;Database=testDb;Username=postgres;Password=Admin#1234"
-ASPNETCORE_ENVIRONMENT = Development
-ASPNETCORE_URLS = http://+:80
-```
+- [ ] Implementación de Patrón Repository para mayor abstracción.
 
----
+- [ ] Notificaciones en tiempo real con SignalR.
 
-## 🛑 Detener el sistema
-
-- Para detener contenedores sin borrar datos:
-  ```bash
-  docker-compose down
-  ```
-- Para detener y borrar volúmenes (incluye borrar datos de DB):
-  ```bash
-  docker-compose down -v
-  ```
-
----
-
-## 🔍 Endpoints disponibles (ejemplos)
-
-- `GET /api/v1/dishes` — listar platos (con filtros y orden)  
-- `POST /api/v1/dishes` — crear nuevo plato  
-- `PUT /api/v1/dishes/{id}` — actualizar plato  
-
----
-
-## 🧠 Consejos y notas
-
-- Frontend estático es servido por Nginx dentro del contenedor `frontend`.  
-- API usa `dotnet watch` para recargar automáticamente en desarrollo.  
-- Datos de la base de datos se persisten en el volumen `db_data`.  
-- Si cambias modelos, asegurate de generar migraciones con EF Core y aplicarlas.  
-- Si algo falla, correr `docker ps` para revisar qué contenedor no arrancó.  
+## Contacto
+Jonathan Miskinich - [LinkedIn](www.linkedin.com/in/jonathan-miskinich-devbackend) - [Email](jonathan.miskinich.jobs@gmail.com)
